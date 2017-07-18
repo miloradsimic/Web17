@@ -9,11 +9,12 @@ function getFormData($form) {
 	return indexed_array;
 }
 
+
 function login() {
 	var $form = $("#loginform");
 	var data = getFormData($form);
 	var s = JSON.stringify(data);
-	console.log("Request object: " + s);
+	alert("Request object: " + s);
 	$.ajax({
 		url : "rest/authenticate/login",
 		type : "POST",
@@ -23,29 +24,42 @@ function login() {
 		success : function(user) {
 			
 			if(user == undefined) {
-				console.log("User doesn't exist!");
+				alert("User doesn't exist!");
 				return;
 			}
-			console.log("Response stringify: " + JSON.stringify(user));
+			alert("Response stringify: " + JSON.stringify(user));
 			
 			if (user.role.toLowerCase() === "ADMIN".toLowerCase()) {
-				console.log("role is admin");
-				window.location.href = "admin.html";
+				alert("role is admin");
+				enableUserPrivs();
+//				window.location.href = "admin.html";
 			}
 			if (user.role.toLowerCase() === "MODERATOR".toLowerCase()) {
-				console.log("role is moderator");
+				alert("role is moderator");
+				enableModeratorPrivs();
 			}
 			if (user.role.toLowerCase() === "USER".toLowerCase()) {
-				console.log("role is user");
+				alert("role is user");
+				enableAdminPrivs();
 			}
-
-			//window.location.href = "main.html";
-
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			alert("AJAX ERROR: " + errorThrown);
 		}
 	});
+}
+
+function enableUserPrivs() {
+	
+}
+
+function enableModeratorPrivs() {
+	enableUserPrivs();
+}
+
+function enableAdminPrivs() {
+	enableUserPrivs();
+	enableModeratorPrivs();
 }
 
 function signup() {
