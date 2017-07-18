@@ -4,6 +4,9 @@ import java.util.ArrayList;
 public class Subforum {
 	
 	private long subforumId;
+	/**
+	 * Unique
+	 */
 	private String name;
 	private String description;
 	private String icon;

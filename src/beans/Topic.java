@@ -11,12 +11,12 @@ import model.enums.TopicType;
 public class Topic implements Serializable{
 
 	private long topicId;
-	private TopicType type;
 	private Subforum subforum;
 	/**
 	 * Unique
 	 */
 	private String title;
+	private TopicType type;
 	private User author;
 	//napravi novi rest call za dobijanje komentara
 	private ArrayList<Comment> comments;
