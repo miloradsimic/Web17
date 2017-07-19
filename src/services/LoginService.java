@@ -140,7 +140,6 @@ public class LoginService {
 	@GET
 	@Path("/logout")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
 	public String logout(@Context HttpServletRequest request) {
 		LoginBean user = null;
 		user = (LoginBean) request.getSession().getAttribute("user");

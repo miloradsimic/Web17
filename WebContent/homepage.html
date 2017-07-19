@@ -28,15 +28,22 @@
 
 
 		<!-- Trigger the modal with a button -->
-		<span class="pull-right" id="loginLink" style="font-size:10px; margin-top:-20px;">Want to join?
-		<a role="button"
-			onclick="showLoginModal()">log in</a>
-		 or 
-		<a role="button" id="signupLink"
-			onclick="showSignupModal()">sign up</a>
-		 in seconds.</span>
-		
-			
+		<div id="loginButtons">
+			<span class="pull-right" id="loginLink"
+				style="font-size: 10px; margin-top: -20px;">Want to join? <a
+				role="button" onclick="showLoginModal()">log in</a> or <a
+				role="button" id="signupLink" onclick="showSignupModal()">sign
+					up</a> in seconds.
+			</span>
+		</div>
+		<!-- Logout -->
+		<div id="logoutButton" style="display: none;">
+			<span class="pull-right" id="welcomeUser"
+				style="font-size: 10px; margin-top: -20px;">
+				
+			</span>
+		</div>
+
 		<!-- PAGE CONTENT -->
 		<div w3-include-html="login_dialog.html"></div>
 
