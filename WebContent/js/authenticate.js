@@ -1,14 +1,29 @@
-function getFormData($form) {
-	var unindexed_array = $form.serializeArray();
-	var indexed_array = {};
 
-	$.map(unindexed_array, function(n, i) {
-		indexed_array[n['name']] = n['value'];
+var userURL = "rest/authenticate/get_logged_user";
+
+function loadLoggedUser(){
+	$.ajax({
+		type : 'GET',
+		url : userURL,
+		dataType : "json", // data type of response
+		success : function(user){
+			if (user != null) {
+				sessionStorage.setItem("user", JSON.stringify(user));
+				//		console.log("ExecuteOnLoad executed not null!" + sessionStorage.getItem('user'));
+				$(function() {
+					showLogoutButons(user.firstName);
+				});
+			} else {
+				sessionStorage.removeItem("user");
+				showLoginButons();
+				//		console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
+			}
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
 	});
-
-	return indexed_array;
 }
-
 
 function login() {
 	var $form = $("#loginform");
@@ -27,10 +42,8 @@ function login() {
 				alert("User doesn't exist!");
 				return;
 			} else {
-				$("#loginButtons").hide();
-				$("#welcomeUser").html('Welcome ' + user.firstName + '. Click here for ' + 
-						'<a id="logout" role="button" onclick="logout()">log out</a>');
-				$("#logoutButton").show();
+				sessionStorage.setItem("user", JSON.stringify(user));
+				console.log("Logged user saved in localStorage!");
 			}
 //			alert("Response stringify: " + JSON.stringify(user));
 			
@@ -50,6 +63,9 @@ function login() {
 				console.log("Successfully logged as USER with username: " + user.username);
 				enableAdminPrivs();
 			}
+			
+			location.reload();
+			
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			alert("AJAX ERROR: " + errorThrown);
@@ -69,8 +85,8 @@ function logout() {
 			$("#loginButtons").show();
 			//$("#welcomeUser").prepend('Welcome ' + user.firstName + '. Click here for ');
 			$("#logoutButton").hide();
-			
-			
+			sessionStorage.removeItem("user");
+			location.reload();
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			alert("AJAX ERROR: " + errorThrown);
@@ -111,4 +127,16 @@ function signup() {
 			alert("AJAX ERROR: " + errorThrown);
 		}
 	});
+}
+
+
+function getFormData($form) {
+	var unindexed_array = $form.serializeArray();
+	var indexed_array = {};
+
+	$.map(unindexed_array, function(n, i) {
+		indexed_array[n['name']] = n['value'];
+	});
+
+	return indexed_array;
 }

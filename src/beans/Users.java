@@ -18,6 +18,7 @@ public class Users implements Serializable{
 	private String rootPath;
 	private ArrayList<User> usersList = new ArrayList<>();
 	private HashMap<Long, User> usersMap = new HashMap<Long, User>();
+	private HashMap<String, User> usersMapByUsername = new HashMap<String, User>();
 
 
 	public ArrayList<User> getUsers() {
@@ -37,6 +38,14 @@ public class Users implements Serializable{
 	}
 
 	
+	public HashMap<String, User> getUsersMapByUsername() {
+		return usersMapByUsername;
+	}
+
+	public void setUsersMapByUsername(HashMap<String, User> usersMapByUsername) {
+		this.usersMapByUsername = usersMapByUsername;
+	}
+
 	public Users(){
 		
 	}
@@ -96,6 +105,7 @@ public class Users implements Serializable{
 				User user = new User(idNumber, Utils.stringToRole(role), username, password, firstName, lastName, telephone, avatar);
 				usersList.add(user);
 				usersMap.put(idNumber, user);
+				usersMapByUsername.put(username, user);
 				
 			}
 		} catch (Exception ex) {

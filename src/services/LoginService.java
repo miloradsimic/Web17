@@ -34,6 +34,24 @@ public class LoginService {
 	public String test() {
 		return "REST is working.";
 	}
+	
+	@GET
+	@Path("/get_logged_user")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public User login(@Context HttpServletRequest request) {
+		LoginBean sessionUser = null;
+		sessionUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (sessionUser == null) {
+			System.out.println("No previous logged users.");
+			return null;
+		} else {
+			System.out.println("User " + sessionUser.getUsername() + " is already logged!");
+		}
+		User user = getUsers().getUsersMapByUsername().get(sessionUser.getUsername());
+		
+		return user;
+	}
 
 	/**
 	 * Demonstrira injektovanje HTTP zahteva u parametre metode. Injektovani
@@ -60,16 +78,16 @@ public class LoginService {
 			System.out.println("User " + retVal.getUsername() + " is already logged!");
 		}
 		Users users = getUsers();
-		System.out.println("Users in file-------------------------");
+//		System.out.println("Users in file-------------------------");
 		for (User user2 : users.getUsers()) {
 			System.out.println(user2.toString());
 			if (user2.getUsername().equals(user.getUsername()) && user2.getPassword().equals(user.getPassword())) {
-				System.out.println("Access granted to " + user.getUsername());
+//				System.out.println("Access granted to " + user.getUsername());
 				request.getSession().setAttribute("user", user);
 				return user2;
 			}
 		}
-		System.out.println("Users in file----------------------END");
+//		System.out.println("Users in file----------------------END");
 
 		return null;
 	}
