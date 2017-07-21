@@ -1,3 +1,3 @@
-1;ADMIN;johnnydoe;doe;Johnny;Doe;06512345678;resources/lav.jpg
-2;USER;johnsmith;smith;John;Doe;06100022200;resources/lav.jpg
-3;MODERATOR;mika;mika;Mika;Mikic;0652222222;resources/slon.jpg
+1;ADMIN;johnnydoe;doe;Johnny;Doe;06512345678;johnnydoe@m.m;resources/lav.jpg
+2;USER;johnsmith;smith;John;Doe;06100022200;johnsmith@m.m;resources/lav.jpg
+3;MODERATOR;mika;mika;Mika;Mikic;0652222222;mika@m.m;resources/slon.jpg

@@ -10,10 +10,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+
 import beans.LoginBean;
 import beans.SignUpBean;
 import beans.User;
 import beans.Users;
+import controller.Utils;
 import model.enums.Role;
 
 @Path("/authenticate")
@@ -110,24 +113,25 @@ public class LoginService {
 		retVal = (LoginBean) request.getSession().getAttribute("user");
 
 		System.out.println("USER1: " +  user.toString());
-		if (retVal == null) {
-			System.out.println("No previous logged users.");
-		} else {
-			System.out.println("User " + retVal.getUsername() + " is already logged!");
-			request.getSession().invalidate();
-		}
+//		if (retVal == null) {
+//			System.out.println("No previous logged users.");
+//		} else {
+//			System.out.println("User " + retVal.getUsername() + " is already logged!");
+//			request.getSession().invalidate();
+//		}
 		Users users = getUsers();
 		System.out.println("Users in file-------------------------");
 		for (User user2 : users.getUsers()) {
 			System.out.println(user.toString());
 			if (user2.getUsername().equals(user.getUsername())) {
 				request.getSession().invalidate();
+				System.out.println("This one already exist " + user2.getUsername());
 				return null;
 			}
 		}
 		System.out.println("Users in file----------------------END");
 		//TODO: Napravi upload i za sliku usera
-		User newUser = new User(Role.USER, user.getUsername(), user.getPassword(), user.getFirstname(), user.getLastname(), user.getTelephone(), null);
+		User newUser = new User(Role.USER, user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getTelephone(), null, user.getEmail(), Utils.getCurrentDate());
 
 		System.out.println("USER2: " +  newUser.toString());
 		addUser(newUser);

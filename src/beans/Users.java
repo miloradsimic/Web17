@@ -13,13 +13,12 @@ import java.util.StringTokenizer;
 import controller.Utils;
 import model.enums.Role;
 
-public class Users implements Serializable{
+public class Users implements Serializable {
 	private static String pathToFile = "/data/users.txt";
 	private String rootPath;
 	private ArrayList<User> usersList = new ArrayList<>();
 	private HashMap<Long, User> usersMap = new HashMap<Long, User>();
 	private HashMap<String, User> usersMapByUsername = new HashMap<String, User>();
-
 
 	public ArrayList<User> getUsers() {
 		return usersList;
@@ -28,7 +27,7 @@ public class Users implements Serializable{
 	public void setUsers(ArrayList<User> users) {
 		this.usersList = users;
 	}
-	
+
 	public HashMap<Long, User> getUsersMap() {
 		return usersMap;
 	}
@@ -37,7 +36,6 @@ public class Users implements Serializable{
 		this.usersMap = usersMap;
 	}
 
-	
 	public HashMap<String, User> getUsersMapByUsername() {
 		return usersMapByUsername;
 	}
@@ -46,10 +44,10 @@ public class Users implements Serializable{
 		this.usersMapByUsername = usersMapByUsername;
 	}
 
-	public Users(){
-		
+	public Users() {
+
 	}
-	
+
 	public Users(String path) {
 		this.rootPath = path;
 		BufferedReader in = null;
@@ -59,23 +57,23 @@ public class Users implements Serializable{
 			readUsers(in);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
-			if ( in != null ) {
+		} finally {
+			if (in != null) {
 				try {
 					in.close();
+				} catch (Exception e) {
 				}
-				catch (Exception e) { }
 			}
 		}
 	}
-	
+
 	/**
 	 * Cita korisnike iz datoteke i smesta ih u asocijativnu listu korisnika.
 	 * Kljuc je username.
 	 */
 	private void readUsers(BufferedReader in) {
-		String line, id = "", role = "", username = "", password = "", firstName = "", lastName = "", telephone = "", avatar = "";
+		String line, id = "", role = "", username = "", password = "", firstName = "", lastName = "", telephone = "",
+				email = "", avatar = "";
 		StringTokenizer st;
 		try {
 			while ((line = in.readLine()) != null) {
@@ -91,55 +89,59 @@ public class Users implements Serializable{
 					firstName = st.nextToken().trim();
 					lastName = st.nextToken().trim();
 					telephone = st.nextToken().trim();
-					avatar = st.nextToken().trim();
+					email = st.nextToken().trim();
+					if (st.hasMoreTokens()) {
+						avatar = st.nextToken().trim();
+					}
 				}
 
 				long idNumber = -1;
-				
+
 				try {
 					idNumber = Long.parseLong(id);
 				} catch (NumberFormatException e) {
 					System.out.println("Can't parse comments attribute");
 					e.printStackTrace();
 				}
-				User user = new User(idNumber, Utils.stringToRole(role), username, password, firstName, lastName, telephone, avatar);
+				User user = new User(idNumber, Utils.stringToRole(role), username, password, firstName, lastName,
+						telephone, email, avatar);
 				usersList.add(user);
 				usersMap.put(idNumber, user);
 				usersMapByUsername.put(username, user);
-				
+
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public User saveUser(User user) {
 		BufferedWriter out = null;
 		try {
 			File file = new File(rootPath + pathToFile);
 			System.out.println(file.getCanonicalPath());
 			out = new BufferedWriter(new FileWriter(file, true));
-			
+
 			String data = user.toString();
-			
+
 			System.out.println(data);
-			out.write(data + "\n");
-			
+			out.write("\n" + data);
+
 			usersList.add(user);
 			usersMap.put(user.getUserId(), user);
+			usersMapByUsername.put(user.getUsername(), user);
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		finally {
-			if ( out != null ) {
+		} finally {
+			if (out != null) {
 				try {
 					out.close();
+				} catch (Exception e) {
 				}
-				catch (Exception e) { }
 			}
 		}
 		return user;
 	}
-	
+
 }

@@ -29,7 +29,7 @@
 						<label><input type="checkbox" value="" checked>Remember
 							me</label>
 					</div>
-					<button type="button" class="btn btn-success btn-block" data-dismiss="modal" onclick="login()">
+					<button type="button" id="loginSubmit" class="btn btn-success btn-block" data-dismiss="modal">
 						<span class="glyphicon glyphicon-off"></span> Login
 					</button>
 				</form>
@@ -61,42 +61,49 @@
 				</h4>
 			</div>
 			<div class="modal-body" style="padding: 40px 50px;">
-				<form role="form">
+				<form role="form" id="signupform">
 					<div class="form-group">
 						<label for="firstname"><span
 							class="glyphicon glyphicon-user"></span> First name</label> <input
-							type="text" class="form-control" 
+							type="text" class="form-control" name="firstName"
 							placeholder="Enter first name">
 					</div>
 					<div class="form-group">
 						<label for="lastname"><span
 							class="glyphicon glyphicon-user"></span> Last name</label> <input
-							type="text" class="form-control" 
+							type="text" class="form-control" name="lastName"
 							placeholder="Enter last name">
 					</div>
 					<div class="form-group">
 						<label for="username"><span
 							class="glyphicon glyphicon-user"></span> Username</label> <input
-							type="text" class="form-control" 
+							type="text" class="form-control" name="username"
 							placeholder="Enter username">
 					</div>
 					<div class="form-group">
 						<label for="password"><span
 							class="glyphicon glyphicon-eye-open"></span> Password</label> <input
-							type="password" class="form-control" 
+							type="password" class="form-control" name="password"
 							placeholder="Enter password">
+					</div>
+					<div class="form-group">
+						<label for="telephone"><span
+							class="glyphicon glyphicon-envelope"></span> Telephone</label> <input
+							type="number" class="form-control" name="telephone"
+							placeholder="Enter telephone">
 					</div>
 					<div class="form-group">
 						<label for="email"><span
 							class="glyphicon glyphicon-envelope"></span> Email</label> <input
-							type="email" class="form-control" 
+							type="email" class="form-control" name="email"
 							placeholder="Enter email">
 					</div>
 					<div class="checkbox">
 						<label><input type="checkbox" value="" checked>Remember
 							me</label>
 					</div>
-					<button type="button" class="btn btn-success btn-block">
+					<button type="button" id="signUpSubmit" class="btn btn-success btn-block"
+					data-dismiss="modal">
 						<span class="glyphicon glyphicon-off"></span> Sign up
 					</button>
 				</form>

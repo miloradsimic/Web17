@@ -9,14 +9,14 @@ function loadLoggedUser(){
 		success : function(user){
 			if (user != null) {
 				sessionStorage.setItem("user", JSON.stringify(user));
-				//		console.log("ExecuteOnLoad executed not null!" + sessionStorage.getItem('user'));
+//						console.log("ExecuteOnLoad executed not null!" + sessionStorage.getItem('user'));
 				$(function() {
 					showLogoutButons(user.firstName);
 				});
 			} else {
 				sessionStorage.removeItem("user");
 				showLoginButons();
-				//		console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
+//						console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
 			}
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
@@ -29,7 +29,8 @@ function login() {
 	var $form = $("#loginform");
 	var data = getFormData($form);
 	var s = JSON.stringify(data);
-	alert("Request object: " + s);
+//	alert("Request object: " + s);
+	console.log("Login triggered!");
 	$.ajax({
 		url : "rest/authenticate/login",
 		type : "POST",
@@ -74,6 +75,7 @@ function login() {
 }
 
 function logout() {
+	console.log("Logout triggered!");
 	$.ajax({
 		url : "rest/authenticate/logout",
 		type : "GET",
@@ -108,6 +110,7 @@ function enableAdminPrivs() {
 }
 
 function signup() {
+	console.log("Signup triggered!");
 	var $form = $("#signupform");
 	var data = getFormData($form);
 	var s = JSON.stringify(data);
@@ -118,10 +121,17 @@ function signup() {
 		data : s,
 		contentType : "application/json",
 		dataType : "json",
-		success : function(data2) {
-			console.log("Response Object: " + data2);
-			console.log("Response Text: " + data2.responseText);
-//			window.location.href = "profile.html";
+		success : function(user) {
+			
+			if(user == undefined) {
+				alert("User with that username already exist!");
+				return;
+			} else {
+				sessionStorage.setItem("user", JSON.stringify(user));
+				console.log("Logged user saved in localStorage!");
+				location.reload();
+			}
+			
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			alert("AJAX ERROR: " + errorThrown);

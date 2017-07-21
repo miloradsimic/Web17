@@ -8,6 +8,7 @@ executeOnLoad();
 
 
 function executeOnLoad() {
+	assignListeners();
 	loadLoggedUser();
 //	var user = JSON.parse(sessionStorage.getItem('user'));
 //	if (user != null) {
@@ -20,6 +21,15 @@ function executeOnLoad() {
 //		//		console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
 //	}
 //	console.log("ExecuteOnLoad executed!" + sessionStorage.getItem('user'));
+}
+
+function assignListeners() {
+	$(function() {
+		$("#loginSubmit").on( "click", login);
+		$("#signUpSubmit").on( "click", signup);
+		$("#logout").on( "click", logout);
+		
+	});
 }
 
 //Redirect functions

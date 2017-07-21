@@ -1,4 +1,4 @@
-
+var DEFAULT_IMAGE = "resources/cvet.jpg"
 
 
 function showLoginButons() {
@@ -9,20 +9,23 @@ function showLoginButons() {
 function showLogoutButons(data) {
 	$("#loginButtons").hide();
 	$("#welcomeUser").html('Welcome ' + data + '. Click here for ' +
-		'<a id="logout" role="button" onclick="logout()">log out</a>');
+		'<a id="logout" role="button" onclick=logout()>log out</a>');
 	$("#logoutButton").show();
+
 }
 
 function showLoginModal() {
 	$("#signupModal").modal("hide");
 	$("#loginModal").modal();
 	$("body").addClass("notScroll");
+	$("#loginSubmit").on( "click", login);
 }
 
 function showSignupModal() {
 	$("#loginModal").modal("hide");
 	$("#signupModal").modal();
 	$("body").addClass("notScroll");
+	$("#signUpSubmit").on( "click", signup);
 }
 
 
@@ -69,11 +72,17 @@ function renderTopicsList(data) {
 	$.each(list, function(index, topic) {
 
 		console.log("TOPIC: " + topic.title);
+		console.log("TOPIC user: " + topic.author.username);
 
 		var media = $('<div class="topic media" onclick="goToTopic(\'' + topic.topicId + '\')"></div>');
 
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
-		var mediaThumbnail = $('<img class="media-object" src="' + topic.author.avatar + '">');
+		var slika = DEFAULT_IMAGE;
+		
+		if(topic.author.avatar !== "") {
+			slika = topic.author.avatar;
+		}
+		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
 
 		mediaFirstChild.append(mediaThumbnail);
 		media.append(mediaFirstChild);

@@ -65,9 +65,11 @@ public class User implements Serializable {
 	 * @param lastName
 	 * @param telephone
 	 * @param avatar
+	 * @param email 
+	 * @param registrationDate 
 	 */
 	public User(Role role, String username, String password, String firstName, String lastName, String telephone,
-			String avatar) {
+			String avatar, String email, String registrationDate) {
 		this.userId = count.incrementAndGet();
 		this.role = role;
 		this.username = username;
@@ -75,10 +77,12 @@ public class User implements Serializable {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.telephone = telephone;
+		this.email = email;
+		this.registrationDate = registrationDate;
 		this.avatar = avatar;
 	}
 	
-	public User(long id, Role role, String username, String password, String firstName, String lastName, String telephone,
+	public User(long id, Role role, String username, String password, String firstName, String lastName, String telephone, String email, 
 			String avatar) {
 		this.userId = id;
 		this.role = role;
@@ -87,6 +91,7 @@ public class User implements Serializable {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.telephone = telephone;
+		this.email = email;
 		this.avatar = avatar;
 	}
 	
@@ -180,8 +185,8 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return Utils.roleToString(role) + ";" + username + ";" + password + ";" + firstName + ";" + lastName + ";"
-				+ telephone;
+		return userId + ";" + Utils.roleToString(role) + ";" + username + ";" + password + ";" + firstName + ";" + lastName + ";"
+				+ telephone + ";" + email +  ";" + avatar;// + avatar==null?"":avatar
 	}
 
 	public String getAvatar() {

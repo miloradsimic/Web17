@@ -49,4 +49,9 @@ public class Utils {
 		return dt.format(date);
 	}
 	
+	public static String getCurrentDate(){
+		Date date = new Date();
+		return dt.format(date);
+	}
+	
 }
