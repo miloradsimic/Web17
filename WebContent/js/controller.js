@@ -28,6 +28,7 @@ function assignListeners() {
 		$("#loginSubmit").on( "click", login);
 		$("#signUpSubmit").on( "click", signup);
 		$("#logout").on( "click", logout);
+		//$("#homeButton").on( "click", logout);
 		
 	});
 }
@@ -113,4 +114,8 @@ function getUrlParameter(sParam) {
 			return sParameterName[1] === undefined ? true : sParameterName[1];
 		}
 	}
+}
+
+function userLogged(){
+	return sessionStorage.getItem("user") != null;
 }

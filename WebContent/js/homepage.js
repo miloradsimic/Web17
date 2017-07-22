@@ -28,8 +28,6 @@ function showSignupModal() {
 	$("#signUpSubmit").on( "click", signup);
 }
 
-
-
 function renderSubforumsList(data) {
 	console.log('renderSubforumsList form file into page.');
 	console.log(data);
@@ -158,11 +156,17 @@ function printAll(comment, commentsContainer) {
 	var commentListItem = $('<li></li>');
 	var media = $('<div class="media"></div>');
 	var mediaLeft = $('<div class="media-left"></div>');
-	var mediaLike = $('<div class="glyphicon glyphicon-menu-up"></div>');
-	//var mediaRating = $('<div class="glyphicon glyphicon-menu-up"></div>');
+	var mediaLike;
+	if (userLogged()) {
+		mediaLike = $('<div class="glyphicon glyphicon-menu-up"></div>');
+	}
 	var rating = parseInt(comment.likes) - parseInt(comment.dislikes);
-	var mediaRating = $('<div>' + rating + '</div>');
-	var mediaDisike = $('<div class="glyphicon glyphicon-menu-down"></div>');
+	var commentClass = rating>=0?"likes":"dislikes";
+	var mediaRating = $('<div class="comment-' + commentClass + '">' + rating + '</div>');
+	var mediaDisike;
+	if (userLogged()) {
+		mediaDisike = $('<div class="glyphicon glyphicon-menu-down"></div>');
+	}
 	var mediaBody = $('<div class="media-body"></div>');
 
 
@@ -174,9 +178,9 @@ function printAll(comment, commentsContainer) {
 	console.log("Comment text: " + comment.text);
 	var reply;
 
-	if (sessionStorage.getItem("user") != null) {
-		reply = $('<p class="comment-replay">Reply</p>');
-		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
+	if (userLogged()) {
+		reply = $('<a role="button" class="comment-replay" onclick="buildCommentReplyBox($(this))">Reply</a>');
+//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
 	}
 
 
@@ -204,3 +208,27 @@ function printAll(comment, commentsContainer) {
 	//	well.append(commentListItem);
 	commentsContainer.append(commentListItem);
 }
+
+function buildCommentReplyBox(reply){
+	console.log("reply hide " + reply.name);
+	reply.hide();
+	
+	var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
+	var textArea = $('<textarea class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
+	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment(this)">Comment</button>');
+	container.append(textArea);
+	container.append(submitButton);
+	console.log("reply hide ");
+	reply.parent().append(container);
+	console.log("reply hide " );
+}
+
+function submitComment(button){
+	console.log("Button " + button);
+	console.log("Button parent (textarea) " + button.parent());
+	console.log("TextArea parent (media body) " + button.parent().parent().find(".comment-text").text());
+//	console.log();
+	
+}
+
+

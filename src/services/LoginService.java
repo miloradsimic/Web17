@@ -46,10 +46,10 @@ public class LoginService {
 		sessionUser = (LoginBean) request.getSession().getAttribute("user");
 
 		if (sessionUser == null) {
-			System.out.println("No previous logged users.");
+//			System.out.println("No previous logged users.");
 			return null;
-		} else {
-			System.out.println("User " + sessionUser.getUsername() + " is already logged!");
+//		} else {
+//			System.out.println("User " + sessionUser.getUsername() + " is already logged!");
 		}
 		User user = getUsers().getUsersMapByUsername().get(sessionUser.getUsername());
 		
