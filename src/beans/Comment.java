@@ -2,13 +2,17 @@ package beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonManagedReference;
 
+import controller.Utils;
+
 public class Comment implements Serializable{
 
-	private long commmentId;
+	private static final AtomicLong count = new AtomicLong(100); 
+	private long commentId;
 	private Topic topic;
 	private User author;
 	private String commentDate;
@@ -21,7 +25,7 @@ public class Comment implements Serializable{
 	
 	public Comment(long commentId, Topic topic) {
 		super();
-		this.commmentId = commentId;
+		this.commentId = commentId;
 		this.topic = topic;
 		this.author = null;
 		this.commentDate = null;
@@ -36,7 +40,22 @@ public class Comment implements Serializable{
 	public Comment(long commentId, Topic topic, User author, String commentDate, long parentCommentId, String text, int likes,
 			int dislikes, boolean edited) {
 		super();
-		this.commmentId = commentId;
+		this.commentId = commentId;
+		this.topic = topic;
+		this.author = author;
+		this.commentDate = commentDate;
+		this.parentCommentId = parentCommentId;
+		this.text = text;
+		this.likes = likes;
+		this.dislikes = dislikes;
+		this.edited = edited;
+		this.childComments = new ArrayList<>();
+	}
+	
+	public Comment(Topic topic, User author, String commentDate, long parentCommentId, String text, int likes,
+			int dislikes, boolean edited) {
+		super();
+		this.commentId = count.incrementAndGet();
 		this.topic = topic;
 		this.author = author;
 		this.commentDate = commentDate;
@@ -103,20 +122,21 @@ public class Comment implements Serializable{
 	public void setEdited(boolean edited) {
 		this.edited = edited;
 	}
-	public long getCommmentId() {
-		return commmentId;
+	public long getCommentId() {
+		return commentId;
 	}
-	public void setCommmentId(long commmentId) {
-		this.commmentId = commmentId;
+	public void setCommentId(long commentId) {
+		this.commentId = commentId;
 	}
 
 	public boolean hasParent(){
 		return parentCommentId != -1;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "Comement ID: " + commmentId + " Text: " + text;
+		return commentId + ";" + topic.getTopicId() + ";" + author.getUserId() + ";" + commentDate + ";" + parentCommentId +
+				";" + text + ";" + likes + ";" + dislikes +  ";" + edited;
 	}
 	
 }

@@ -20,6 +20,7 @@ import javax.ws.rs.core.MediaType;
 import com.sun.org.apache.xml.internal.security.keys.content.KeyValue;
 
 import beans.Comment;
+import beans.CommentSubmitBean;
 import beans.Comments;
 import beans.LoginBean;
 import beans.Subforum;
@@ -28,6 +29,7 @@ import beans.Topic;
 import beans.Topics;
 import beans.User;
 import beans.Users;
+import controller.Utils;
 
 @Path("/homepage")
 public class HomePageService {
@@ -131,14 +133,33 @@ public class HomePageService {
 		} else {
 			System.out.println("User " + retVal.getUsername() + " is already logged!");
 		}
-		/*
-		 * Users users = getUsers(); for (User user2 : users.getUsers()) { if
-		 * (user2.getUsername().equals(user.getUsername()) &&
-		 * user2.getPassword().equals(user.getPassword())) {
-		 * request.getSession().setAttribute("user", user); return user2; } }
-		 */
-
 		return null;
+	}
+	
+	@POST
+	@Path("/add_comment")
+	@Produces(MediaType.APPLICATION_JSON)
+//	@Consumes(MediaType.APPLICATION_JSON)
+	public Boolean addComment(@Context HttpServletRequest request, CommentSubmitBean comment) {
+		LoginBean retVal = null;
+		retVal = (LoginBean) request.getSession().getAttribute("user");
+
+		if (retVal == null) {
+			System.out.println("You can't comment because you're not logged.");
+			return false;
+		} else {
+//			System.out.println("User " + retVal.getUsername() + " is already logged!");
+			User author = getUsers().getUsersMapByUsername().get(comment.getAuthorUsername());
+			Topic topic = getTopics().getTopicsMap().get(comment.getTopicId());
+			String date = Utils.getCurrentDate();
+			Comment entry = new Comment(topic, author, date, comment.getParentId(), comment.getText(), 0, 0, false);
+			
+			if(getComments().save(entry)) {
+				Comments comments = new Comments(ctx.getRealPath(""));
+				ctx.setAttribute("comments", comments);
+			}
+			return true;
+		}
 	}
 
 	@GET

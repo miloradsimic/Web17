@@ -113,7 +113,7 @@ function renderTopicAndComments(data) {
 
 	console.log("TOPIC: " + data.title);
 
-	var well = $('<div class="well well-sm"></div>');
+	var well = $('<div id="' + data.topicId + '" class="topic-root well well-sm"></div>');
 	var media = $('<div class="media"></div>');
 	var heading = $('<h4 class="media-heading media-top">' + data.title + '</div>');
 
@@ -153,8 +153,10 @@ function renderTopicAndComments(data) {
 }
 
 function printAll(comment, commentsContainer) {
+
+	console.log("Comment id: " + comment.commentId);
 	var commentListItem = $('<li></li>');
-	var media = $('<div class="media"></div>');
+	var media = $('<div class="media" id="' + comment.commentId + '"></div>');
 	var mediaLeft = $('<div class="media-left"></div>');
 	var mediaLike;
 	if (userLogged()) {
@@ -214,8 +216,8 @@ function buildCommentReplyBox(reply){
 	reply.hide();
 	
 	var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
-	var textArea = $('<textarea class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
-	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment(this)">Comment</button>');
+	var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
+	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent().parent())">Comment</button>');
 	container.append(textArea);
 	container.append(submitButton);
 	console.log("reply hide ");
@@ -223,12 +225,12 @@ function buildCommentReplyBox(reply){
 	console.log("reply hide " );
 }
 
-function submitComment(button){
+/*function submitComment(button){
 	console.log("Button " + button);
 	console.log("Button parent (textarea) " + button.parent());
-	console.log("TextArea parent (media body) " + button.parent().parent().find(".comment-text").text());
+	console.log("TextArea parent (media body) " + button.parent().parent().find(".comment-author").text());
 //	console.log();
 	
-}
+}*/
 
 

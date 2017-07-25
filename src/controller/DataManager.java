@@ -17,6 +17,7 @@ public class DataManager {
 	private String stringTopics = "topics.data";
 	private String stringSubforums = "subforums.data";
 	private String stringMessages = "messages.data";
+	private String rootPath = "";
 	
 	private ArrayList<User> users;
 	private ArrayList<Comment> comments;
@@ -32,11 +33,15 @@ public class DataManager {
 	}
 	
 	private DataManager() {
-		
-	
-		
-		
 	}
+	
+	public void setUpRootPath(String path){
+		this.rootPath = path;
+	}
+	
+	
+	
+	
 
 	
 	

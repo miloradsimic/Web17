@@ -91,6 +91,50 @@ function loadTopics() {
 	});
 }
 
+function submitComment(comment) {
+	
+
+//	alert(".comment-reply-area: " + comment.find(".comment-reply-area").val() );
+	
+	var data = {
+			text : comment.find(".comment-reply-area").val(),
+			authorUsername : comment.find(".comment-author").text(),
+			parentId : comment.attr("id"),
+			topicId : $('.topic-root').attr("id")
+	};
+	
+	
+//	var $textArea = $("#");
+//	var data = getFormData($form);
+	var s = JSON.stringify(data);
+//		alert("Request object: " + s);
+	console.log("Comment submit triggered! " + s);
+	$.ajax({
+		url : "rest/homepage/add_comment",
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(flag) {
+			
+			if(flag == undefined) {
+				alert("Undefined!");
+				return;
+			}
+			if(flag == true) {
+				alert("true!");
+			}else {
+				alert("false!");
+			}
+			location.reload();
+			
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR: " + errorThrown);
+		}
+	});
+	
+}
 //Helper functions
 
 //Helper function to serialize all the form fields into a JSON string

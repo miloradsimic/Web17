@@ -1,8 +1,10 @@
 package beans;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,17 +22,18 @@ public class Comments {
 	private ArrayList<Comment> commentList;
 	private HashMap<Long, Comment> commentsMap;
 
-	private final String COMMENTS_PATH = "/data/comments.txt";
+	private static String pathToFile = "/data/comments.txt";
+	private String rootPath;
 
 	public Comments() {
 		super();
 	}
 
 	public Comments(String path) {
-
+		this.rootPath = path;
 		BufferedReader in = null;
 		try {
-			File file = new File(path + COMMENTS_PATH);
+			File file = new File(rootPath + pathToFile);
 			in = new BufferedReader(new FileReader(file));
 			Users users = new Users(path);
 			readComments(in, users);
@@ -99,7 +102,7 @@ public class Comments {
 
 				// -----------------------------------------
 
-				linkedComments.put(entry.getCommmentId(), entry);
+				linkedComments.put(entry.getCommentId(), entry);
 			}
 
 			Iterator it = linkedComments.entrySet().iterator();
@@ -108,7 +111,7 @@ public class Comments {
 				Comment entry = (Comment) pair.getValue();
 				if (entry.hasParent()) {
 					Comment parentComment = linkedComments.get(entry.getParentComment());
-					entry.setParentComment(parentComment.getCommmentId());
+					entry.setParentComment(parentComment.getCommentId());
 					parentComment.getChildComments().add(entry);
 					it.remove(); // avoids a ConcurrentModificationException
 				}
@@ -127,6 +130,32 @@ public class Comments {
 			ex.printStackTrace();
 		}
 	}
+	
+
+	public boolean save(Comment entry) {
+		BufferedWriter out = null;
+		try {
+			File file = new File(rootPath + pathToFile);
+			System.out.println(file.getCanonicalPath());
+			out = new BufferedWriter(new FileWriter(file, true));
+
+			String data = entry.toString();
+
+			System.out.println(data);
+			out.write("\n" + data);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Exception e) {
+				}
+			}
+		}
+		return true;
+	}
 
 	public ArrayList<Comment> getCommentList() {
 		return commentList;
@@ -143,5 +172,6 @@ public class Comments {
 	public void setCommentsMap(HashMap<Long, Comment> commentsMap) {
 		this.commentsMap = commentsMap;
 	}
+
 
 }
