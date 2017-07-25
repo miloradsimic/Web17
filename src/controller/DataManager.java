@@ -56,7 +56,7 @@ public class DataManager {
 			oos = new ObjectOutputStream(fout);
 			oos.writeObject(comments);
 
-			System.out.println("Done");
+			System.out.println("Write Done");
 
 		} catch (Exception ex) {
 

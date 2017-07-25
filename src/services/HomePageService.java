@@ -93,14 +93,14 @@ public class HomePageService {
 		ArrayList<Comment> allComments = getComments().getCommentList();
 		HashMap<Long, User> users = getUsers().getUsersMap();
 
-		if (topic.getComments().isEmpty()) {
-			// Find all comments of topic
-			for (Comment comment : allComments) {
-				if (topic.getTopicId() == comment.getTopicId()) {
-					topic.getComments().add(comment);
-				}
+		topic.getComments().clear();
+		// Find all comments of topic
+		for (Comment comment : allComments) {
+			if (topic.getTopicId() == comment.getTopicId()) {
+				topic.getComments().add(comment);
 			}
 		}
+		
 		return topic;
 	}
 
@@ -150,7 +150,7 @@ public class HomePageService {
 			return false;
 		} else {
 //			System.out.println("User " + retVal.getUsername() + " is already logged!");
-			User author = getUsers().getUsersMapByUsername().get(comment.getAuthorUsername());
+			User author = getUsers().getUsersMapByUsername().get(retVal.getUsername());
 			String date = Utils.getCurrentDate();
 			Comment entry = new Comment(comment.getTopicId(), author, date, comment.getParentId(), comment.getText(), 0, 0, false);
 			

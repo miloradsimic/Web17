@@ -98,12 +98,13 @@ function submitComment(comment) {
 	console.log('Submiting comment.');
 	var data = {
 			text : comment.find(".comment-reply-area").val(),
-			authorUsername : comment.find(".comment-author").text(),
 			parentId : comment.attr("id"),
 			topicId : $('.topic-root').attr("id")
 	};
+
 	
 	var s = JSON.stringify(data);
+	console.log(s);
 	$.ajax({
 		url : "rest/homepage/add_comment",
 		type : "POST",

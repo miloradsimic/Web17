@@ -66,7 +66,7 @@ public class Comments implements Serializable {
 		//Boolean retVal = false;
 		for (Comment comment : parent.getChildComments()) {
 			if(comment.getCommentId() == entry.getParentComment()) {
-				parent.getChildComments().add(entry);
+				comment.getChildComments().add(entry);
 				return true;
 			} else {
 				// TODO: Might need check if there are any children
