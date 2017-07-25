@@ -57,7 +57,7 @@ function loadTopicDetailsAndComments() {
 		dataType : "json", // data type of response
 		success : renderTopicAndComments,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown + "\nTextStatus: " + textStatus);
+			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
 		}
 	});
 }
@@ -70,7 +70,7 @@ function loadSubforums() {
 		dataType : "json", // data type of response
 		success : renderSubforumsList,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown + "\nTextStatus: " + textStatus);
+			alert("AJAX ERROR6: " + errorThrown + "\nTextStatus: " + textStatus);
 		}
 	});
 }
@@ -86,16 +86,16 @@ function loadTopics() {
 		dataType : "json", // data type of response
 		success : renderTopicsList,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown + "\nTextStatus: " + textStatus);
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig,"");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest"  + XMLHttpRequest);
 		}
 	});
 }
 
 function submitComment(comment) {
-	
-
-//	alert(".comment-reply-area: " + comment.find(".comment-reply-area").val() );
-	
+	console.log('Submiting comment.');
 	var data = {
 			text : comment.find(".comment-reply-area").val(),
 			authorUsername : comment.find(".comment-author").text(),
@@ -103,12 +103,7 @@ function submitComment(comment) {
 			topicId : $('.topic-root').attr("id")
 	};
 	
-	
-//	var $textArea = $("#");
-//	var data = getFormData($form);
 	var s = JSON.stringify(data);
-//		alert("Request object: " + s);
-	console.log("Comment submit triggered! " + s);
 	$.ajax({
 		url : "rest/homepage/add_comment",
 		type : "POST",
@@ -127,10 +122,10 @@ function submitComment(comment) {
 				alert("false!");
 			}
 			location.reload();
-			
+
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown);
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest"  + XMLHttpRequest);
 		}
 	});
 	

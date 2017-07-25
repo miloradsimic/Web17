@@ -29,6 +29,7 @@ import beans.Topic;
 import beans.Topics;
 import beans.User;
 import beans.Users;
+import controller.DataManager;
 import controller.Utils;
 
 @Path("/homepage")
@@ -95,7 +96,7 @@ public class HomePageService {
 		if (topic.getComments().isEmpty()) {
 			// Find all comments of topic
 			for (Comment comment : allComments) {
-				if (topic.getTopicId() == comment.getTopic().getTopicId()) {
+				if (topic.getTopicId() == comment.getTopicId()) {
 					topic.getComments().add(comment);
 				}
 			}
@@ -139,7 +140,7 @@ public class HomePageService {
 	@POST
 	@Path("/add_comment")
 	@Produces(MediaType.APPLICATION_JSON)
-//	@Consumes(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
 	public Boolean addComment(@Context HttpServletRequest request, CommentSubmitBean comment) {
 		LoginBean retVal = null;
 		retVal = (LoginBean) request.getSession().getAttribute("user");
@@ -150,13 +151,12 @@ public class HomePageService {
 		} else {
 //			System.out.println("User " + retVal.getUsername() + " is already logged!");
 			User author = getUsers().getUsersMapByUsername().get(comment.getAuthorUsername());
-			Topic topic = getTopics().getTopicsMap().get(comment.getTopicId());
 			String date = Utils.getCurrentDate();
-			Comment entry = new Comment(topic, author, date, comment.getParentId(), comment.getText(), 0, 0, false);
+			Comment entry = new Comment(comment.getTopicId(), author, date, comment.getParentId(), comment.getText(), 0, 0, false);
 			
-			if(getComments().save(entry)) {
-				Comments comments = new Comments(ctx.getRealPath(""));
-				ctx.setAttribute("comments", comments);
+			if(DataManager.getInstance().saveComment(entry)) {
+				//Comments comments = new Comments(ctx.getRealPath(""));
+				ctx.setAttribute("comments", DataManager.getInstance().readComments());
 			}
 			return true;
 		}
@@ -224,10 +224,28 @@ public class HomePageService {
 	private Comments getComments() {
 		Comments comments = (Comments) ctx.getAttribute("comments");
 		if (comments == null) {
-			comments = new Comments(ctx.getRealPath(""));
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			commentsData();
+			comments = DataManager.getInstance().readComments();
 			ctx.setAttribute("comments", comments);
 		}
 		return comments;
+	}
+
+
+	
+	
+	
+	private void commentsData() {
+		
+		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0, "Text komentara1", 2, 2, false);
+		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0, "Text komentara2", 3, 5, false);
+		Comment c3 = new Comment(3l, 1l, getUsers().getUsersMapByUsername().get("mika"), Utils.getCurrentDate(), 1, "Text komentara3", 2, 1, false);
+		Comment c4 = new Comment(4l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 2, "Text komentara4", 2, 2, false);
+		DataManager.getInstance().saveComment(c1);
+		DataManager.getInstance().saveComment(c2);
+		DataManager.getInstance().saveComment(c3);
+		DataManager.getInstance().saveComment(c4);
 	}
 
 }

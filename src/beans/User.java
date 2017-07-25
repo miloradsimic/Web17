@@ -11,6 +11,10 @@ import model.enums.Role;
 
 public class User implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final AtomicLong count = new AtomicLong(100); 
 	private long userId;
 	private String username;

@@ -11,9 +11,13 @@ import controller.Utils;
 
 public class Comment implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final AtomicLong count = new AtomicLong(100); 
 	private long commentId;
-	private Topic topic;
+	private long topicId;
 	private User author;
 	private String commentDate;
 	private long parentCommentId;
@@ -23,10 +27,10 @@ public class Comment implements Serializable{
 	private int dislikes;
 	private boolean edited;
 	
-	public Comment(long commentId, Topic topic) {
+	public Comment(long commentId, long topicId) {
 		super();
 		this.commentId = commentId;
-		this.topic = topic;
+		this.topicId = topicId;
 		this.author = null;
 		this.commentDate = null;
 		this.parentCommentId = -1;
@@ -37,11 +41,11 @@ public class Comment implements Serializable{
 		this.childComments = new ArrayList<>();
 	}
 	
-	public Comment(long commentId, Topic topic, User author, String commentDate, long parentCommentId, String text, int likes,
+	public Comment(long commentId, long topicId, User author, String commentDate, long parentCommentId, String text, int likes,
 			int dislikes, boolean edited) {
 		super();
 		this.commentId = commentId;
-		this.topic = topic;
+		this.topicId = topicId;
 		this.author = author;
 		this.commentDate = commentDate;
 		this.parentCommentId = parentCommentId;
@@ -52,11 +56,11 @@ public class Comment implements Serializable{
 		this.childComments = new ArrayList<>();
 	}
 	
-	public Comment(Topic topic, User author, String commentDate, long parentCommentId, String text, int likes,
+	public Comment(long topicId, User author, String commentDate, long parentCommentId, String text, int likes,
 			int dislikes, boolean edited) {
 		super();
 		this.commentId = count.incrementAndGet();
-		this.topic = topic;
+		this.topicId = topicId;
 		this.author = author;
 		this.commentDate = commentDate;
 		this.parentCommentId = parentCommentId;
@@ -68,11 +72,11 @@ public class Comment implements Serializable{
 	}
 	
 	
-	public Topic getTopic() {
-		return topic;
+	public long getTopicId() {
+		return topicId;
 	}
-	public void setTopic(Topic topic) {
-		this.topic = topic;
+	public void setTopic(long topic) {
+		this.topicId = topic;
 	}
 	public User getAuthor() {
 		return author;
@@ -135,7 +139,7 @@ public class Comment implements Serializable{
 	
 	@Override
 	public String toString() {
-		return commentId + ";" + topic.getTopicId() + ";" + author.getUserId() + ";" + commentDate + ";" + parentCommentId +
+		return commentId + ";" + topicId + ";" + author.getUserId() + ";" + commentDate + ";" + parentCommentId +
 				";" + text + ";" + likes + ";" + dislikes +  ";" + edited;
 	}
 	

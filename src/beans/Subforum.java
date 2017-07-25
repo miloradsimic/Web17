@@ -1,8 +1,13 @@
 package beans;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Subforum {
+public class Subforum implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long subforumId;
 	/**
 	 * Unique

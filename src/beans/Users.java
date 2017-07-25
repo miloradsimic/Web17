@@ -14,6 +14,10 @@ import controller.Utils;
 import model.enums.Role;
 
 public class Users implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static String pathToFile = "/data/users.txt";
 	private String rootPath;
 	private ArrayList<User> usersList = new ArrayList<>();

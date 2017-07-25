@@ -10,6 +10,10 @@ import model.enums.TopicType;
 
 public class Topic implements Serializable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private long topicId;
 	private Subforum subforum;
 	/**

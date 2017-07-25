@@ -3,6 +3,7 @@ package beans;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.time.DateTimeException;
 import java.util.ArrayList;
@@ -16,8 +17,12 @@ import controller.Utils;
 import model.enums.Role;
 import model.enums.TopicType;
 
-public class Topics {
+public class Topics implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ArrayList<Topic> topicsList = new ArrayList<>();
 	private HashMap<Long, Topic> topicsMap = new HashMap<>();
 	

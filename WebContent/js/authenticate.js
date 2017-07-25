@@ -20,7 +20,7 @@ function loadLoggedUser(){
 			}
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown + "\nTextStatus: " + textStatus);
+			alert("AJAX ERROR1: " + errorThrown + "\nTextStatus: " + textStatus);
 		}
 	});
 }
@@ -69,7 +69,7 @@ function login() {
 			
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown);
+			alert("AJAX ERROR2: " + errorThrown);
 		}
 	});
 }
@@ -91,7 +91,7 @@ function logout() {
 			location.reload();
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown);
+			alert("AJAX ERROR3: " + errorThrown);
 		}
 	});
 }
@@ -134,7 +134,7 @@ function signup() {
 			
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR: " + errorThrown);
+			alert("AJAX ERROR4: " + errorThrown);
 		}
 	});
 }

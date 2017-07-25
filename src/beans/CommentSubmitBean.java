@@ -1,7 +1,13 @@
 package beans;
 
-public class CommentSubmitBean {
+import java.io.Serializable;
+
+public class CommentSubmitBean  implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String text;
 	private String authorUsername;
 	private long parentId;
