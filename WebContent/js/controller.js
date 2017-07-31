@@ -132,13 +132,13 @@ function submitComment(comment) {
 }
 function submitLike(element, commentId){
 	console.log('Submiting Like.');
-	var rating = -1;
+	var rate = -1;
 	if(element.hasClass("comment-like")) {
-		rating = 1;
+		rate = 1;
 	}
 	var data = {
 			commentId : commentId,
-			ratingValue : rating
+			ratingValue : rate
 	};
 	
 	var s = JSON.stringify(data);
@@ -151,36 +151,38 @@ function submitLike(element, commentId){
 		dataType : "json",
 		success : function(rating) {
 
-			console.log("Successful rating: " + rating);
-			console.log("'#c' + commentId: " + '#c' + commentId);
-			console.log("'#c' + commentId obj: " + $('#c' + commentId).html());
-			console.log("$('#c' + commentId).find('.comment-rating')" + $('#c' + commentId).find(".comment-rating").html());
+			console.log("Successful rating: " + rating.total);
+			// Icon color
+			if(rate == 1) {
+				if(rating.rated == 1) {
+					$('#c' + commentId).find(".comment-like-unused").removeClass("comment-like-unused").addClass("comment-like-used");
+				} else {
+					$('#c' + commentId).find(".comment-like-used").removeClass("comment-like-used").addClass("comment-like-unused");
+				}
+				$('#c' + commentId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
+				
+			} else if(rate == -1) {
+				if(rating.rated == -1) {
+					$('#c' + commentId).find(".comment-dislike-unused").removeClass("comment-dislike-unused").addClass("comment-dislike-used");
+				} else {
+					$('#c' + commentId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
+				}
+				$('#c' + commentId).find(".comment-like-used").removeClass("comment-like-used").addClass("comment-like-unused");
+			}
+			// Rating text color
+			$('#c' + commentId).find(".comment-rating").removeClass("comment-likes").removeClass("comment-dislikes").removeClass("comment-neutral");
+			if(rating.total > 0) {
+				$('#c' + commentId).find(".comment-rating").addClass("comment-likes");
+			}
+			if(rating.total < 0) {
+				$('#c' + commentId).find(".comment-rating").addClass("comment-dislikes");
+			}
+			if(rating.total == 0) {
+				$('#c' + commentId).find(".comment-rating").addClass("comment-neutral");
+			}
 			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			// Hmmm... Treba obojiti drugom bojom ako se promeni predznak ratinka
-			// Treba promeniti ikonicu ako se komentar lajkuje i obrnuto
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			$('#c' + commentId).find(".comment-rating").text(rating);
+			// Rating text update
+			$('#c' + commentId).find(".comment-rating").text(rating.total);
 			
 			
 		},

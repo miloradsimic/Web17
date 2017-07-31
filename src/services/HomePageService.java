@@ -89,8 +89,11 @@ public class HomePageService {
 	@Path("/topic/{topic}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Topic test4(@Context HttpServletRequest request,
+	public HashMap<String, Object> test4(@Context HttpServletRequest request,
 			/* @PathParam("subforum") long subforumId, */ @PathParam("topic") long topicId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		
 		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
 		Topic topic = getTopics().getTopicsMap().get(topicId);
 		ArrayList<Comment> allComments = getComments().getCommentList();
@@ -103,8 +106,21 @@ public class HomePageService {
 				topic.getComments().add(comment);
 			}
 		}
+		ArrayList<CommentRating> ratings = new ArrayList<>();
+		if (loggedUser != null) {
+			for (CommentRating rating : getRatings().getRatingsList()) {
+				if(getComments().getComment(rating.getCommentId()).getTopicId() == topicId && 
+						rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
+					ratings.add(rating);
+				}
+			}
+		}
+		
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("topic", topic);
+		retVal.put("ratings", ratings);
 
-		return topic;
+		return retVal;
 	}
 
 	@GET
@@ -171,24 +187,32 @@ public class HomePageService {
 	@Path("/like_comment_toogle")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String addLike(@Context HttpServletRequest request, CommentLikeBean comment) {
-		LoginBean retVal = null;
-		retVal = (LoginBean) request.getSession().getAttribute("user");
+	public HashMap<String, Object> addLike(@Context HttpServletRequest request, CommentLikeBean comment) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
-		if (retVal == null) {
+		if (loggedUser == null) {
 			System.out.println("You can't comment because you're not logged.");
-			return "";
+			return null;
 		} else {
 			
-			long userId = getUsers().getUsersMapByUsername().get(retVal.getUsername()).getUserId();
+			long userId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
 			DataManager.getInstance().saveRating(new CommentRating(comment.getCommentId(),userId, comment.getRatingValue()));
 			ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
 			
 			int likes = getComments().getComment(comment.getCommentId()).getLikes();
 			int dislikes = getComments().getComment(comment.getCommentId()).getDislikes();
-			int value = likes - dislikes;
+			int total = likes - dislikes;
 
-			return value+"";
+			HashMap<String, Object> retVal = new HashMap<>();
+			retVal.put("total", total);
+			
+			int value = 0;
+			if(getRatings().getRating(comment.getCommentId(), userId) != null){
+				value = getRatings().getRating(comment.getCommentId(), userId).getValue();
+			}
+			retVal.put("rated", value);
+			return retVal;
 		}
 	}
 

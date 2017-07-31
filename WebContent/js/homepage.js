@@ -18,14 +18,14 @@ function showLoginModal() {
 	$("#signupModal").modal("hide");
 	$("#loginModal").modal();
 	$("body").addClass("notScroll");
-	$("#loginSubmit").on( "click", login);
+	$("#loginSubmit").on("click", login);
 }
 
 function showSignupModal() {
 	$("#loginModal").modal("hide");
 	$("#signupModal").modal();
 	$("body").addClass("notScroll");
-	$("#signUpSubmit").on( "click", signup);
+	$("#signUpSubmit").on("click", signup);
 }
 
 function renderSubforumsList(data) {
@@ -76,8 +76,8 @@ function renderTopicsList(data) {
 
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
 		var slika = DEFAULT_IMAGE;
-		
-		if(topic.author.avatar !== "") {
+
+		if (topic.author.avatar !== "") {
 			slika = topic.author.avatar;
 		}
 		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
@@ -107,29 +107,31 @@ function renderTopicsList(data) {
 function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');
 	console.log(data);
+	var topic = data.topic;
+	var ratings = data.ratings;
 	//var list = data.comments == null ? [] : (data.comments instanceof Array ? data.comments : [ data.comments ]);
 
 	//var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 
-	console.log("TOPIC: " + data.title);
+	console.log("TOPIC: " + topic.title);
 
-	var well = $('<div id="' + data.topicId + '" class="topic-root well well-sm"></div>');
+	var well = $('<div id="' + topic.topicId + '" class="topic-root well well-sm"></div>');
 	var media = $('<div class="media"></div>');
-	var heading = $('<h4 class="media-heading media-top">' + data.title + '</div>');
+	var heading = $('<h4 class="media-heading media-top">' + topic.title + '</div>');
 
 
 	var content = "";
-	switch (data.type) {
+	switch (topic.type) {
 	case "TEXT": {
-		content = $('<p>' + data.content + '</p>');
+		content = $('<p>' + topic.content + '</p>');
 		break;
 	}
 	case "LINK": {
-		content = $('<a href="' + data.content + '">' + data.content + '</a>');
+		content = $('<a href="' + topic.content + '">' + topic.content + '</a>');
 		break;
 	}
 	case "IMAGE": {
-		content = $('<img src="' + data.content + '" alt="Here should be image!"</img>');
+		content = $('<img src="' + topic.content + '" alt="Here should be image!"</img>');
 		break;
 	}
 	}
@@ -140,10 +142,10 @@ function renderTopicAndComments(data) {
 
 	var commentsContainer = $('<ul class="commentsContainer" id="commentsContainer"></ul>');
 
-	$.each(data.comments, function(index, comment) {
+	$.each(topic.comments, function(index, comment) {
 		//		console.log("Comment text: " + comment.text);
 
-		printAll(comment, commentsContainer);
+		printAll(comment, ratings, commentsContainer);
 	});
 
 
@@ -152,7 +154,13 @@ function renderTopicAndComments(data) {
 
 }
 
-function printAll(comment, commentsContainer) {
+function printAll(comment, ratings, commentsContainer) {
+	var rating;
+	$.each(ratings, function(index, tempRating) {
+		if (tempRating.commentId == comment.commentId) {
+			rating = tempRating;
+		}
+	});
 
 	console.log("Comment id: " + comment.commentId);
 	var commentListItem = $('<li></li>');
@@ -160,14 +168,31 @@ function printAll(comment, commentsContainer) {
 	var mediaLeft = $('<div class="media-left"></div>');
 	var mediaLike;
 	if (userLogged()) {
-		mediaLike = $('<div class="comment-like glyphicon glyphicon-menu-up" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
+		var used = "unused";
+		if (rating != undefined && rating.value == 1) {
+			used = "used";
+		}
+		mediaLike = $('<div class="comment-like comment-like-' + used + ' glyphicon glyphicon-menu-up" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var rating = parseInt(comment.likes) - parseInt(comment.dislikes);
-	var commentClass = rating>=0?"likes":"dislikes";
-	var mediaRating = $('<div class="comment-rating comment-' + commentClass + '">' + rating + '</div>');
-	var mediaDisike;
+	var commentClass = "neutral"
+	if (rating > 0) {
+		commentClass = "likes";
+	} else if (rating < 0) {
+		commentClass = "dislikes";
+	}
+	var padding;
+	if(userLogged()){
+		padding = " comment-rating-padding";
+	}
+	var mediaRating = $('<div class="comment-rating comment-' + commentClass + ' ' +  padding + '">' + rating + '</div>');
+	var mediaDislike;
 	if (userLogged()) {
-		mediaDisike = $('<div class="comment-dislike glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
+		var used = "unused";
+		if (rating != undefined && rating.value == -1) {
+			used = "used";
+		}
+		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
 
@@ -182,21 +207,21 @@ function printAll(comment, commentsContainer) {
 
 	if (userLogged()) {
 		reply = $('<a role="button" class="comment-replay" onclick="buildCommentReplyBox($(this))">Reply</a>');
-//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
+	//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
 	}
 
 
 	if (typeof comment.childComments != 'undefined') {
 		var commentsContainerChild = $('<ul class="commentsContainer"></ul>');
 		$.each(comment.childComments, function(index, commentChild) {
-			printAll(commentChild, commentsContainerChild);
+			printAll(commentChild, ratings, commentsContainerChild);
 		});
 		commentListItem.append(commentsContainerChild);
 	}
 
 	mediaLeft.append(mediaLike);
 	mediaLeft.append(mediaRating);
-	mediaLeft.append(mediaDisike);
+	mediaLeft.append(mediaDislike);
 	mediaBody.append(commentAuthor);
 	mediaBody.append(commentText);
 	mediaBody.append(reply);
@@ -211,10 +236,10 @@ function printAll(comment, commentsContainer) {
 	commentsContainer.append(commentListItem);
 }
 
-function buildCommentReplyBox(reply){
+function buildCommentReplyBox(reply) {
 	console.log("reply hide " + reply.name);
 	reply.hide();
-	
+
 	var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
 	var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
 	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent().parent())">Comment</button>');
@@ -222,7 +247,7 @@ function buildCommentReplyBox(reply){
 	container.append(submitButton);
 	console.log("reply hide ");
 	reply.parent().append(container);
-	console.log("reply hide " );
+	console.log("reply hide ");
 }
 
 /*function submitComment(button){
@@ -232,5 +257,3 @@ function buildCommentReplyBox(reply){
 //	console.log();
 	
 }*/
-
-

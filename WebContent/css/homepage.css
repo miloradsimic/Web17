@@ -37,11 +37,32 @@
 	padding-top: 4px;
 	font-size: 9px;
 }
+.comment-rating-padding{
+	margin-top: -2px;
+}
 .comment-likes {
 	color: #00FF00;
+	text-align: center;
 }
 .comment-dislikes {
 	color: #FF0000;
+	text-align: center;
+}
+.comment-neutral {
+	color: #000000;
+	text-align: center;
+}
+.comment-like-used {
+	color: #00FF00;
+}
+.comment-like-unused {
+	color: #000000;
+}
+.comment-dislike-used {
+	color: #FF0000;
+}
+.comment-dislike-unused {
+	color: #000000;
 }
 .comment-reply-area {
   resize: none;
