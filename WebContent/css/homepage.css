@@ -14,6 +14,11 @@
 	margin-left: -20px;
 }
 
+#commentsContainerRoot {
+	margin-top: -20px;
+	margin-left: -40px;
+}
+
 #commentsContainer {
 	margin-left: -40px;
 }

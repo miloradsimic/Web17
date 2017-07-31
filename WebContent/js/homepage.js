@@ -118,7 +118,22 @@ function renderTopicAndComments(data) {
 	var well = $('<div id="' + topic.topicId + '" class="topic-root well well-sm"></div>');
 	var media = $('<div class="media"></div>');
 	var heading = $('<h4 class="media-heading media-top">' + topic.title + '</div>');
+	var commentsContainer1;
+	if (userLogged()) {
+		// Comment topic directly
+		var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
+		var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
+		var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent())">Comment</button>');
+		var commentListItem = $('<li></li>');
+		var media2 = $('<div class="media" id="c0"></div>');
+		container.append(textArea);
+		container.append(submitButton);
+		media2.append(container);
+		commentListItem.append(media2);
 
+		commentsContainer1 = $('<ul class="commentsContainer" id="commentsContainerRoot"></ul>');
+		commentsContainer1.append(commentListItem);
+	}
 
 	var content = "";
 	switch (topic.type) {
@@ -141,6 +156,7 @@ function renderTopicAndComments(data) {
 	well.append(media);
 
 	var commentsContainer = $('<ul class="commentsContainer" id="commentsContainer"></ul>');
+	commentsContainer.append(commentsContainer1);
 
 	$.each(topic.comments, function(index, comment) {
 		//		console.log("Comment text: " + comment.text);
@@ -182,10 +198,10 @@ function printAll(comment, ratings, commentsContainer) {
 		commentClass = "dislikes";
 	}
 	var padding;
-	if(userLogged()){
+	if (userLogged()) {
 		padding = " comment-rating-padding";
 	}
-	var mediaRating = $('<div class="comment-rating comment-' + commentClass + ' ' +  padding + '">' + rating + '</div>');
+	var mediaRating = $('<div class="comment-rating comment-' + commentClass + ' ' + padding + '">' + rating + '</div>');
 	var mediaDislike;
 	if (userLogged()) {
 		var used = "unused";

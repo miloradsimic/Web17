@@ -98,7 +98,7 @@ function submitComment(comment) {
 	console.log('Submiting comment.');
 	var data = {
 			text : comment.find(".comment-reply-area").val(),
-			parentId : comment.attr("id"),
+			parentId : comment.attr("id").replace('c', ''),
 			topicId : $('.topic-root').attr("id")
 	};
 	
