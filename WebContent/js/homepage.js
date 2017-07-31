@@ -156,18 +156,18 @@ function printAll(comment, commentsContainer) {
 
 	console.log("Comment id: " + comment.commentId);
 	var commentListItem = $('<li></li>');
-	var media = $('<div class="media" id="' + comment.commentId + '"></div>');
+	var media = $('<div class="media" id="c' + comment.commentId + '"></div>');
 	var mediaLeft = $('<div class="media-left"></div>');
 	var mediaLike;
 	if (userLogged()) {
-		mediaLike = $('<div class="glyphicon glyphicon-menu-up"></div>');
+		mediaLike = $('<div class="comment-like glyphicon glyphicon-menu-up" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var rating = parseInt(comment.likes) - parseInt(comment.dislikes);
 	var commentClass = rating>=0?"likes":"dislikes";
-	var mediaRating = $('<div class="comment-' + commentClass + '">' + rating + '</div>');
+	var mediaRating = $('<div class="comment-rating comment-' + commentClass + '">' + rating + '</div>');
 	var mediaDisike;
 	if (userLogged()) {
-		mediaDisike = $('<div class="glyphicon glyphicon-menu-down"></div>');
+		mediaDisike = $('<div class="comment-dislike glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
 

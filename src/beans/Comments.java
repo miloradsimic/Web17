@@ -38,6 +38,7 @@ public class Comments implements Serializable {
 		if(entry.getParentComment() == 0) {
 			commentList.add(entry);
 			commentsMap.put(entry.getCommentId(), entry);
+			return;
 		}
 		// Finding parent in list
 		for (int i=0; i<commentList.size(); i++) {
@@ -48,11 +49,11 @@ public class Comments implements Serializable {
 //				return;
 			} else {
 				// Looking in children
-				if ( findComment(commentList.get(i), entry) ) {
+				if ( addToChildren(commentList.get(i), entry) ) {
 					isSuccessful = true;
 				}
 			}
-			// If found and replaced in list, take his ancestor without parent and put him in map instead old non-updated comment  
+			// Put whole comment tree in map from list instead old one
 			if (isSuccessful) {
 				commentsMap.put(commentList.get(i).getCommentId(), commentList.get(i));
 				return;
@@ -62,19 +63,56 @@ public class Comments implements Serializable {
 	/**
 	 * Looks for entries parent in comments children. If founds than connects them
 	 */
-	private Boolean findComment(Comment parent, Comment entry) {
+	private Boolean addToChildren(Comment parent, Comment entry) {
 		//Boolean retVal = false;
 		for (Comment comment : parent.getChildComments()) {
 			if(comment.getCommentId() == entry.getParentComment()) {
 				comment.getChildComments().add(entry);
 				return true;
 			} else {
-				// TODO: Might need check if there are any children
-				findComment(comment, entry);
+				addToChildren(comment, entry);
 			}
 		}
 		return false;
 	}
+	
+	public Comment getComment(long id){
+		Comment retVal = null;
+		// Finding comment in list
+		for (int i=0; i<commentList.size(); i++) {
+			// First in root (commentList.get(i) has no parent)
+			if(commentList.get(i).getCommentId() == id) {
+				return commentList.get(i);
+			} else {
+				// Looking in children
+				if ( (retVal = getFromChildren(commentList.get(i), id)) != null ) {
+					return retVal;
+				}
+			}
+		}
+		return null;
+	}
+	
+	private Comment getFromChildren(Comment parent, long id) {
+		for (Comment comment : parent.getChildComments()) {
+			if(comment.getCommentId() == id) {
+				return comment;
+			} else {
+				Comment retVal;
+				if ( (retVal = getFromChildren(comment, id)) != null) {
+					return retVal;
+				}
+			}
+		}
+		return null;
+	}
+	
 
+	public void liked(long id) {
+		getComment(id).like();
+	}
+	public void disliked(long id) {
+		getComment(id).dislike();
+	}
 
 }

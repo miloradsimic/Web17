@@ -101,7 +101,6 @@ function submitComment(comment) {
 			parentId : comment.attr("id"),
 			topicId : $('.topic-root').attr("id")
 	};
-
 	
 	var s = JSON.stringify(data);
 	console.log(s);
@@ -118,7 +117,7 @@ function submitComment(comment) {
 				return;
 			}
 			if(flag == true) {
-				alert("true!");
+//				alert("true!");
 			}else {
 				alert("false!");
 			}
@@ -131,6 +130,70 @@ function submitComment(comment) {
 	});
 	
 }
+function submitLike(element, commentId){
+	console.log('Submiting Like.');
+	var rating = -1;
+	if(element.hasClass("comment-like")) {
+		rating = 1;
+	}
+	var data = {
+			commentId : commentId,
+			ratingValue : rating
+	};
+	
+	var s = JSON.stringify(data);
+	console.log(s);
+	$.ajax({
+		url : "rest/homepage/like_comment_toogle",
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(rating) {
+
+			console.log("Successful rating: " + rating);
+			console.log("'#c' + commentId: " + '#c' + commentId);
+			console.log("'#c' + commentId obj: " + $('#c' + commentId).html());
+			console.log("$('#c' + commentId).find('.comment-rating')" + $('#c' + commentId).find(".comment-rating").html());
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			// Hmmm... Treba obojiti drugom bojom ako se promeni predznak ratinka
+			// Treba promeniti ikonicu ako se komentar lajkuje i obrnuto
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			$('#c' + commentId).find(".comment-rating").text(rating);
+			
+			
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest"  + XMLHttpRequest);
+		}
+	});
+	
+}
+function submitDislike(commentId){
+	
+}
+
 //Helper functions
 
 //Helper function to serialize all the form fields into a JSON string

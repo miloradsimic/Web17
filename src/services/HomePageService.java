@@ -20,6 +20,9 @@ import javax.ws.rs.core.MediaType;
 import com.sun.org.apache.xml.internal.security.keys.content.KeyValue;
 
 import beans.Comment;
+import beans.CommentLikeBean;
+import beans.CommentRating;
+import beans.CommentRatings;
 import beans.CommentSubmitBean;
 import beans.Comments;
 import beans.LoginBean;
@@ -100,7 +103,7 @@ public class HomePageService {
 				topic.getComments().add(comment);
 			}
 		}
-		
+
 		return topic;
 	}
 
@@ -136,7 +139,7 @@ public class HomePageService {
 		}
 		return null;
 	}
-	
+
 	@POST
 	@Path("/add_comment")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -149,16 +152,43 @@ public class HomePageService {
 			System.out.println("You can't comment because you're not logged.");
 			return false;
 		} else {
-//			System.out.println("User " + retVal.getUsername() + " is already logged!");
+			// System.out.println("User " + retVal.getUsername() + " is already
+			// logged!");
 			User author = getUsers().getUsersMapByUsername().get(retVal.getUsername());
 			String date = Utils.getCurrentDate();
-			Comment entry = new Comment(comment.getTopicId(), author, date, comment.getParentId(), comment.getText(), 0, 0, false);
-			
-			if(DataManager.getInstance().saveComment(entry)) {
-				//Comments comments = new Comments(ctx.getRealPath(""));
+			Comment entry = new Comment(comment.getTopicId(), author, date, comment.getParentId(), comment.getText(), 0,
+					0, false);
+
+			if (DataManager.getInstance().saveComment(entry)) {
+				// Comments comments = new Comments(ctx.getRealPath(""));
 				ctx.setAttribute("comments", DataManager.getInstance().readComments());
 			}
 			return true;
+		}
+	}
+
+	@POST
+	@Path("/like_comment_toogle")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String addLike(@Context HttpServletRequest request, CommentLikeBean comment) {
+		LoginBean retVal = null;
+		retVal = (LoginBean) request.getSession().getAttribute("user");
+
+		if (retVal == null) {
+			System.out.println("You can't comment because you're not logged.");
+			return "";
+		} else {
+			
+			long userId = getUsers().getUsersMapByUsername().get(retVal.getUsername()).getUserId();
+			DataManager.getInstance().saveRating(new CommentRating(comment.getCommentId(),userId, comment.getRatingValue()));
+			ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
+			
+			int likes = getComments().getComment(comment.getCommentId()).getLikes();
+			int dislikes = getComments().getComment(comment.getCommentId()).getDislikes();
+			int value = likes - dislikes;
+
+			return value+"";
 		}
 	}
 
@@ -226,26 +256,56 @@ public class HomePageService {
 		if (comments == null) {
 			DataManager.setUpRootPath(ctx.getRealPath(""));
 			commentsData();
+			ratingsData();
 			comments = DataManager.getInstance().readComments();
 			ctx.setAttribute("comments", comments);
 		}
 		return comments;
 	}
 
+	private CommentRatings getRatings() {
+		CommentRatings ratings = (CommentRatings) ctx.getAttribute("ratings");
+		if (ratings == null) {
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			ratings = DataManager.getInstance().readRatings();
+			ctx.setAttribute("ratings", ratings);
+		}
+		return ratings;
+	}
 
-	
-	
-	
-	private void commentsData() {
+	private void ratingsData() {
+
+		CommentRating r1 = new CommentRating(1l, 1l, 1);
+		CommentRating r2 = new CommentRating(1l, 2l, 1);
+		CommentRating r3 = new CommentRating(1l, 3l, 1);
+		CommentRating r4 = new CommentRating(2l, 1l, -1);
 		
-		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0, "Text komentara1", 2, 2, false);
-		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0, "Text komentara2", 3, 5, false);
-		Comment c3 = new Comment(3l, 1l, getUsers().getUsersMapByUsername().get("mika"), Utils.getCurrentDate(), 1, "Text komentara3", 2, 1, false);
-		Comment c4 = new Comment(4l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 2, "Text komentara4", 2, 2, false);
+		DataManager.getInstance().saveRating(r1);
+		DataManager.getInstance().saveRating(r2);
+		DataManager.getInstance().saveRating(r3);
+		DataManager.getInstance().saveRating(r4);
+	}
+
+	private void commentsData() {
+
+		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0,
+				"Text komentara1", 0, 0, false);
+		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 1,
+				"Text komentara2", 0, 0, false);
+		Comment c3 = new Comment(3l, 1l, getUsers().getUsersMapByUsername().get("mika"), Utils.getCurrentDate(), 0,
+				"Text komentara3", 0, 0, false);
+		Comment c4 = new Comment(4l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 2,
+				"Text komentara4", 0, 0, false);
+		Comment c5 = new Comment(5l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 4,
+				"Text komentara5", 0, 0, false);
+		Comment c6 = new Comment(6l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 4,
+				"Text komentara6", 0, 0, false);
 		DataManager.getInstance().saveComment(c1);
 		DataManager.getInstance().saveComment(c2);
 		DataManager.getInstance().saveComment(c3);
 		DataManager.getInstance().saveComment(c4);
+		DataManager.getInstance().saveComment(c5);
+		DataManager.getInstance().saveComment(c6);
 	}
 
 }
