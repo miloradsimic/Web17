@@ -2,6 +2,7 @@
 var subforumsURL = "rest/homepage/subforums";
 var topicsURL = "rest/homepage/topics";
 var topicURL = "rest/homepage/topic";
+var profileURL = "rest/homepage/profile";
 
 executeOnLoad();
 
@@ -25,11 +26,11 @@ function executeOnLoad() {
 
 function assignListeners() {
 	$(function() {
-		$("#loginSubmit").on( "click", login);
-		$("#signUpSubmit").on( "click", signup);
-		$("#logout").on( "click", logout);
+		$("#loginSubmit").on("click", login);
+		$("#signUpSubmit").on("click", signup);
+		$("#logout").on("click", logout);
 		//$("#homeButton").on( "click", logout);
-		
+
 	});
 }
 
@@ -42,15 +43,41 @@ function goToSubforum(id) {
 function goToTopic(id) {
 	window.location.href = "topic.html" + "?id=" + id;
 }
+// ------PROFILE-----
+function goToProfile(id) {
+	var ID = id;
+	if(id == -1) {
+		console.log("id = -1 !" + JSON.parse(sessionStorage.getItem('user')).username);
+		ID=JSON.parse(sessionStorage.getItem('user')).userId;
+	}
+	window.location.href = "profile.html" + "?id=" + ID;
+
+}
+
+function setUpProfileAvatar(input) {
+	if (input.files && input.files[0]) {
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			$('#avatar')
+				.attr('src', e.target.result);
+		//                .width(150)
+		//                .height(200);
+		};
+
+		reader.readAsDataURL(input.files[0]);
+	}
+}
+//-------PROFILE END-----
 
 //AJAX calls
 
 
 
 function loadTopicDetailsAndComments() {
-//	console.log('LoadTopicDetailsAndComments from file into page.');
+	//	console.log('LoadTopicDetailsAndComments from file into page.');
 	var id = getUrlParameter("id");
-//	console.log('Topic id: ' + id);
+	//	console.log('Topic id: ' + id);
 	$.ajax({
 		type : 'GET',
 		url : topicURL + "/" + id,
@@ -87,21 +114,37 @@ function loadTopics() {
 		success : renderTopicsList,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			var OriginalString = XMLHttpRequest.responseText;
-			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig,"");
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
 			console.log(StrippedString);
-			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest"  + XMLHttpRequest);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 		}
 	});
 }
-
+function loadProfileData() {
+	console.log('Load Profile Data');
+	var id = getUrlParameter("id");
+	console.log('User id: ' + id);
+	$.ajax({
+		type : 'GET',
+		url : profileURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderProfilePage,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
 function submitComment(comment) {
 	console.log('Submiting comment.');
 	var data = {
-			text : comment.find(".comment-reply-area").val(),
-			parentId : comment.attr("id").replace('c', ''),
-			topicId : $('.topic-root').attr("id")
+		text : comment.find(".comment-reply-area").val(),
+		parentId : comment.attr("id").replace('c', ''),
+		topicId : $('.topic-root').attr("id")
 	};
-	
+
 	var s = JSON.stringify(data);
 	console.log(s);
 	$.ajax({
@@ -111,36 +154,36 @@ function submitComment(comment) {
 		contentType : "application/json",
 		dataType : "json",
 		success : function(flag) {
-			
-			if(flag == undefined) {
+
+			if (flag == undefined) {
 				alert("Undefined!");
 				return;
 			}
-			if(flag == true) {
-//				alert("true!");
-			}else {
+			if (flag == true) {
+				//				alert("true!");
+			} else {
 				alert("false!");
 			}
 			location.reload();
 
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest"  + XMLHttpRequest);
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
 		}
 	});
-	
+
 }
-function submitLike(element, commentId){
+function submitLike(element, commentId) {
 	console.log('Submiting Like.');
 	var rate = -1;
-	if(element.hasClass("comment-like")) {
+	if (element.hasClass("comment-like")) {
 		rate = 1;
 	}
 	var data = {
-			commentId : commentId,
-			ratingValue : rate
+		commentId : commentId,
+		ratingValue : rate
 	};
-	
+
 	var s = JSON.stringify(data);
 	console.log(s);
 	$.ajax({
@@ -153,16 +196,16 @@ function submitLike(element, commentId){
 
 			console.log("Successful rating: " + rating.total);
 			// Icon color
-			if(rate == 1) {
-				if(rating.rated == 1) {
+			if (rate == 1) {
+				if (rating.rated == 1) {
 					$('#c' + commentId).find(".comment-like-unused").removeClass("comment-like-unused").addClass("comment-like-used");
 				} else {
 					$('#c' + commentId).find(".comment-like-used").removeClass("comment-like-used").addClass("comment-like-unused");
 				}
 				$('#c' + commentId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
-				
-			} else if(rate == -1) {
-				if(rating.rated == -1) {
+
+			} else if (rate == -1) {
+				if (rating.rated == -1) {
 					$('#c' + commentId).find(".comment-dislike-unused").removeClass("comment-dislike-unused").addClass("comment-dislike-used");
 				} else {
 					$('#c' + commentId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
@@ -171,29 +214,28 @@ function submitLike(element, commentId){
 			}
 			// Rating text color
 			$('#c' + commentId).find(".comment-rating").removeClass("comment-likes").removeClass("comment-dislikes").removeClass("comment-neutral");
-			if(rating.total > 0) {
+			if (rating.total > 0) {
 				$('#c' + commentId).find(".comment-rating").addClass("comment-likes");
 			}
-			if(rating.total < 0) {
+			if (rating.total < 0) {
 				$('#c' + commentId).find(".comment-rating").addClass("comment-dislikes");
 			}
-			if(rating.total == 0) {
+			if (rating.total == 0) {
 				$('#c' + commentId).find(".comment-rating").addClass("comment-neutral");
 			}
-			
+
 			// Rating text update
 			$('#c' + commentId).find(".comment-rating").text(rating.total);
-			
-			
+
+
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest"  + XMLHttpRequest);
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
 		}
 	});
-	
+
 }
-function submitDislike(commentId){
-	
+function submitDislike(commentId) {
 }
 
 //Helper functions
@@ -221,6 +263,6 @@ function getUrlParameter(sParam) {
 	}
 }
 
-function userLogged(){
+function userLogged() {
 	return sessionStorage.getItem("user") != null;
 }

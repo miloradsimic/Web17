@@ -122,6 +122,66 @@ public class HomePageService {
 
 		return retVal;
 	}
+	
+	/**
+	 * Returns full topic object with loaded comments
+	 */
+	@GET
+	@Path("/profile/{profile}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Object test5(@Context HttpServletRequest request,
+			/* @PathParam("subforum") long subforumId, */ @PathParam("profile") long profileId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		
+		User retVal;
+		if(loggedUser != null && (retVal = getUsers().getUsersMapByUsername().get(loggedUser.getUsername())).getUserId() == profileId) {
+			// return full profile data.
+			
+			
+		} else {
+			User temp = getUsers().getUsersMap().get(profileId);
+			if(temp == null) {
+				System.out.println("User doesn't exist dude!");
+				return null;
+			}
+			retVal = new User(temp);
+			
+			// return min profile data
+			// not gonna be implemented for now
+		}
+
+		return retVal;
+		
+		
+//		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
+//		Topic topic = getTopics().getTopicsMap().get(topicId);
+//		ArrayList<Comment> allComments = getComments().getCommentList();
+//		HashMap<Long, User> users = getUsers().getUsersMap();
+//
+//		topic.getComments().clear();
+		// Find all comments of topic
+//		for (Comment comment : allComments) {
+//			if (topic.getTopicId() == comment.getTopicId()) {
+//				topic.getComments().add(comment);
+//			}
+//		}
+//		ArrayList<CommentRating> ratings = new ArrayList<>();
+//		if (loggedUser != null) {
+//			for (CommentRating rating : getRatings().getRatingsList()) {
+//				if(getComments().getComment(rating.getCommentId()).getTopicId() == topicId && 
+//						rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
+//					ratings.add(rating);
+//				}
+//			}
+//		}
+//		
+//		HashMap<String, Object> retVal = new HashMap<>();
+//		retVal.put("topic", topic);
+//		retVal.put("ratings", ratings);
+
+	}
 
 	@GET
 	@Path("/test")

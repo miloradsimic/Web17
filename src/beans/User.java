@@ -45,6 +45,22 @@ public class User implements Serializable {
 		this.avatar = null;
 	}
 	/**
+	 * Visited user, no password
+	 * @param id
+	 */
+	public User(User user) {
+		this.userId = user.userId;
+		this.role = user.role;
+		this.username = user.username;
+		this.password = "";
+		this.firstName = user.firstName;
+		this.lastName = user.lastName;
+		this.telephone = user.telephone;
+		this.avatar = user.avatar;
+		this.email = user.email;
+		this.registrationDate = user.registrationDate;
+	}
+	/**
 	 * Specific role user
 	 * @param id
 	 * @param role

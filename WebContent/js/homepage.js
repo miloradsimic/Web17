@@ -2,16 +2,57 @@ var DEFAULT_IMAGE = "resources/cvet.jpg"
 
 
 function showLoginButons() {
+//	console.log("MENU PROFILE is visible: " + $("#menuContainer").is(':visible'));
+	$("#menuContainer").load("menu.html", function(){
+		$(this).find("#menu_profile").hide();
+		setMainMenuTabSelected();
+		
+	});
 	$("#loginButtons").show();
 	$("#logoutButton").hide();
 }
 
 function showLogoutButons(data) {
+	console.log("user: " + data);
+//	console.log("MENU PROFILE is visible: " + $("#menu_profile").is(':visible'));
+	$("#menuContainer").load("menu.html", function(){
+		$(this).find("#menu_profile").show();
+		setMainMenuTabSelected();
+	});
 	$("#loginButtons").hide();
-	$("#welcomeUser").html('Welcome ' + data + '. Click here for ' +
+	$("#welcomeUser").html('Welcome <a role="button" onclick="goToProfile(' + data.userId + ')">'+ data.username + '</a>. Click here for ' +
 		'<a id="logout" role="button" onclick=logout()>log out</a>');
 	$("#logoutButton").show();
 
+}
+
+function setMainMenuTabSelected() {
+	var page_name = window.location.pathname.split("/")[2];
+	var page_name=page_name.substr(0,page_name.indexOf(".")).toLowerCase();
+	console.log("Page name: " + page_name);
+
+	var menu_item_id = "";
+	switch(page_name){
+	case "homepage":
+	case "subforum":
+	case "topic": {
+		menu_item_id="menu_homepage";
+		break;
+	}
+	case "profile": {
+		menu_item_id="menu_profile";
+		break;
+	}	
+	}
+	console.log("Menu item ID: " + menu_item_id);
+	$('.nav .navbar-nav li').removeClass('active');
+    $("#" + menu_item_id).parent().addClass('active');  
+}
+
+function setProfileMenuTabSelected(tab_name) {
+
+
+    
 }
 
 function showLoginModal() {
@@ -31,6 +72,7 @@ function showSignupModal() {
 function renderSubforumsList(data) {
 	console.log('renderSubforumsList form file into page.');
 	console.log(data);
+//	setActiveMenuItem("menu_homepage");
 
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
@@ -62,6 +104,7 @@ function renderSubforumsList(data) {
 function renderTopicsList(data) {
 	console.log('renderTopicsList form file into page.');
 	console.log(data);
+//	setActiveMenuItem("menu_homepage");
 
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
@@ -107,6 +150,8 @@ function renderTopicsList(data) {
 function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');
 	console.log(data);
+
+//	setActiveMenuItem("menu_homepage");
 	var topic = data.topic;
 	var ratings = data.ratings;
 	//var list = data.comments == null ? [] : (data.comments instanceof Array ? data.comments : [ data.comments ]);
@@ -170,6 +215,72 @@ function renderTopicAndComments(data) {
 
 }
 
+function renderProfilePage(user) {
+
+//	setActiveMenuItem("menu_profile");
+	/*var menu = $('<div class="profile-menu menu" id="menu"></div>');
+	var ul = $('<ul class="profile-list-inline list-inline"></ul>');
+	var li1 = $('<li><a href="#">profile</a></li>');
+	var li2 = $('<li><a href="#">messages</a></li>');
+	var li3 = $('<li><a href="#">manage users</a></li>');
+	var li4 = $('<li><a href="#">manage topics</a></li>');
+	var li5 = $('<li><a href="#">manage subforums</a></li>');
+
+	ul.append(li1);
+	ul.append(li2);
+	ul.append(li3);
+	ul.append(li4);
+	ul.append(li5);
+	menu.append(ul);
+	
+	$("#mediaContainer").append(menu);
+	
+	
+	<div class="col-md-2 hidden-xs">
+	<img src="http://websamplenow.com/30/userprofile/images/avatar.jpg" class="img-responsive img-thumbnail ">
+	  </div>*/
+	if(user == undefined) {
+		console.log("User is undefined!");
+	}
+	console.log(user.firstName);
+//	
+//
+	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
+	console.log("Provided user" + user.username);
+	
+	
+	// Logged user profile
+	if(JSON.parse(sessionStorage.getItem('user')).username === user.username) {
+
+		console.log("TRUE!");
+		$("#menuContainer").load("menu.html", function(){
+			$(this).find("#menu_profile").show();
+			setMainMenuTabSelected();
+		});
+		
+		$("#profileMenuContainer").load("profile_menu.html", function(){
+			$('profile-list-inline li').removeClass('active');
+		    $("#profile").parent().addClass('active');
+//			console.log(this.find("#first_name"));
+		});
+		
+		$("#mediaContainer").load("profile_logged_user.html", function(){
+			$(this).find("#first_name").val(user.firstName);
+			$(this).find("#last_name").val(user.lastName);
+			$(this).find("#email").val(user.email);
+			$(this).find("#avatar").attr("src", user.avatar);
+//			console.log(this.find("#first_name"));
+		});
+		//console.log($("#mediaContainer").find("#").val());
+		
+//		$("#mediaContainer").attr("w3-include-html", "profile_logged_user.html");
+//		console.log($("#mediaContainer").find("#first_name").html());
+//		$("#mediaContainer").find("#first_name").val(user.firstName);
+	}
+	
+	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
+}
+
 function printAll(comment, ratings, commentsContainer) {
 	var rating;
 	$.each(ratings, function(index, tempRating) {
@@ -208,7 +319,7 @@ function printAll(comment, ratings, commentsContainer) {
 		if (rating != undefined && rating.value == -1) {
 			used = "used";
 		}
-		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
+		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this)),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
 
