@@ -203,3 +203,7 @@ span .pull-right {
 }*/
 
 /*------------------End of Profile menu */
+
+form .error {
+  color: #ff0000;
+}

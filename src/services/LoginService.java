@@ -16,6 +16,7 @@ import beans.LoginBean;
 import beans.SignUpBean;
 import beans.User;
 import beans.Users;
+import controller.DataManager;
 import controller.Utils;
 import model.enums.Role;
 
@@ -134,10 +135,14 @@ public class LoginService {
 		User newUser = new User(Role.USER, user.getUsername(), user.getPassword(), user.getFirstName(), user.getLastName(), user.getTelephone(), null, user.getEmail(), Utils.getCurrentDate());
 
 		System.out.println("USER2: " +  newUser.toString());
-		addUser(newUser);
-		retVal = new LoginBean(newUser.getUsername(), newUser.getPassword());
-		request.getSession().setAttribute("user", retVal);
-		return newUser;
+		
+		if (DataManager.getInstance().updateProfile(newUser)) {
+			retVal = new LoginBean(newUser.getUsername(), newUser.getPassword());
+			request.getSession().setAttribute("user", retVal);
+			ctx.setAttribute("users", DataManager.getInstance().readUsers());
+			return newUser;
+		}
+		return null;
 	}
 
 	@GET
@@ -174,19 +179,23 @@ public class LoginService {
 	private Users getUsers() {
 		Users users = (Users) ctx.getAttribute("users");
 		if (users == null) {
-			users = new Users(ctx.getRealPath(""));
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			usersData();
+			users = DataManager.getInstance().readUsers();
 			ctx.setAttribute("users", users);
 		}
 		return users;
 	}
 
-	private User addUser(User newUser) {
-		Users users = (Users) ctx.getAttribute("users");
-		if (users == null) {
-			users = new Users(ctx.getRealPath(""));
-			ctx.setAttribute("users", users);
-		}
-		return users.saveUser(newUser);
+	private void usersData() {
+		
+		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com", "resources/lav.jpg");
+		User u2 = new User(2, Role.MODERATOR, "moderator", "moderator", "Mike", "Morison", "0652222222", "mike@gmail.com", "resources/lav.jpg");
+		User u3 = new User(3, Role.USER, "user", "user", "Usain", "Ulman", "0653333333", "usain@gmail.com", "resources/slon.jpg");
+		
+		DataManager.getInstance().saveUser(u1);
+		DataManager.getInstance().saveUser(u2);
+		DataManager.getInstance().saveUser(u3);
 	}
 
 }

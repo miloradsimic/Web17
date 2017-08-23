@@ -1,5 +1,6 @@
 package services;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import beans.CommentRating;
 import beans.CommentRatings;
 import beans.CommentSubmitBean;
 import beans.Comments;
+import beans.EditProfileBean;
 import beans.LoginBean;
 import beans.Subforum;
 import beans.Subforums;
@@ -34,6 +36,7 @@ import beans.User;
 import beans.Users;
 import controller.DataManager;
 import controller.Utils;
+import model.enums.Role;
 
 @Path("/homepage")
 public class HomePageService {
@@ -123,9 +126,41 @@ public class HomePageService {
 		return retVal;
 	}
 	
-	/**
-	 * Returns full topic object with loaded comments
-	 */
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("submit_profile_data")
+	public Boolean uploadProfileData(@Context HttpServletRequest request, EditProfileBean profileData) throws Exception {
+	    
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		
+		User old = getUsers().getUsersMapByUsername().get(loggedUser.getUsername());
+		old.setFirstName(profileData.getFirstName());
+		old.setLastName(profileData.getLastName());
+		old.setEmail(profileData.getEmail());
+		if(!profileData.getPassword().equals("")){
+			old.setPassword(profileData.getPassword());
+		}
+		
+		if (DataManager.getInstance().updateProfile(old)) {
+			ctx.setAttribute("users", DataManager.getInstance().readUsers());
+			return true;
+		}
+		
+	    return false;
+	}
+	
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("upload_avatar")
+	public Boolean uploadAvatar(InputStream fileInputStream) throws Exception {
+	    
+		System.out.println("File: " + fileInputStream);
+	    return true;
+	}
+	
 	@GET
 	@Path("/profile/{profile}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -329,7 +364,9 @@ public class HomePageService {
 	private Users getUsers() {
 		Users users = (Users) ctx.getAttribute("users");
 		if (users == null) {
-			users = new Users(ctx.getRealPath(""));
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			usersData();
+			users = DataManager.getInstance().readUsers();
 			ctx.setAttribute("users", users);
 		}
 		return users;
@@ -371,7 +408,6 @@ public class HomePageService {
 	}
 
 	private void commentsData() {
-
 		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0,
 				"Text komentara1", 0, 0, false);
 		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 1,
@@ -390,6 +426,17 @@ public class HomePageService {
 		DataManager.getInstance().saveComment(c4);
 		DataManager.getInstance().saveComment(c5);
 		DataManager.getInstance().saveComment(c6);
+	}
+	
+	private void usersData() {
+	
+		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com", "resources/lav.jpg");
+		User u2 = new User(2, Role.MODERATOR, "moderator", "moderator", "Mike", "Morison", "0652222222", "mike@gmail.com", "resources/lav.jpg");
+		User u3 = new User(3, Role.USER, "user", "user", "Usain", "Ulman", "0653333333", "usain@gmail.com", "resources/slon.jpg");
+		
+		DataManager.getInstance().saveUser(u1);
+		DataManager.getInstance().saveUser(u2);
+		DataManager.getInstance().saveUser(u3);
 	}
 
 }

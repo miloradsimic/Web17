@@ -15,25 +15,27 @@ import beans.Message;
 import beans.Subforum;
 import beans.Topic;
 import beans.User;
+import beans.Users;
 
 public class DataManager {
 
 	private static DataManager instance = null;
 
-	private String stringUsers = "/data/users.txt";
+	private static String stringUsers = "/data/users.txt";
 	private static String stringComments = "/data/comments.txt";
 	private static String stringRatings = "/data/ratings";
-	private String stringTopics = "/data/topics.txt";
-	private String stringSubforums = "/data/subforums.txt";
-	private String stringMessages = "/data/messages.txt";
+//	private String stringTopics = "/data/topics.txt";
+//	private String stringSubforums = "/data/subforums.txt";
+//	private String stringMessages = "/data/messages.txt";
 	private static String rootPath = "";
 
-	private ArrayList<User> users;
+	
+	private Users users = new Users();
 	private Comments comments = new Comments();
 	private CommentRatings commentRatings = new CommentRatings();
-	private ArrayList<Topic> tpics;
-	private ArrayList<Subforum> subforums;
-	private ArrayList<Message> messages;
+//	private ArrayList<Topic> tpics;
+//	private ArrayList<Subforum> subforums;
+//	private ArrayList<Message> messages;
 
 	public static DataManager getInstance() {
 		if (instance == null) {
@@ -127,18 +129,7 @@ public class DataManager {
 
 		return true;
 	}
-
-	// 5;1;1; 23.05.2017 22:16:00;1; Ja sam ADMIN i komentarisem drugi put na
-	// prvi komentar!;80;2;false
-	// 4;1;2; 23.05.2017 22:15:00;0;Ja sam USER i komentarisem drugi
-	// put!;40;0;false
-	// 3;1;1; 23.05.2017 22:10:00;2;LOL! Ja sam ADMIN i mogu vam obrisati
-	// naloge!;20;0;false
-	// 2;1;3; 23.05.2017 22:05:00;1;Ja sam MODERATOR i mogu da obrisem mikin
-	// komentar;10;0;false
-	// 1;1;2; 23.05.2017 22:00:00;0;Ja sam USER i mogu da komentarisem temu kad
-	// sam logovan.;5;0;false
-
+	
 	public Comments readComments() {
 
 		FileInputStream fin = null;
@@ -307,6 +298,129 @@ public class DataManager {
 		}
 
 		return commentRatings;
+	}
+
+	public boolean updateProfile(User edited) {
+		if(users == null) {
+			readUsers();
+		}
+		users.updateUser(edited);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringUsers);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(users);
+
+			System.out.println("Write Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
+
+	public Users readUsers() {
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
+
+			fin = new FileInputStream(rootPath + stringUsers);
+			ois = new ObjectInputStream(fin);
+			Object o = ois.readObject();
+			users = (Users) o;
+			System.out.println("Read Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+			return null;
+
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return users;
+	}
+
+	public Boolean saveUser(User entry) {
+//		comments.addComment(entry);
+		users.addUser(entry);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringUsers);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(users);
+
+			System.out.println("Write Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
 	}
 
 }

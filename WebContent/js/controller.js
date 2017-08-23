@@ -3,6 +3,8 @@ var subforumsURL = "rest/homepage/subforums";
 var topicsURL = "rest/homepage/topics";
 var topicURL = "rest/homepage/topic";
 var profileURL = "rest/homepage/profile";
+var upload_avatarURL = "rest/homepage/upload_avatar";
+var submitProfileDataURL = "rest/homepage/submit_profile_data";
 
 executeOnLoad();
 
@@ -46,9 +48,9 @@ function goToTopic(id) {
 // ------PROFILE-----
 function goToProfile(id) {
 	var ID = id;
-	if(id == -1) {
+	if (id == -1) {
 		console.log("id = -1 !" + JSON.parse(sessionStorage.getItem('user')).username);
-		ID=JSON.parse(sessionStorage.getItem('user')).userId;
+		ID = JSON.parse(sessionStorage.getItem('user')).userId;
 	}
 	window.location.href = "profile.html" + "?id=" + ID;
 
@@ -56,16 +58,30 @@ function goToProfile(id) {
 
 function setUpProfileAvatar(input) {
 	if (input.files && input.files[0]) {
-		var reader = new FileReader();
 
-		reader.onload = function(e) {
-			$('#avatar')
-				.attr('src', e.target.result);
-		//                .width(150)
-		//                .height(200);
-		};
+		console.log("TRUE");
+		var file = input.files[0];
+		$.ajax({
+			url : upload_avatarURL,
+			type : "POST",
+			contentType : "multipart/form-data",
+			data : file,
+			processData : false,
+			success : function(isDone) {
+				var reader = new FileReader();
 
-		reader.readAsDataURL(input.files[0]);
+				reader.onload = function(e) {
+					$('#avatar')
+						.attr('src', e.target.result);
+				//                .width(150)
+				//                .height(200);
+				};
+
+				reader.readAsDataURL(input.files[0]);
+			}
+		});
+
+
 	}
 }
 //-------PROFILE END-----
@@ -136,6 +152,58 @@ function loadProfileData() {
 			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 		}
 	});
+}
+function submitProfileData(form) {
+	console.log('Submiting form: ' + form.find("#upload_avatar").val());
+
+	//	if (form.find("#upload_avatar").files) {
+	//
+	//		console.log("It works!");
+	//	}
+
+
+	var data = {
+		firstName : form.find("#first_name").val(),
+		lastName : form.find("#last_name").val(),
+		email : form.find("#email").val(),
+		password : form.find("#new_password").val()
+	//		,
+	//		avatar : form.find("#upload_avatar").files[0]
+	};
+	if (form.valid()) {
+		console.log("Form is valid");
+		console.log("Submiting data object" + JSON.stringify(data));
+
+		var s = JSON.stringify(data);
+		console.log(s);
+		$.ajax({
+			url : submitProfileDataURL,
+			type : "POST",
+			data : s,
+			contentType : "application/json",
+			dataType : "json",
+			success : function(flag) {
+
+				if (flag == undefined) {
+					alert("Undefined! Not successful!");
+					return;
+				}
+				if (flag == true) {
+					alert("True! Successful!");
+				} else {
+					alert("False! Not successful!");
+				}
+				location.reload();
+
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+			}
+		});
+	}
+
+//
+//	
 }
 function submitComment(comment) {
 	console.log('Submiting comment.');

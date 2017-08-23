@@ -70,6 +70,13 @@ public class Users implements Serializable {
 			}
 		}
 	}
+	
+	public void addUser(User entry) {
+	
+		usersList.add(entry);
+		usersMap.put(entry.getUserId(), entry);
+		usersMapByUsername.put(entry.getUsername(), entry);
+	}
 
 	/**
 	 * Cita korisnike iz datoteke i smesta ih u asocijativnu listu korisnika.
@@ -119,33 +126,16 @@ public class Users implements Serializable {
 		}
 	}
 
-	public User saveUser(User user) {
-		BufferedWriter out = null;
-		try {
-			File file = new File(rootPath + pathToFile);
-			System.out.println(file.getCanonicalPath());
-			out = new BufferedWriter(new FileWriter(file, true));
 
-			String data = user.toString();
+	public boolean updateUser(User user) {
 
-			System.out.println(data);
-			out.write("\n" + data);
+		usersList.remove(user);
+		usersMap.remove(user.getUserId());
+		usersMapByUsername.remove(user.getUsername());
+		usersList.add(user);
+		usersMap.put(user.getUserId(), user);
+		usersMapByUsername.put(user.getUsername(), user);
 
-			usersList.add(user);
-			usersMap.put(user.getUserId(), user);
-			usersMapByUsername.put(user.getUsername(), user);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (Exception e) {
-				}
-			}
-		}
-		return user;
+		return true;
 	}
-
 }

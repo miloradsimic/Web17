@@ -51,13 +51,13 @@ function setMainMenuTabSelected() {
 
 function setProfileMenuTabSelected(tab_name) {
 
-
-    
 }
 
 function showLoginModal() {
 	$("#signupModal").modal("hide");
 	$("#loginModal").modal();
+	$("#loginModal").find("#username").val("moderator");
+	$("#loginModal").find("#password").val("moderator");
 	$("body").addClass("notScroll");
 	$("#loginSubmit").on("click", login);
 }
@@ -269,7 +269,32 @@ function renderProfilePage(user) {
 			$(this).find("#last_name").val(user.lastName);
 			$(this).find("#email").val(user.email);
 			$(this).find("#avatar").attr("src", user.avatar);
-//			console.log(this.find("#first_name"));
+//			$(this).find("#upload_avatar").on("")
+			
+			$(this).find("#edit_profile_form").validate({
+			        rules : {
+			            new_password : {
+			                minlength : 3
+			            },
+			            confirm_password : {
+			                equalTo : "#new_password"
+			            },
+			            email : {
+			            	email: true
+			            }
+			        },
+			        messages: {
+			        	new_password:  {
+			            	minlength: "Minimal length is 3"
+			            },
+			            confirm_password: {
+			            	equalTo: "Passwords don't match"
+			            },
+			            email: {
+			            	email: "Your email address must be in the format of name@domain.com"
+			            }
+			          }
+				});
 		});
 		//console.log($("#mediaContainer").find("#").val());
 		
