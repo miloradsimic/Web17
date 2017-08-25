@@ -58,16 +58,29 @@ function goToProfile(id) {
 
 function setUpProfileAvatar(input) {
 	if (input.files && input.files[0]) {
+	
 
-		console.log("TRUE");
-		var file = input.files[0];
-		$.ajax({
-			url : upload_avatarURL,
-			type : "POST",
-			contentType : "multipart/form-data",
-			data : file,
-			processData : false,
-			success : function(isDone) {
+	    var objFormData = new FormData();
+	    var objFile = input.files[0]
+	    
+//	    var name1 = objFile.fileName;
+//	    var name2 = objFile.name;
+//	    
+//	    console.log('file name1: ' + name1);
+//	    console.log('file name2: ' + name2);
+//	    console.log('file name type: ' + name1.constructor.name + " name 2 " + name2.constructor.name);
+		
+	    objFormData.append('image', objFile);
+	    objFormData.append('name', objFile.name);
+	    
+	    
+	    $.ajax({
+	        url: upload_avatarURL,
+	        type: 'POST',
+	        contentType: false,
+	        data: objFormData,
+	        processData: false,
+	        success : function(isDone) {
 				var reader = new FileReader();
 
 				reader.onload = function(e) {
@@ -78,10 +91,65 @@ function setUpProfileAvatar(input) {
 				};
 
 				reader.readAsDataURL(input.files[0]);
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				var OriginalString = XMLHttpRequest.responseText;
+				var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+				console.log(StrippedString);
+				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 			}
-		});
+	    });
+		/*
 
+		//		var data = new FormData();
+		var file = input.files[0];
+		//		data.append('file', file);
+		//		data.append('name', file.name);
+		//		var formData = new FormData();
+		//		formData.append('uploadfile', file);
+		var reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function() {
+			console.log(reader.result);
 
+			var data = {
+				image : reader
+			};
+			console.log("JSON upload data type:" + reader.result.constructor.name);
+			console.log("TRUE");
+			$.ajax({
+				url : upload_avatarURL,
+				type : "POST",
+				contentType : "application/json",
+				data : data,
+				processData : false,
+				success : function(isDone) {
+					var reader = new FileReader();
+
+					reader.onload = function(e) {
+						$('#avatar')
+							.attr('src', e.target.result);
+					//                .width(150)
+					//                .height(200);
+					};
+
+					reader.readAsDataURL(input.files[0]);
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown) {
+					var OriginalString = XMLHttpRequest.responseText;
+					var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+					console.log(StrippedString);
+					alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+				}
+			});
+
+		};
+		reader.onerror = function(error) {
+			console.log('Error: ', error);
+		};
+
+		//var extension = file.fileName.substr('.', file.name.length);
+		*/
 	}
 }
 //-------PROFILE END-----

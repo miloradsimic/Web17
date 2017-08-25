@@ -63,15 +63,6 @@
 								class="form-control input-md">
 						</div>
 					</div>
-					
-					<!-- File Button -->
-					<div class="form-group">
-						<label class="col-md-4 control-label" for="Upload photo">Upload
-							photo</label>
-						<div class="col-md-4">
-							<input id="upload_avatar" onchange="setUpProfileAvatar(this);" name="Upload photo" class="input-file" type="file">
-						</div>
-					</div>
 
 					<div class="form-group">
 						<label class="col-md-4 control-label"></label>
@@ -87,8 +78,18 @@
 				</fieldset>
 			</form>
 		</div>
-		<div class="col-md-2 hidden-xs">
+		<div class="col-md-2 col-lg-1">
 			<img id="avatar"
 				src="http://websamplenow.com/30/userprofile/images/avatar.jpg"
 				class="img-responsive img-thumbnail ">
+			<!-- File Button -->
+			<div>
+				<label class="control-label" for="Upload photo">Upload
+					photo</label>
+				<div>
+					<input id="upload_avatar" onchange="setUpProfileAvatar(this);"
+						name="Upload photo" class="input-file" type="file">
+				</div>
+			</div>
+
 		</div>

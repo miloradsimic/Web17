@@ -1,12 +1,23 @@
 package services;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
+import javax.imageio.ImageIO;
+import javax.print.attribute.ResolutionSyntax;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -18,8 +29,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import com.sun.org.apache.xml.internal.security.keys.content.KeyValue;
 
+import beans.AvatarBean;
 import beans.Comment;
 import beans.CommentLikeBean;
 import beans.CommentRating;
@@ -36,7 +50,9 @@ import beans.User;
 import beans.Users;
 import controller.DataManager;
 import controller.Utils;
+import javassist.bytecode.ByteArray;
 import model.enums.Role;
+import sun.misc.BASE64Decoder;
 
 @Path("/homepage")
 public class HomePageService {
@@ -96,7 +112,7 @@ public class HomePageService {
 			/* @PathParam("subforum") long subforumId, */ @PathParam("topic") long topicId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
-		
+
 		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
 		Topic topic = getTopics().getTopicsMap().get(topicId);
 		ArrayList<Comment> allComments = getComments().getCommentList();
@@ -112,55 +128,65 @@ public class HomePageService {
 		ArrayList<CommentRating> ratings = new ArrayList<>();
 		if (loggedUser != null) {
 			for (CommentRating rating : getRatings().getRatingsList()) {
-				if(getComments().getComment(rating.getCommentId()).getTopicId() == topicId && 
-						rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
+				if (getComments().getComment(rating.getCommentId()).getTopicId() == topicId && rating
+						.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
 					ratings.add(rating);
 				}
 			}
 		}
-		
+
 		HashMap<String, Object> retVal = new HashMap<>();
 		retVal.put("topic", topic);
 		retVal.put("ratings", ratings);
 
 		return retVal;
 	}
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Path("submit_profile_data")
-	public Boolean uploadProfileData(@Context HttpServletRequest request, EditProfileBean profileData) throws Exception {
-	    
+	public Boolean uploadProfileData(@Context HttpServletRequest request, EditProfileBean profileData)
+			throws Exception {
+
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
-		
+
 		User old = getUsers().getUsersMapByUsername().get(loggedUser.getUsername());
 		old.setFirstName(profileData.getFirstName());
 		old.setLastName(profileData.getLastName());
 		old.setEmail(profileData.getEmail());
-		if(!profileData.getPassword().equals("")){
+		if (!profileData.getPassword().equals("")) {
 			old.setPassword(profileData.getPassword());
 		}
-		
+
 		if (DataManager.getInstance().updateProfile(old)) {
 			ctx.setAttribute("users", DataManager.getInstance().readUsers());
 			return true;
 		}
-		
-	    return false;
+
+		return false;
 	}
-	
+
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@Produces(MediaType.APPLICATION_JSON)
+	// @Produces(MediaType.APPLICATION_JSON)
 	@Path("upload_avatar")
-	public Boolean uploadAvatar(InputStream fileInputStream) throws Exception {
-	    
-		System.out.println("File: " + fileInputStream);
-	    return true;
+	public Boolean uploadAvatar(@Context HttpServletRequest request, @FormDataParam("image") File image,
+			@FormDataParam("name") String name) throws Exception {
+		System.out.println(name);
+
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		if (loggedUser == null) {
+			return null;
+		}
+
+		DataManager.getInstance().saveAvatar(image, name, loggedUser.getUsername());
+
+		return true;
 	}
-	
+
 	@GET
 	@Path("/profile/{profile}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -169,52 +195,55 @@ public class HomePageService {
 			/* @PathParam("subforum") long subforumId, */ @PathParam("profile") long profileId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
-		
+
 		User retVal;
-		if(loggedUser != null && (retVal = getUsers().getUsersMapByUsername().get(loggedUser.getUsername())).getUserId() == profileId) {
+		if (loggedUser != null && (retVal = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()))
+				.getUserId() == profileId) {
 			// return full profile data.
-			
-			
+
 		} else {
 			User temp = getUsers().getUsersMap().get(profileId);
-			if(temp == null) {
+			if (temp == null) {
 				System.out.println("User doesn't exist dude!");
 				return null;
 			}
 			retVal = new User(temp);
-			
+
 			// return min profile data
 			// not gonna be implemented for now
 		}
 
 		return retVal;
-		
-		
-//		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
-//		Topic topic = getTopics().getTopicsMap().get(topicId);
-//		ArrayList<Comment> allComments = getComments().getCommentList();
-//		HashMap<Long, User> users = getUsers().getUsersMap();
-//
-//		topic.getComments().clear();
+
+		// System.out.println("Reading topic with id: " + topicId + ". Loading
+		// comments.");
+		// Topic topic = getTopics().getTopicsMap().get(topicId);
+		// ArrayList<Comment> allComments = getComments().getCommentList();
+		// HashMap<Long, User> users = getUsers().getUsersMap();
+		//
+		// topic.getComments().clear();
 		// Find all comments of topic
-//		for (Comment comment : allComments) {
-//			if (topic.getTopicId() == comment.getTopicId()) {
-//				topic.getComments().add(comment);
-//			}
-//		}
-//		ArrayList<CommentRating> ratings = new ArrayList<>();
-//		if (loggedUser != null) {
-//			for (CommentRating rating : getRatings().getRatingsList()) {
-//				if(getComments().getComment(rating.getCommentId()).getTopicId() == topicId && 
-//						rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
-//					ratings.add(rating);
-//				}
-//			}
-//		}
-//		
-//		HashMap<String, Object> retVal = new HashMap<>();
-//		retVal.put("topic", topic);
-//		retVal.put("ratings", ratings);
+		// for (Comment comment : allComments) {
+		// if (topic.getTopicId() == comment.getTopicId()) {
+		// topic.getComments().add(comment);
+		// }
+		// }
+		// ArrayList<CommentRating> ratings = new ArrayList<>();
+		// if (loggedUser != null) {
+		// for (CommentRating rating : getRatings().getRatingsList()) {
+		// if(getComments().getComment(rating.getCommentId()).getTopicId() ==
+		// topicId &&
+		// rating.getUserId() ==
+		// getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId())
+		// {
+		// ratings.add(rating);
+		// }
+		// }
+		// }
+		//
+		// HashMap<String, Object> retVal = new HashMap<>();
+		// retVal.put("topic", topic);
+		// retVal.put("ratings", ratings);
 
 	}
 
@@ -290,20 +319,21 @@ public class HomePageService {
 			System.out.println("You can't comment because you're not logged.");
 			return null;
 		} else {
-			
+
 			long userId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
-			DataManager.getInstance().saveRating(new CommentRating(comment.getCommentId(),userId, comment.getRatingValue()));
+			DataManager.getInstance()
+					.saveRating(new CommentRating(comment.getCommentId(), userId, comment.getRatingValue()));
 			ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
-			
+
 			int likes = getComments().getComment(comment.getCommentId()).getLikes();
 			int dislikes = getComments().getComment(comment.getCommentId()).getDislikes();
 			int total = likes - dislikes;
 
 			HashMap<String, Object> retVal = new HashMap<>();
 			retVal.put("total", total);
-			
+
 			int value = 0;
-			if(getRatings().getRating(comment.getCommentId(), userId) != null){
+			if (getRatings().getRating(comment.getCommentId(), userId) != null) {
 				value = getRatings().getRating(comment.getCommentId(), userId).getValue();
 			}
 			retVal.put("rated", value);
@@ -400,7 +430,7 @@ public class HomePageService {
 		CommentRating r2 = new CommentRating(1l, 2l, 1);
 		CommentRating r3 = new CommentRating(1l, 3l, 1);
 		CommentRating r4 = new CommentRating(2l, 1l, -1);
-		
+
 		DataManager.getInstance().saveRating(r1);
 		DataManager.getInstance().saveRating(r2);
 		DataManager.getInstance().saveRating(r3);
@@ -427,13 +457,16 @@ public class HomePageService {
 		DataManager.getInstance().saveComment(c5);
 		DataManager.getInstance().saveComment(c6);
 	}
-	
+
 	private void usersData() {
-	
-		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com", "resources/lav.jpg");
-		User u2 = new User(2, Role.MODERATOR, "moderator", "moderator", "Mike", "Morison", "0652222222", "mike@gmail.com", "resources/lav.jpg");
-		User u3 = new User(3, Role.USER, "user", "user", "Usain", "Ulman", "0653333333", "usain@gmail.com", "resources/slon.jpg");
-		
+
+		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com",
+				"resources/lav.jpg");
+		User u2 = new User(2, Role.MODERATOR, "moderator", "moderator", "Mike", "Morison", "0652222222",
+				"mike@gmail.com", "resources/lav.jpg");
+		User u3 = new User(3, Role.USER, "user", "user", "Usain", "Ulman", "0653333333", "usain@gmail.com",
+				"resources/slon.jpg");
+
 		DataManager.getInstance().saveUser(u1);
 		DataManager.getInstance().saveUser(u2);
 		DataManager.getInstance().saveUser(u3);

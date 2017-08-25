@@ -191,6 +191,11 @@ span .pull-right {
 	background-color: #AAAAFF;
 	opacity: 1;
 }
+
+input[type='file'] {
+  color: transparent;
+}
+
 /*
 .profile-menu a:focus {
 	text-decoration: none;
