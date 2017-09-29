@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
+import javax.jws.soap.SOAPBinding.Use;
 import javax.print.attribute.ResolutionSyntax;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +48,7 @@ import beans.Subforums;
 import beans.Topic;
 import beans.Topics;
 import beans.User;
+import beans.UserPublicBean;
 import beans.Users;
 import controller.DataManager;
 import controller.Utils;
@@ -140,6 +142,38 @@ public class HomePageService {
 		retVal.put("ratings", ratings);
 
 		return retVal;
+	}
+
+	/**
+	 * Returns registered users
+	 */
+	@GET
+	@Path("/users_list/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public ArrayList<UserPublicBean> test6(@Context HttpServletRequest request, @PathParam("id") long userId) {
+
+		ArrayList<UserPublicBean> retValList = new ArrayList<>();
+		UserPublicBean tempUser;
+		for (User user : getUsers().getUsers()) {
+	
+			if (user.getUserId() == userId) {
+				continue;
+			}
+			tempUser = new UserPublicBean();
+			
+			tempUser.setUserId(user.getUserId());
+			tempUser.setUsername(user.getUsername());
+			tempUser.setFirstName(user.getFirstName());
+			tempUser.setLastName(user.getLastName());
+			tempUser.setAvatar(user.getAvatar());
+			
+			System.out.println(tempUser.getUsername());
+			
+			retValList.add(tempUser);
+			
+		}
+		return retValList;
 	}
 
 	@POST
@@ -438,17 +472,17 @@ public class HomePageService {
 	}
 
 	private void commentsData() {
-		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 0,
+		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("admin"), Utils.getCurrentDate(), 0,
 				"Text komentara1", 0, 0, false);
-		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("johnnydoe"), Utils.getCurrentDate(), 1,
+		Comment c2 = new Comment(2l, 1l, getUsers().getUsersMapByUsername().get("admin"), Utils.getCurrentDate(), 1,
 				"Text komentara2", 0, 0, false);
-		Comment c3 = new Comment(3l, 1l, getUsers().getUsersMapByUsername().get("mika"), Utils.getCurrentDate(), 0,
+		Comment c3 = new Comment(3l, 1l, getUsers().getUsersMapByUsername().get("moderator"), Utils.getCurrentDate(), 0,
 				"Text komentara3", 0, 0, false);
-		Comment c4 = new Comment(4l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 2,
+		Comment c4 = new Comment(4l, 1l, getUsers().getUsersMapByUsername().get("admin"), Utils.getCurrentDate(), 2,
 				"Text komentara4", 0, 0, false);
-		Comment c5 = new Comment(5l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 4,
+		Comment c5 = new Comment(5l, 1l, getUsers().getUsersMapByUsername().get("user"), Utils.getCurrentDate(), 4,
 				"Text komentara5", 0, 0, false);
-		Comment c6 = new Comment(6l, 1l, getUsers().getUsersMapByUsername().get("johnsmith"), Utils.getCurrentDate(), 4,
+		Comment c6 = new Comment(6l, 1l, getUsers().getUsersMapByUsername().get("user"), Utils.getCurrentDate(), 4,
 				"Text komentara6", 0, 0, false);
 		DataManager.getInstance().saveComment(c1);
 		DataManager.getInstance().saveComment(c2);

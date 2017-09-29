@@ -3,13 +3,11 @@ var subforumsURL = "rest/homepage/subforums";
 var topicsURL = "rest/homepage/topics";
 var topicURL = "rest/homepage/topic";
 var profileURL = "rest/homepage/profile";
+var users_listURL = "rest/homepage/users_list";
 var upload_avatarURL = "rest/homepage/upload_avatar";
 var submitProfileDataURL = "rest/homepage/submit_profile_data";
 
 executeOnLoad();
-
-
-
 function executeOnLoad() {
 	assignListeners();
 	loadLoggedUser();
@@ -25,7 +23,6 @@ function executeOnLoad() {
 //	}
 //	console.log("ExecuteOnLoad executed!" + sessionStorage.getItem('user'));
 }
-
 function assignListeners() {
 	$(function() {
 		$("#loginSubmit").on("click", login);
@@ -37,16 +34,15 @@ function assignListeners() {
 }
 
 //Redirect functions
-
 function goToSubforum(id) {
 	window.location.href = "subforum.html" + "?id=" + id;
 }
-
 function goToTopic(id) {
 	window.location.href = "topic.html" + "?id=" + id;
 }
 // ------PROFILE-----
 function goToProfile(id) {
+	console.log('Go To Profile');
 	var ID = id;
 	if (id == -1) {
 		console.log("id = -1 !" + JSON.parse(sessionStorage.getItem('user')).username);
@@ -55,7 +51,6 @@ function goToProfile(id) {
 	window.location.href = "profile.html" + "?id=" + ID;
 
 }
-
 function setUpProfileAvatar(input) {
 	if (input.files && input.files[0]) {
 	
@@ -152,59 +147,12 @@ function setUpProfileAvatar(input) {
 		*/
 	}
 }
-//-------PROFILE END-----
-
-//AJAX calls
-
-
-
-function loadTopicDetailsAndComments() {
-	//	console.log('LoadTopicDetailsAndComments from file into page.');
-	var id = getUrlParameter("id");
-	//	console.log('Topic id: ' + id);
-	$.ajax({
-		type : 'GET',
-		url : topicURL + "/" + id,
-		dataType : "json", // data type of response
-		success : renderTopicAndComments,
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
-		}
-	});
-}
-
-function loadSubforums() {
-	console.log('LoadSubforums from file into page.');
-	$.ajax({
-		type : 'GET',
-		url : subforumsURL,
-		dataType : "json", // data type of response
-		success : renderSubforumsList,
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR6: " + errorThrown + "\nTextStatus: " + textStatus);
-		}
-	});
-}
-
-
-function loadTopics() {
-	console.log('LoadTopics from file into page.');
-	var id = getUrlParameter("id");
-	console.log('Subforum id: ' + id);
-	$.ajax({
-		type : 'GET',
-		url : topicsURL + "/" + id,
-		dataType : "json", // data type of response
-		success : renderTopicsList,
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			var OriginalString = XMLHttpRequest.responseText;
-			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
-			console.log(StrippedString);
-			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
-		}
-	});
-}
 function loadProfileData() {
+	if(userLogged()==false){
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
 	console.log('Load Profile Data');
 	var id = getUrlParameter("id");
 	console.log('User id: ' + id);
@@ -272,6 +220,84 @@ function submitProfileData(form) {
 
 //
 //	
+}
+function loadUsersList(){
+	console.log('Load Users List');
+	var id = getUrlParameter("id");
+	console.log('User with id: ' + id + ' requests all users list' );
+	$.ajax({
+		type : 'GET',
+		url : users_listURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderUsersListPage,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
+//-------PROFILE END-----
+
+//AJAX calls
+function loadTopicDetailsAndComments() {
+	if(userLogged()==false){
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
+	//	console.log('LoadTopicDetailsAndComments from file into page.');
+	var id = getUrlParameter("id");
+	//	console.log('Topic id: ' + id);
+	$.ajax({
+		type : 'GET',
+		url : topicURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderTopicAndComments,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
+	});
+}
+function loadSubforums() {
+	if(userLogged()==false){
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
+	console.log('LoadSubforums from file into page.');
+	$.ajax({
+		type : 'GET',
+		url : subforumsURL,
+		dataType : "json", // data type of response
+		success : renderSubforumsList,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR6: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
+	});
+}
+function loadTopics() {
+	if(userLogged()==false){
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
+	console.log('LoadTopics from file into page.');
+	var id = getUrlParameter("id");
+	console.log('Subforum id: ' + id);
+	$.ajax({
+		type : 'GET',
+		url : topicsURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderTopicsList,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+		}
+	});
 }
 function submitComment(comment) {
 	console.log('Submiting comment.');
@@ -371,11 +397,8 @@ function submitLike(element, commentId) {
 	});
 
 }
-function submitDislike(commentId) {
-}
 
 //Helper functions
-
 //Helper function to serialize all the form fields into a JSON string
 function formToJSON(id, count) {
 	return JSON.stringify({
@@ -383,7 +406,6 @@ function formToJSON(id, count) {
 		"count" : count,
 	});
 }
-
 function getUrlParameter(sParam) {
 	var sPageURL = decodeURIComponent(window.location.search.substring(1)),
 		sURLVariables = sPageURL.split('&'),
@@ -398,7 +420,8 @@ function getUrlParameter(sParam) {
 		}
 	}
 }
-
 function userLogged() {
-	return sessionStorage.getItem("user") != null;
+	var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
+	console.log('isUserLogged = ' + isLogged);
+	return isLogged;
 }

@@ -9,14 +9,12 @@ function loadLoggedUser() {
 		success : function(user) {
 			if (user != null) {
 				sessionStorage.setItem("user", JSON.stringify(user));
-										console.log("ExecuteOnLoad executed not null!" + sessionStorage.getItem('user'));
-				
-				showLogoutButons(user);
+
+				console.log('Load Logged User [User is logged]');
 				
 			} else {
-				showLoginButons();
 				sessionStorage.removeItem("user");
-									console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
+				console.log('Load Logged User [User is NOT logged]');
 			}
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {

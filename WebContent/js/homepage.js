@@ -1,8 +1,8 @@
 var DEFAULT_IMAGE = "resources/cvet.jpg"
 
-
 function showLoginButons() {
 //	console.log("MENU PROFILE is visible: " + $("#menuContainer").is(':visible'));
+	console.log("Show login buttons");
 	$("#menuContainer").load("menu.html", function(){
 		$(this).find("#menu_profile").hide();
 		setMainMenuTabSelected();
@@ -11,9 +11,13 @@ function showLoginButons() {
 	$("#loginButtons").show();
 	$("#logoutButton").hide();
 }
-
-function showLogoutButons(data) {
-	console.log("user: " + data);
+function showLogoutButons() {
+	var data = JSON.parse(sessionStorage.getItem("user"));
+	console.log("Show logout buttons");
+	console.log("userID=" + data.userId + " username=" + data.username);
+	console.log("object: " + JSON.stringify(data));
+	
+	
 //	console.log("MENU PROFILE is visible: " + $("#menu_profile").is(':visible'));
 	$("#menuContainer").load("menu.html", function(){
 		$(this).find("#menu_profile").show();
@@ -24,8 +28,12 @@ function showLogoutButons(data) {
 		'<a id="logout" role="button" onclick=logout()>log out</a>');
 	$("#logoutButton").show();
 
-}
+	console.log("Logout button: " + $("#logoutButton"));
+	console.log("Logout button html: " + $("#logoutButton").html());
+	console.log("Logout button text: " + $("#logoutButton").text());
+	
 
+}
 function setMainMenuTabSelected() {
 	var page_name = window.location.pathname.split("/")[2];
 	var page_name=page_name.substr(0,page_name.indexOf(".")).toLowerCase();
@@ -48,11 +56,8 @@ function setMainMenuTabSelected() {
 	$('.nav .navbar-nav li').removeClass('active');
     $("#" + menu_item_id).parent().addClass('active');  
 }
-
 function setProfileMenuTabSelected(tab_name) {
-
 }
-
 function showLoginModal() {
 	$("#signupModal").modal("hide");
 	$("#loginModal").modal();
@@ -61,14 +66,12 @@ function showLoginModal() {
 	$("body").addClass("notScroll");
 	$("#loginSubmit").on("click", login);
 }
-
 function showSignupModal() {
 	$("#loginModal").modal("hide");
 	$("#signupModal").modal();
 	$("body").addClass("notScroll");
 	$("#signUpSubmit").on("click", signup);
 }
-
 function renderSubforumsList(data) {
 	console.log('renderSubforumsList form file into page.');
 	console.log(data);
@@ -100,7 +103,6 @@ function renderSubforumsList(data) {
 		$('#mediaContainer').append(media);
 	});
 }
-
 function renderTopicsList(data) {
 	console.log('renderTopicsList form file into page.');
 	console.log(data);
@@ -146,7 +148,6 @@ function renderTopicsList(data) {
 		$("#mediaContainer").append(media);
 	});
 }
-
 function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');
 	console.log(data);
@@ -214,7 +215,6 @@ function renderTopicAndComments(data) {
 	$("#mediaContainer").append(commentsContainer);
 
 }
-
 function renderProfilePage(user) {
 
 //	setActiveMenuItem("menu_profile");
@@ -241,6 +241,11 @@ function renderProfilePage(user) {
 	  </div>*/
 	if(user == undefined) {
 		console.log("User is undefined!");
+	}
+	if(!userLogged()){
+		console.log("User not logged");
+		showLoginButons();
+		return;
 	}
 	console.log(user.firstName);
 //	
@@ -305,7 +310,168 @@ function renderProfilePage(user) {
 	
 	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
 }
+function renderUsersListPage(data) {
+//data: list of users with attributes {id, username, firstname, lastname, email, telephone}
+	
+//	setActiveMenuItem("menu_profile");
+	/*var menu = $('<div class="profile-menu menu" id="menu"></div>');
+	var ul = $('<ul class="profile-list-inline list-inline"></ul>');
+	var li1 = $('<li><a href="#">profile</a></li>');
+	var li2 = $('<li><a href="#">messages</a></li>');
+	var li3 = $('<li><a href="#">manage users</a></li>');
+	var li4 = $('<li><a href="#">manage topics</a></li>');
+	var li5 = $('<li><a href="#">manage subforums</a></li>');
 
+	ul.append(li1);
+	ul.append(li2);
+	ul.append(li3);
+	ul.append(li4);
+	ul.append(li5);
+	menu.append(ul);
+	
+	$("#mediaContainer").append(menu);
+	
+	
+	<div class="col-md-2 hidden-xs">
+	<img src="http://websamplenow.com/30/userprofile/images/avatar.jpg" class="img-responsive img-thumbnail ">
+	  </div>*/
+//	if(user == undefined) {
+//		console.log("User is undefined!");
+//	}
+//	console.log(user.firstName);
+	console.log('renderUsersList start');
+	console.log("users: " + data);
+
+	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
+	
+//	console.log("Provided user" + user.username);
+	
+	$("#menuContainer").load("menu.html", function(){
+		$(this).find("#menu_profile").show();
+		setMainMenuTabSelected();
+	});
+	
+	$("#profileMenuContainer").load("profile_menu.html", function(){
+		$('profile-list-inline li').removeClass('active');
+	    $("#profile").parent().addClass('active');
+//		console.log(this.find("#first_name"));
+	});
+	
+	$("#mediaContainer").load("profile_manage_users.html", function(){
+		var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
+		var container = $(this).find("#profile_manage_users_list");
+
+		$.each(list, function(index, user) {
+
+			console.log("username: " + user.username);
+		});
+	});
+	
+	
+//	
+//	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
+//	var container = $("#profile_manage_users_list");
+//
+//	$.each(list, function(index, user) {
+//
+//		console.log("username: " + user.username);
+//
+//
+//		var media = $('<div class="topic media" onclick="goToTopic(\'' + topic.topicId + '\')"></div>');
+//
+//		
+//		
+//		var mediaFirstChild = $('<div class="media-left media-top"></div>');
+//		var slika = DEFAULT_IMAGE;
+//
+//		if (topic.author.avatar !== "") {
+//			slika = topic.author.avatar;
+//		}
+//		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
+//
+//		mediaFirstChild.append(mediaThumbnail);
+//		media.append(mediaFirstChild);
+//
+//		var mediaBody = $('<div class="media-body"></div');
+//		var heading = $('<h4 class="media-heading">' + topic.title + '</div>');
+//
+//
+//		var likes = $('<span class="media-left media-top">Likes: ' + topic.likes + '</span>');
+//		var dislikes = $('<span class="media-left media-bottom">Dislikes: ' + topic.dislikes + '</span>');
+//		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
+//
+//
+//		mediaBody.append(heading);
+//		mediaBody.append(date);
+//		mediaBody.append(likes);
+//		mediaBody.append(dislikes);
+//		media.append(mediaBody);
+//
+//		$("#mediaContainer").append(media);
+//	});
+
+//	
+//	
+//	
+//	
+//	
+//	// Logged user profile
+//	if(JSON.parse(sessionStorage.getItem('user')).username === user.username) {
+//
+//		console.log("TRUE!");
+//		$("#menuContainer").load("menu.html", function(){
+//			$(this).find("#menu_profile").show();
+//			setMainMenuTabSelected();
+//		});
+//		
+//		$("#profileMenuContainer").load("profile_menu.html", function(){
+//			$('profile-list-inline li').removeClass('active');
+//		    $("#profile").parent().addClass('active');
+////			console.log(this.find("#first_name"));
+//		});
+//		
+//		$("#mediaContainer").load("profile_logged_user.html", function(){
+//			$(this).find("#first_name").val(user.firstName);
+//			$(this).find("#last_name").val(user.lastName);
+//			$(this).find("#email").val(user.email);
+//			$(this).find("#avatar").attr("src", user.avatar);
+////			$(this).find("#upload_avatar").on("")
+//			
+//			$(this).find("#edit_profile_form").validate({
+//			        rules : {
+//			            new_password : {
+//			                minlength : 3
+//			            },
+//			            confirm_password : {
+//			                equalTo : "#new_password"
+//			            },
+//			            email : {
+//			            	email: true
+//			            }
+//			        },
+//			        messages: {
+//			        	new_password:  {
+//			            	minlength: "Minimal length is 3"
+//			            },
+//			            confirm_password: {
+//			            	equalTo: "Passwords don't match"
+//			            },
+//			            email: {
+//			            	email: "Your email address must be in the format of name@domain.com"
+//			            }
+//			          }
+//				});
+//		});
+//	}
+
+//	console.log($("#mediaContainer").find("#").val());
+	
+//	$("#mediaContainer").attr("w3-include-html", "profile_logged_user.html");
+//	console.log($("#mediaContainer").find("#first_name").html());
+//	$("#mediaContainer").find("#first_name").val(user.firstName);
+
+	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
+}
 function printAll(comment, ratings, commentsContainer) {
 	var rating;
 	$.each(ratings, function(index, tempRating) {
@@ -344,7 +510,7 @@ function printAll(comment, ratings, commentsContainer) {
 		if (rating != undefined && rating.value == -1) {
 			used = "used";
 		}
-		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this)),' + comment.commentId + ')"></div>');
+		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
 
@@ -387,7 +553,6 @@ function printAll(comment, ratings, commentsContainer) {
 	//	well.append(commentListItem);
 	commentsContainer.append(commentListItem);
 }
-
 function buildCommentReplyBox(reply) {
 	console.log("reply hide " + reply.name);
 	reply.hide();
@@ -401,7 +566,6 @@ function buildCommentReplyBox(reply) {
 	reply.parent().append(container);
 	console.log("reply hide ");
 }
-
 /*function submitComment(button){
 	console.log("Button " + button);
 	console.log("Button parent (textarea) " + button.parent());
