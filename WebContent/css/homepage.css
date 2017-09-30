@@ -196,6 +196,10 @@ input[type='file'] {
   color: transparent;
 }
 
+.center-verticaly {
+    vertical-align: middle;
+}
+
 /*
 .profile-menu a:focus {
 	text-decoration: none;

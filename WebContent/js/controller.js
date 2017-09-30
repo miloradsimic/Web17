@@ -147,6 +147,7 @@ function setUpProfileAvatar(input) {
 		*/
 	}
 }
+/** Loaded on click on Profile*/
 function loadProfileData() {
 	if(userLogged()==false){
 		showLoginButons();
@@ -229,7 +230,7 @@ function loadUsersList(){
 		type : 'GET',
 		url : users_listURL + "/" + id,
 		dataType : "json", // data type of response
-		success : renderUsersListPage,
+		success : renderManageUsersPage,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			var OriginalString = XMLHttpRequest.responseText;
 			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");

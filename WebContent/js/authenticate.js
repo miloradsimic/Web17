@@ -15,6 +15,7 @@ function loadLoggedUser() {
 			} else {
 				sessionStorage.removeItem("user");
 				console.log('Load Logged User [User is NOT logged]');
+				showLoginButons();
 			}
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {

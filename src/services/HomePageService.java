@@ -63,20 +63,16 @@ public class HomePageService {
 	HttpServletRequest request;
 	@Context
 	ServletContext ctx;
-
 	/**
-	 * Testira REST sistem. URL izgleda ovako: <code>rest/demo/test</code>
-	 * 
-	 * @return Vra�a tekst da vidimo da sve radi.
+	 * Returns all subforums available on forum
 	 */
 	@GET
 	@Path("/subforums")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<Subforum> test() {
+	public ArrayList<Subforum> getSubformData() {
 		return getSubforums().getSubforumsList();
 	}
-
 	/**
 	 * Returns all topic of selected subforum
 	 */
@@ -102,7 +98,6 @@ public class HomePageService {
 		}
 		return topicsFromSubforum;
 	}
-
 	/**
 	 * Returns full topic object with loaded comments
 	 */
@@ -143,7 +138,6 @@ public class HomePageService {
 
 		return retVal;
 	}
-
 	/**
 	 * Returns registered users
 	 */
@@ -151,7 +145,7 @@ public class HomePageService {
 	@Path("/users_list/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<UserPublicBean> test6(@Context HttpServletRequest request, @PathParam("id") long userId) {
+	public ArrayList<UserPublicBean> getUsersDataREST(@Context HttpServletRequest request, @PathParam("id") long userId) {
 
 		ArrayList<UserPublicBean> retValList = new ArrayList<>();
 		UserPublicBean tempUser;
@@ -175,7 +169,6 @@ public class HomePageService {
 		}
 		return retValList;
 	}
-
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -201,7 +194,6 @@ public class HomePageService {
 
 		return false;
 	}
-
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	// @Produces(MediaType.APPLICATION_JSON)
@@ -220,12 +212,11 @@ public class HomePageService {
 
 		return true;
 	}
-
 	@GET
 	@Path("/profile/{profile}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Object test5(@Context HttpServletRequest request,
+	public Object getProfileData(@Context HttpServletRequest request,
 			/* @PathParam("subforum") long subforumId, */ @PathParam("profile") long profileId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
@@ -280,13 +271,6 @@ public class HomePageService {
 		// retVal.put("ratings", ratings);
 
 	}
-
-	@GET
-	@Path("/test")
-	public String test2() {
-		return "Server radi";
-	}
-
 	/**
 	 * Demonstrira injektovanje HTTP zahteva u parametre metode. Injektovani
 	 * zahtev �emo iskoristiti da iz njega izvu�emo sesiju, a nju �emo
@@ -313,7 +297,6 @@ public class HomePageService {
 		}
 		return null;
 	}
-
 	@POST
 	@Path("/add_comment")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -340,7 +323,6 @@ public class HomePageService {
 			return true;
 		}
 	}
-
 	@POST
 	@Path("/like_comment_toogle")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -374,7 +356,6 @@ public class HomePageService {
 			return retVal;
 		}
 	}
-
 	@GET
 	@Path("/testlogin")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -386,7 +367,6 @@ public class HomePageService {
 		}
 		return "User " + retVal.getUsername() + " is currently logged!";
 	}
-
 	/**
 	 * Invalidira sesiju.
 	 * 
@@ -415,7 +395,6 @@ public class HomePageService {
 		}
 		return subforums;
 	}
-
 	private Topics getTopics() {
 		Topics allTopics = (Topics) ctx.getAttribute("topics");
 		if (allTopics == null) {
@@ -424,7 +403,6 @@ public class HomePageService {
 		}
 		return allTopics;
 	}
-
 	private Users getUsers() {
 		Users users = (Users) ctx.getAttribute("users");
 		if (users == null) {
@@ -435,7 +413,6 @@ public class HomePageService {
 		}
 		return users;
 	}
-
 	private Comments getComments() {
 		Comments comments = (Comments) ctx.getAttribute("comments");
 		if (comments == null) {
@@ -447,7 +424,6 @@ public class HomePageService {
 		}
 		return comments;
 	}
-
 	private CommentRatings getRatings() {
 		CommentRatings ratings = (CommentRatings) ctx.getAttribute("ratings");
 		if (ratings == null) {
@@ -457,7 +433,6 @@ public class HomePageService {
 		}
 		return ratings;
 	}
-
 	private void ratingsData() {
 
 		CommentRating r1 = new CommentRating(1l, 1l, 1);
@@ -470,7 +445,6 @@ public class HomePageService {
 		DataManager.getInstance().saveRating(r3);
 		DataManager.getInstance().saveRating(r4);
 	}
-
 	private void commentsData() {
 		Comment c1 = new Comment(1l, 1l, getUsers().getUsersMapByUsername().get("admin"), Utils.getCurrentDate(), 0,
 				"Text komentara1", 0, 0, false);
@@ -491,7 +465,6 @@ public class HomePageService {
 		DataManager.getInstance().saveComment(c5);
 		DataManager.getInstance().saveComment(c6);
 	}
-
 	private void usersData() {
 
 		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com",

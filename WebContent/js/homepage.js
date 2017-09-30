@@ -92,7 +92,7 @@ function renderSubforumsList(data) {
 		media.append(mediaFirstChild);
 
 		var mediaBody = $('<div class="media-body"></div');
-		var heading = $('<h4 class="media-heading">' + subforum.name + '</div>');
+		var heading = $('<div class="media-heading">' + subforum.name + '</div>');
 		var description = $('<p>' + subforum.description + '</p>')
 
 
@@ -131,7 +131,7 @@ function renderTopicsList(data) {
 		media.append(mediaFirstChild);
 
 		var mediaBody = $('<div class="media-body"></div');
-		var heading = $('<h4 class="media-heading">' + topic.title + '</div>');
+		var heading = $('<div class="media-heading">' + topic.title + '</div>');
 
 
 		var likes = $('<span class="media-left media-top">Likes: ' + topic.likes + '</span>');
@@ -243,8 +243,9 @@ function renderProfilePage(user) {
 		console.log("User is undefined!");
 	}
 	if(!userLogged()){
-		console.log("User not logged");
+		console.log("User not logged! Username:" + user.username );
 		showLoginButons();
+		/* Show unlogged user profile page. */
 		return;
 	}
 	console.log(user.firstName);
@@ -310,41 +311,13 @@ function renderProfilePage(user) {
 	
 	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
 }
-function renderUsersListPage(data) {
+function renderManageUsersPage(data) {
 //data: list of users with attributes {id, username, firstname, lastname, email, telephone}
 	
-//	setActiveMenuItem("menu_profile");
-	/*var menu = $('<div class="profile-menu menu" id="menu"></div>');
-	var ul = $('<ul class="profile-list-inline list-inline"></ul>');
-	var li1 = $('<li><a href="#">profile</a></li>');
-	var li2 = $('<li><a href="#">messages</a></li>');
-	var li3 = $('<li><a href="#">manage users</a></li>');
-	var li4 = $('<li><a href="#">manage topics</a></li>');
-	var li5 = $('<li><a href="#">manage subforums</a></li>');
-
-	ul.append(li1);
-	ul.append(li2);
-	ul.append(li3);
-	ul.append(li4);
-	ul.append(li5);
-	menu.append(ul);
-	
-	$("#mediaContainer").append(menu);
-	
-	
-	<div class="col-md-2 hidden-xs">
-	<img src="http://websamplenow.com/30/userprofile/images/avatar.jpg" class="img-responsive img-thumbnail ">
-	  </div>*/
-//	if(user == undefined) {
-//		console.log("User is undefined!");
-//	}
-//	console.log(user.firstName);
 	console.log('renderUsersList start');
-	console.log("users: " + data);
+	console.log("users: " + JSON.stringify(data));
 
 	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
-	
-//	console.log("Provided user" + user.username);
 	
 	$("#menuContainer").load("menu.html", function(){
 		$(this).find("#menu_profile").show();
@@ -364,113 +337,43 @@ function renderUsersListPage(data) {
 		$.each(list, function(index, user) {
 
 			console.log("username: " + user.username);
+			
+			console.log("LIST username: " + user.username);
+
+			var item = $('<li class="list-group-item" onclick="goToProfile(\'' + user.userId + '\')"></li>');
+			
+			var media = $('<div class="media" id="' + user.userId + '"></div>');
+			var mediaLeft = $('<div class="media-left media-top"></div>');
+			
+			var slika = DEFAULT_IMAGE;
+
+			if (user.avatar !== "") {
+				slika = user.avatar;
+			}
+			var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
+
+			mediaLeft.append(mediaThumbnail);
+			media.append(mediaLeft);
+			
+			var mediaBody = $('<div class="media-body"></div>');
+			var heading = $('<div class="media-heading">' + user.firstName + ' ' + user.lastName + '</div>');
+			var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
+
+			mediaBody.append(heading);
+			mediaBody.append(details);
+			media.append(mediaBody);
+			
+			
+			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="#"><span class="glyphicon glyphicon-envelope"></span></a></div>');
+			var trash = $('<div class="action-buttons media-right center-verticaly"><a href="#" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
+
+			media.append(envelope);
+			media.append(trash);
+
+			item.append(media);
+			container.append(item);
 		});
 	});
-	
-	
-//	
-//	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
-//	var container = $("#profile_manage_users_list");
-//
-//	$.each(list, function(index, user) {
-//
-//		console.log("username: " + user.username);
-//
-//
-//		var media = $('<div class="topic media" onclick="goToTopic(\'' + topic.topicId + '\')"></div>');
-//
-//		
-//		
-//		var mediaFirstChild = $('<div class="media-left media-top"></div>');
-//		var slika = DEFAULT_IMAGE;
-//
-//		if (topic.author.avatar !== "") {
-//			slika = topic.author.avatar;
-//		}
-//		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
-//
-//		mediaFirstChild.append(mediaThumbnail);
-//		media.append(mediaFirstChild);
-//
-//		var mediaBody = $('<div class="media-body"></div');
-//		var heading = $('<h4 class="media-heading">' + topic.title + '</div>');
-//
-//
-//		var likes = $('<span class="media-left media-top">Likes: ' + topic.likes + '</span>');
-//		var dislikes = $('<span class="media-left media-bottom">Dislikes: ' + topic.dislikes + '</span>');
-//		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
-//
-//
-//		mediaBody.append(heading);
-//		mediaBody.append(date);
-//		mediaBody.append(likes);
-//		mediaBody.append(dislikes);
-//		media.append(mediaBody);
-//
-//		$("#mediaContainer").append(media);
-//	});
-
-//	
-//	
-//	
-//	
-//	
-//	// Logged user profile
-//	if(JSON.parse(sessionStorage.getItem('user')).username === user.username) {
-//
-//		console.log("TRUE!");
-//		$("#menuContainer").load("menu.html", function(){
-//			$(this).find("#menu_profile").show();
-//			setMainMenuTabSelected();
-//		});
-//		
-//		$("#profileMenuContainer").load("profile_menu.html", function(){
-//			$('profile-list-inline li').removeClass('active');
-//		    $("#profile").parent().addClass('active');
-////			console.log(this.find("#first_name"));
-//		});
-//		
-//		$("#mediaContainer").load("profile_logged_user.html", function(){
-//			$(this).find("#first_name").val(user.firstName);
-//			$(this).find("#last_name").val(user.lastName);
-//			$(this).find("#email").val(user.email);
-//			$(this).find("#avatar").attr("src", user.avatar);
-////			$(this).find("#upload_avatar").on("")
-//			
-//			$(this).find("#edit_profile_form").validate({
-//			        rules : {
-//			            new_password : {
-//			                minlength : 3
-//			            },
-//			            confirm_password : {
-//			                equalTo : "#new_password"
-//			            },
-//			            email : {
-//			            	email: true
-//			            }
-//			        },
-//			        messages: {
-//			        	new_password:  {
-//			            	minlength: "Minimal length is 3"
-//			            },
-//			            confirm_password: {
-//			            	equalTo: "Passwords don't match"
-//			            },
-//			            email: {
-//			            	email: "Your email address must be in the format of name@domain.com"
-//			            }
-//			          }
-//				});
-//		});
-//	}
-
-//	console.log($("#mediaContainer").find("#").val());
-	
-//	$("#mediaContainer").attr("w3-include-html", "profile_logged_user.html");
-//	console.log($("#mediaContainer").find("#first_name").html());
-//	$("#mediaContainer").find("#first_name").val(user.firstName);
-
-	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
 }
 function printAll(comment, ratings, commentsContainer) {
 	var rating;
@@ -566,10 +469,3 @@ function buildCommentReplyBox(reply) {
 	reply.parent().append(container);
 	console.log("reply hide ");
 }
-/*function submitComment(button){
-	console.log("Button " + button);
-	console.log("Button parent (textarea) " + button.parent());
-	console.log("TextArea parent (media body) " + button.parent().parent().find(".comment-author").text());
-//	console.log();
-	
-}*/
