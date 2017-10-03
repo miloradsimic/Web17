@@ -312,7 +312,7 @@ function renderProfilePage(user) {
 	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
 }
 function renderManageUsersPage(data) {
-//data: list of users with attributes {id, username, firstname, lastname, email, telephone}
+//data: list of users with attributes {id, role, username, firstname, lastname, email, telephone}
 	
 	console.log('renderUsersList start');
 	console.log("users: " + JSON.stringify(data));
@@ -344,29 +344,24 @@ function renderManageUsersPage(data) {
 			
 			var media = $('<div class="media" id="' + user.userId + '"></div>');
 			var mediaLeft = $('<div class="media-left media-top"></div>');
-			
 			var slika = DEFAULT_IMAGE;
-
 			if (user.avatar !== "") {
 				slika = user.avatar;
 			}
 			var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
-
 			mediaLeft.append(mediaThumbnail);
 			media.append(mediaLeft);
 			
 			var mediaBody = $('<div class="media-body"></div>');
 			var heading = $('<div class="media-heading">' + user.firstName + ' ' + user.lastName + '</div>');
 			var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
-
 			mediaBody.append(heading);
 			mediaBody.append(details);
 			media.append(mediaBody);
 			
-			
-			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="#"><span class="glyphicon glyphicon-envelope"></span></a></div>');
-			var trash = $('<div class="action-buttons media-right center-verticaly"><a href="#" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
-
+			//TODO: U href treba ubaciti ID za poruke
+			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com"><span class="glyphicon glyphicon-envelope"></span></a></div>');
+			var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
 			media.append(envelope);
 			media.append(trash);
 

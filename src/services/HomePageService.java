@@ -22,6 +22,7 @@ import javax.print.attribute.ResolutionSyntax;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -161,8 +162,9 @@ public class HomePageService {
 			tempUser.setFirstName(user.getFirstName());
 			tempUser.setLastName(user.getLastName());
 			tempUser.setAvatar(user.getAvatar());
+			tempUser.setRole(user.getRole().toString());
 			
-			System.out.println(tempUser.getUsername());
+			System.out.println("username: " + tempUser.getUsername() + " role: " + user.getRole().toString());
 			
 			retValList.add(tempUser);
 			
@@ -356,36 +358,47 @@ public class HomePageService {
 			return retVal;
 		}
 	}
-	@GET
-	@Path("/testlogin")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String testLogin(@Context HttpServletRequest request) {
-		LoginBean retVal = null;
-		retVal = (LoginBean) request.getSession().getAttribute("user");
-		if (retVal == null) {
-			return "No logged users.";
-		}
-		return "User " + retVal.getUsername() + " is currently logged!";
-	}
-	/**
-	 * Invalidira sesiju.
-	 * 
-	 * @param request
-	 *            Injektovano zaglavlje HTTP zahteva.
-	 * @return Potvrda invalidacije sesije.
-	 */
-	@GET
-	@Path("/logout")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String logout(@Context HttpServletRequest request) {
-		LoginBean user = null;
-		user = (LoginBean) request.getSession().getAttribute("user");
-		if (user != null) {
-			request.getSession().invalidate();
-		}
-		return "Successfully logged off";
-	}
+	
+//TODO: Not gonna happen, only edit exit in specs
+//	@DELETE
+//	@Path("/user/{id}")
+//	@Produces(MediaType.APPLICATION_JSON)
+//	public Boolean removeUser(@Context HttpServletRequest request, long id) {
+//		LoginBean loggedUser = null;
+//		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+//		User userLogged = getUsers().getUsersMapByUsername().get((loggedUser.getUsername()));
+//		User userDelete = getUsers().getUsersMap().get(id);
+//		
+//		if (loggedUser == null) {
+//			System.out.println("You're not logged.");
+//			return false;
+//		} else if (id != userClient.getUserId() && ){
+//			System.out.println("You don't have privileges to do that.");
+//			return false; 
+//		} else {
+//
+//			long userId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
+//			DataManager.getInstance()
+//					.saveRating(new CommentRating(comment.getCommentId(), userId, comment.getRatingValue()));
+//			ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
+//
+//			int likes = getComments().getComment(comment.getCommentId()).getLikes();
+//			int dislikes = getComments().getComment(comment.getCommentId()).getDislikes();
+//			int total = likes - dislikes;
+//
+//			HashMap<String, Object> retVal = new HashMap<>();
+//			retVal.put("total", total);
+//
+//			int value = 0;
+//			if (getRatings().getRating(comment.getCommentId(), userId) != null) {
+//				value = getRatings().getRating(comment.getCommentId(), userId).getValue();
+//			}
+//			retVal.put("rated", value);
+//			return retVal;
+//		}
+//		
+//		return false;
+//	}
 
 	private Subforums getSubforums() {
 		Subforums subforums = (Subforums) ctx.getAttribute("subforums");
