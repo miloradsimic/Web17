@@ -25,6 +25,15 @@ public class UserPublicBean implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
+	public UserPublicBean(User user) {
+		this.userId = user.getUserId();
+		this.username = user.getUsername();
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.avatar = user.getAvatar();
+		this.role = user.getRole().toString().toLowerCase();
+	}
+
 	public long getUserId() {
 		return userId;
 	}

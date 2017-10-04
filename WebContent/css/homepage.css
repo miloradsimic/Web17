@@ -199,7 +199,44 @@ input[type='file'] {
 .center-verticaly {
     vertical-align: middle;
 }
+/*-------------------End of Profile menu */
+/*-------------------Public profile */
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ * this is called a clearfix. it makes sure that the container's children floats are cleared, without using extra markup
+ */
+.clearfix {
+    *zoom:1 /* for IE */
+}
 
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/* end clearfix*/
+
+/* tell the container's children to float left: */
+.float-my-children > * {
+    float:left;
+    margin-right:5px;
+}
+.small-paragraph {
+  margin: 0px;
+}
+
+/*-------------------End of Public profile */
 /*
 .profile-menu a:focus {
 	text-decoration: none;
@@ -211,7 +248,6 @@ input[type='file'] {
 	background-color: #AAAAFF;
 }*/
 
-/*------------------End of Profile menu */
 
 form .error {
   color: #ff0000;

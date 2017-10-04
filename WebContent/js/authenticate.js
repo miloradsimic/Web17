@@ -7,7 +7,7 @@ function loadLoggedUser() {
 		url : userURL,
 		dataType : "json", // data type of response
 		success : function(user) {
-			if (user != null) {
+			if (user != null && user != undefined) {
 				sessionStorage.setItem("user", JSON.stringify(user));
 
 				console.log('Load Logged User [User is logged]');

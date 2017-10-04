@@ -44,9 +44,11 @@ function goToTopic(id) {
 function goToProfile(id) {
 	console.log('Go To Profile: id=' + id);
 	var ID = id;
-	if (id == -1) {
+	if (id == -1 || id == JSON.parse(sessionStorage.getItem('user')).userId) { // Gets logged user.
 		console.log("id = -1 !" + JSON.parse(sessionStorage.getItem('user')).username);
 		ID = JSON.parse(sessionStorage.getItem('user')).userId;
+	} else { //Gets public profile data
+		console.log("Public profile data of user with ID: " + id);
 	}
 	window.location.href = "profile.html" + "?id=" + ID;
 
@@ -223,6 +225,7 @@ function submitProfileData(form) {
 //	
 }
 function loadUsersList() {
+	saveProfileMenuTab(3); //not implemented
 	console.log('Load Users List');
 	var id = getUrlParameter("id");
 	console.log('User with id: ' + id + ' requests all users list');
@@ -401,6 +404,9 @@ function submitLike(element, commentId) {
 
 //Helper functions
 //Helper function to serialize all the form fields into a JSON string
+/** Saves last selected tab, if you go F5 it selects same tab (optional) */
+function saveProfileMenuTab(index) {
+}
 function formToJSON(id, count) {
 	return JSON.stringify({
 		"id" : id,
@@ -421,8 +427,17 @@ function getUrlParameter(sParam) {
 		}
 	}
 }
-function userLogged() {
-	var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
-	console.log('isUserLogged = ' + isLogged);
-	return isLogged;
+function userLogged(username) {
+	if (arguments.length == 0) {
+		console.log('userLogged()');
+		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
+
+		console.log('return userLogged(): ' + isLogged);
+		return isLogged;
+	} else {
+		console.log('userLogged(username): ' + username);
+		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).username === username;
+		console.log('return userLogged(username): ' + isLogged);
+		return isLogged;
+	}
 }

@@ -1,12 +1,12 @@
 var DEFAULT_IMAGE = "resources/cvet.jpg"
 
 function showLoginButons() {
-//	console.log("MENU PROFILE is visible: " + $("#menuContainer").is(':visible'));
+	//	console.log("MENU PROFILE is visible: " + $("#menuContainer").is(':visible'));
 	console.log("Show login buttons");
-	$("#menuContainer").load("menu.html", function(){
+	$("#menuContainer").load("menu.html", function() {
 		$(this).find("#menu_profile").hide();
 		setMainMenuTabSelected();
-		
+
 	});
 	$("#loginButtons").show();
 	$("#logoutButton").hide();
@@ -16,45 +16,45 @@ function showLogoutButons() {
 	console.log("Show logout buttons");
 	console.log("userID=" + data.userId + " username=" + data.username);
 	console.log("object: " + JSON.stringify(data));
-	
-	
-//	console.log("MENU PROFILE is visible: " + $("#menu_profile").is(':visible'));
-	$("#menuContainer").load("menu.html", function(){
+
+
+	//	console.log("MENU PROFILE is visible: " + $("#menu_profile").is(':visible'));
+	$("#menuContainer").load("menu.html", function() {
 		$(this).find("#menu_profile").show();
 		setMainMenuTabSelected();
 	});
 	$("#loginButtons").hide();
-	$("#welcomeUser").html('Welcome <a role="button" onclick="goToProfile(' + data.userId + ')">'+ data.username + '</a>. Click here for ' +
+	$("#welcomeUser").html('Welcome <a role="button" onclick="goToProfile(' + data.userId + ')">' + data.username + '</a>. Click here for ' +
 		'<a id="logout" role="button" onclick=logout()>log out</a>');
 	$("#logoutButton").show();
 
 	console.log("Logout button: " + $("#logoutButton"));
 	console.log("Logout button html: " + $("#logoutButton").html());
 	console.log("Logout button text: " + $("#logoutButton").text());
-	
+
 
 }
 function setMainMenuTabSelected() {
 	var page_name = window.location.pathname.split("/")[2];
-	var page_name=page_name.substr(0,page_name.indexOf(".")).toLowerCase();
+	var page_name = page_name.substr(0, page_name.indexOf(".")).toLowerCase();
 	console.log("Page name: " + page_name);
 
 	var menu_item_id = "";
-	switch(page_name){
+	switch (page_name) {
 	case "homepage":
 	case "subforum":
 	case "topic": {
-		menu_item_id="menu_homepage";
+		menu_item_id = "menu_homepage";
 		break;
 	}
 	case "profile": {
-		menu_item_id="menu_profile";
+		menu_item_id = "menu_profile";
 		break;
-	}	
+	}
 	}
 	console.log("Menu item ID: " + menu_item_id);
 	$('.nav .navbar-nav li').removeClass('active');
-    $("#" + menu_item_id).parent().addClass('active');  
+	$("#" + menu_item_id).parent().addClass('active');
 }
 function setProfileMenuTabSelected(tab_name) {
 }
@@ -75,7 +75,7 @@ function showSignupModal() {
 function renderSubforumsList(data) {
 	console.log('renderSubforumsList form file into page.');
 	console.log(data);
-//	setActiveMenuItem("menu_homepage");
+	//	setActiveMenuItem("menu_homepage");
 
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
@@ -106,7 +106,7 @@ function renderSubforumsList(data) {
 function renderTopicsList(data) {
 	console.log('renderTopicsList form file into page.');
 	console.log(data);
-//	setActiveMenuItem("menu_homepage");
+	//	setActiveMenuItem("menu_homepage");
 
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
@@ -152,7 +152,7 @@ function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');
 	console.log(data);
 
-//	setActiveMenuItem("menu_homepage");
+	//	setActiveMenuItem("menu_homepage");
 	var topic = data.topic;
 	var ratings = data.ratings;
 	//var list = data.comments == null ? [] : (data.comments instanceof Array ? data.comments : [ data.comments ]);
@@ -217,7 +217,8 @@ function renderTopicAndComments(data) {
 }
 function renderProfilePage(user) {
 
-//	setActiveMenuItem("menu_profile");
+
+	//	setActiveMenuItem("menu_profile");
 	/*var menu = $('<div class="profile-menu menu" id="menu"></div>');
 	var ul = $('<ul class="profile-list-inline list-inline"></ul>');
 	var li1 = $('<li><a href="#">profile</a></li>');
@@ -239,109 +240,119 @@ function renderProfilePage(user) {
 	<div class="col-md-2 hidden-xs">
 	<img src="http://websamplenow.com/30/userprofile/images/avatar.jpg" class="img-responsive img-thumbnail ">
 	  </div>*/
-	if(user == undefined) {
+	if (user == undefined) {
 		console.log("User is undefined!");
 	}
-	if(!userLogged()){
-		console.log("User not logged! Username:" + user.username );
-		showLoginButons();
-		/* Show unlogged user profile page. */
-		return;
-	}
-	console.log(user.firstName);
-//	
-//
-	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
-	console.log("Provided user" + user.username);
-	
-	
-	// Logged user profile
-	if(JSON.parse(sessionStorage.getItem('user')).username === user.username) {
+	if (!userLogged(user.username)) { // Public profile data
+		console.log("User not logged! Username:" + user.username);
 
-		console.log("TRUE!");
-		$("#menuContainer").load("menu.html", function(){
-			$(this).find("#menu_profile").show();
-			setMainMenuTabSelected();
-		});
-		
-		$("#profileMenuContainer").load("profile_menu.html", function(){
-			$('profile-list-inline li').removeClass('active');
-		    $("#profile").parent().addClass('active');
-//			console.log(this.find("#first_name"));
-		});
-		
-		$("#mediaContainer").load("profile_logged_user.html", function(){
-			$(this).find("#first_name").val(user.firstName);
-			$(this).find("#last_name").val(user.lastName);
-			$(this).find("#email").val(user.email);
+		//showLoginButons();
+		/* Show unlogged user profile page. */
+		//return;
+
+		if (userLogged()) { // Ako je bilo koji user logovan prikazi i profile button
+			console.log("One of users is logged.");
+			$("#menuContainer").load("menu.html", function() {
+				$(this).find("#menu_profile").show();
+				setMainMenuTabSelected();
+			});
+		}
+
+		$("#mediaContainer").load("profile_not_logged_user.html", function() {
+			$(this).find("#name").text(user.firstName + ' ' + user.lastName);
+			$(this).find("#username").text(user.username);
+			$(this).find("#role").text(user.role);
 			$(this).find("#avatar").attr("src", user.avatar);
-//			$(this).find("#upload_avatar").on("")
-			
-			$(this).find("#edit_profile_form").validate({
-			        rules : {
-			            new_password : {
-			                minlength : 3
-			            },
-			            confirm_password : {
-			                equalTo : "#new_password"
-			            },
-			            email : {
-			            	email: true
-			            }
-			        },
-			        messages: {
-			        	new_password:  {
-			            	minlength: "Minimal length is 3"
-			            },
-			            confirm_password: {
-			            	equalTo: "Passwords don't match"
-			            },
-			            email: {
-			            	email: "Your email address must be in the format of name@domain.com"
-			            }
-			          }
-				});
 		});
-		//console.log($("#mediaContainer").find("#").val());
-		
-//		$("#mediaContainer").attr("w3-include-html", "profile_logged_user.html");
-//		console.log($("#mediaContainer").find("#first_name").html());
-//		$("#mediaContainer").find("#first_name").val(user.firstName);
+	} else { // Logged user page
+		console.log(user.firstName);
+		//	
+		//
+		console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
+		console.log("Provided user" + user.username);
+
+
+		// Logged user profile
+		if (JSON.parse(sessionStorage.getItem('user')).username === user.username) {
+
+			console.log("TRUE!");
+			$("#menuContainer").load("menu.html", function() {
+				$(this).find("#menu_profile").show();
+				setMainMenuTabSelected();
+			});
+
+			$("#profileMenuContainer").load("profile_menu.html", function() {
+				$('profile-list-inline li').removeClass('active');
+				$("#profile").parent().addClass('active');
+			//				console.log(this.find("#first_name"));
+			});
+
+			$("#mediaContainer").load("profile_logged_user.html", function() {
+				$(this).find("#first_name").val(user.firstName);
+				$(this).find("#last_name").val(user.lastName);
+				$(this).find("#email").val(user.email);
+				$(this).find("#avatar").attr("src", user.avatar);
+				//				$(this).find("#upload_avatar").on("")
+
+				$(this).find("#edit_profile_form").validate({
+					rules : {
+						new_password : {
+							minlength : 3
+						},
+						confirm_password : {
+							equalTo : "#new_password"
+						},
+						email : {
+							email : true
+						}
+					},
+					messages : {
+						new_password : {
+							minlength : "Minimal length is 3"
+						},
+						confirm_password : {
+							equalTo : "Passwords don't match"
+						},
+						email : {
+							email : "Your email address must be in the format of name@domain.com"
+						}
+					}
+				});
+			});
+		}
 	}
-	
-	//<div class="container-fluid" id="mediaContainer" w3-include-html="profile_logged_user.html"></div>
 }
 function renderManageUsersPage(data) {
-//data: list of users with attributes {id, role, username, firstname, lastname, email, telephone}
-	
+	//data: list of users with attributes {id, role, username, firstname, lastname, email, telephone}
+
 	console.log('renderUsersList start');
 	console.log("users: " + JSON.stringify(data));
 
 	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
-	
-	$("#menuContainer").load("menu.html", function(){
+
+	$("#menuContainer").load("menu.html", function() {
 		$(this).find("#menu_profile").show();
 		setMainMenuTabSelected();
 	});
-	
-	$("#profileMenuContainer").load("profile_menu.html", function(){
+
+	$("#profileMenuContainer").load("profile_menu.html", function() {
 		$('profile-list-inline li').removeClass('active');
-	    $("#profile").parent().addClass('active');
-//		console.log(this.find("#first_name"));
+		$("#users").parent().addClass('active');
+	//		console.log(this.find("#first_name"));
 	});
-	
-	$("#mediaContainer").load("profile_manage_users.html", function(){
+
+	$("#mediaContainer").load("profile_manage_users.html", function() {
 		var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 		var container = $(this).find("#profile_manage_users_list");
 
 		$.each(list, function(index, user) {
 
 			console.log("username: " + user.username);
-			
+
 			console.log("LIST username: " + user.username);
 
 			var item = $('<li class="list-group-item" onclick="goToProfile(\'' + user.userId + '\')"></li>');
-			
+
 			var media = $('<div class="media" id="' + user.userId + '"></div>');
 			var mediaLeft = $('<div class="media-left media-top"></div>');
 			var slika = DEFAULT_IMAGE;
@@ -351,14 +362,14 @@ function renderManageUsersPage(data) {
 			var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
 			mediaLeft.append(mediaThumbnail);
 			media.append(mediaLeft);
-			
+
 			var mediaBody = $('<div class="media-body"></div>');
 			var heading = $('<div class="media-heading">' + user.firstName + ' ' + user.lastName + '</div>');
 			var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
 			mediaBody.append(heading);
 			mediaBody.append(details);
 			media.append(mediaBody);
-			
+
 			//TODO: U href treba ubaciti ID za poruke
 			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com"><span class="glyphicon glyphicon-envelope"></span></a></div>');
 			var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
