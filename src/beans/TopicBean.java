@@ -3,17 +3,11 @@ package beans;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.codehaus.jackson.annotate.JsonBackReference;
-import org.codehaus.jackson.annotate.JsonIgnore;
-
 import model.enums.TopicType;
 
-public class Topic implements Serializable{
-
-	/**
-	 * 
-	 */
+public class TopicBean implements Serializable{
 	private static final long serialVersionUID = 1L;
+	
 	private long topicId;
 	private long subforumId;
 	/**
@@ -21,41 +15,49 @@ public class Topic implements Serializable{
 	 */
 	private String title;
 	private TopicType type;
-	private long authorId;
+	private User author;
 	//napravi novi rest call za dobijanje komentara
 	private ArrayList<Comment> comments;
 	private String content;
 	private String creationDate;
 	private int likes;
 	private int dislikes;
-
-//	public Topic(long id) {
-//		super();
-//		this.topicId = id;
-//		this.type = null;
-//		this.subforumId = -1;
-//		this.title = null;
-//		this.authorId = -1;
-//		this.content = null;
-//		this.creationDate = null;
-//		this.likes = -1;
-//		this.dislikes = -1;
-//		comments = new ArrayList<>();
-//	}
 	
-	public Topic(long id, TopicType type, long subforumId, String title, long authorId, String content, String creationDate,
-			int likes, int dislikes) {
+	public TopicBean(long topicId, long subforumId, String title, TopicType type, User author,
+			ArrayList<Comment> comments, String content, String creationDate, int likes, int dislikes) {
 		super();
-		this.topicId = id;
-		this.type = type;
+		this.topicId = topicId;
 		this.subforumId = subforumId;
 		this.title = title;
-		this.authorId = authorId;
+		this.type = type;
+		this.author = author;
+		this.comments = comments;
 		this.content = content;
 		this.creationDate = creationDate;
 		this.likes = likes;
 		this.dislikes = dislikes;
-		this.comments = new ArrayList<>();
+	}
+	public TopicBean(Topic topic, User author) {
+		super();
+		this.topicId = topic.getTopicId();
+		this.subforumId = topic.getSubforumId();
+		this.title = topic.getTitle();
+		this.type = topic.getType();
+		this.author = author;
+		this.comments = topic.getComments();
+		this.content = topic.getContent();
+		this.creationDate = topic.getCreationDate();
+		this.likes = topic.getLikes();
+		this.dislikes = topic.getDislikes();
+	}
+	
+
+	public long getTopicId() {
+		return topicId;
+	}
+
+	public void setTopicId(long topicId) {
+		this.topicId = topicId;
 	}
 
 	public long getSubforumId() {
@@ -66,12 +68,12 @@ public class Topic implements Serializable{
 		this.subforumId = subforumId;
 	}
 
-	public long getAuthorId() {
-		return authorId;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setAuthorId(long author) {
-		this.authorId = author;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public TopicType getType() {
@@ -82,15 +84,13 @@ public class Topic implements Serializable{
 		this.type = type;
 	}
 
-
-	public String getTitle() {
-		return title;
+	public User getAuthor() {
+		return author;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setAuthor(User author) {
+		this.author = author;
 	}
-
 
 	public ArrayList<Comment> getComments() {
 		return comments;
@@ -131,13 +131,6 @@ public class Topic implements Serializable{
 	public void setDislikes(int dislikes) {
 		this.dislikes = dislikes;
 	}
-
-	public long getTopicId() {
-		return topicId;
-	}
-
-	public void setTopicId(long topicId) {
-		this.topicId = topicId;
-	}
-
+	
+	
 }

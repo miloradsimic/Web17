@@ -18,6 +18,7 @@ import beans.Comments;
 import beans.Message;
 import beans.Subforum;
 import beans.Topic;
+import beans.Topics;
 import beans.User;
 import beans.Users;
 
@@ -28,7 +29,7 @@ public class DataManager {
 	private static String stringUsers = "/data/users.txt";
 	private static String stringComments = "/data/comments.txt";
 	private static String stringRatings = "/data/ratings";
-//	private String stringTopics = "/data/topics.txt";
+	private static String stringTopics = "/data/topics.txt";
 //	private String stringSubforums = "/data/subforums.txt";
 //	private String stringMessages = "/data/messages.txt";
 	private static String rootPath = "";
@@ -36,6 +37,7 @@ public class DataManager {
 	
 	private Users users = new Users();
 	private Comments comments = new Comments();
+	private Topics topics = new Topics();
 	private CommentRatings commentRatings = new CommentRatings();
 //	private ArrayList<Topic> tpics;
 //	private ArrayList<Subforum> subforums;
@@ -407,7 +409,6 @@ public class DataManager {
 
 		return users;
 	}
-
 	public Boolean saveUser(User entry) {
 		users.addUser(entry);
 		FileOutputStream fout = null;
@@ -459,6 +460,124 @@ public class DataManager {
 			oos.writeObject(users);
 
 			System.out.println("Write update user Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
+	
+	//---------------
+	public Topics readTopics() {
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
+
+			fin = new FileInputStream(rootPath + stringTopics);
+			ois = new ObjectInputStream(fin);
+			Object o = ois.readObject();
+			topics = (Topics) o;
+			System.out.println("Read Topics Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+			return null;
+
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return topics;
+	}
+	public Boolean saveTopic(Topic entry) {
+		topics.addTopic(entry);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringTopics);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(topics);
+
+			System.out.println("Write Topics Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
+	public Boolean updateTopic(Topic entry) {
+		topics.updateTopic(entry);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringTopics);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(topics);
+
+			System.out.println("Update Topic Done");
 
 		} catch (Exception ex) {
 

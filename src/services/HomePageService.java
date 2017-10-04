@@ -47,6 +47,7 @@ import beans.LoginBean;
 import beans.Subforum;
 import beans.Subforums;
 import beans.Topic;
+import beans.TopicBean;
 import beans.Topics;
 import beans.User;
 import beans.UserPublicBean;
@@ -55,6 +56,7 @@ import controller.DataManager;
 import controller.Utils;
 import javassist.bytecode.ByteArray;
 import model.enums.Role;
+import model.enums.TopicType;
 import sun.misc.BASE64Decoder;
 
 @Path("/homepage")
@@ -83,23 +85,26 @@ public class HomePageService {
 	@Path("/topics/{subforum}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<Topic> test3(@Context HttpServletRequest request, @PathParam("subforum") long subforum) {
+	public ArrayList<TopicBean> test3(@Context HttpServletRequest request, @PathParam("subforum") long subforum) {
 		// System.out.println("Reading topics from " + subforum + " subforum.");
 		ArrayList<Topic> topics = getTopics().getTopicsList();
 		HashMap<Long, User> users = getUsers().getUsersMap();
-		ArrayList<Topic> topicsFromSubforum = new ArrayList<>();
+		ArrayList<TopicBean> topicsFromSubforum = new ArrayList<>();
 		for (Topic topic : topics) {
-			if (topic.getSubforum().getSubforumId() == subforum) { // trebaju
-																	// nam samo
-																	// teme tog
-																	// podforuma
-				if (users.containsKey(topic.getAuthor().getUserId())) {
-					topic.setAuthor(users.get(topic.getAuthor().getUserId()));
+			// trebaju nam samo teme tog podforuma
+			if (topic.getSubforumId() == subforum) { 
+				if (users.containsKey(topic.getAuthorId())) {
+//					topic.setAuthorId(users.get(topic.getAuthorId().getUserId()));
+					topicsFromSubforum.add(new TopicBean(topic, users.get(topic.getAuthorId())));
 				}
-				topicsFromSubforum.add(topic);
 			}
 		}
 		return topicsFromSubforum;
+		// HashMap<String, Object> retVal = new HashMap<>();
+		// retVal.put("topics", topicsFromSubforum);
+		// retVal.put("ratings", ratings);
+		//
+		// return retVal;
 	}
 
 	/**
@@ -230,8 +235,8 @@ public class HomePageService {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
-		if (loggedUser != null && getUsers().getUsersMapByUsername().get(loggedUser.getUsername())
-				.getUserId() == profileId) {
+		if (loggedUser != null
+				&& getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId() == profileId) {
 			return getUsers().getUsersMapByUsername().get(loggedUser.getUsername());
 			// return full profile data.
 
@@ -387,12 +392,14 @@ public class HomePageService {
 	}
 
 	private Topics getTopics() {
-		Topics allTopics = (Topics) ctx.getAttribute("topics");
-		if (allTopics == null) {
-			allTopics = new Topics(ctx.getRealPath(""));
-			ctx.setAttribute("topics", allTopics);
+		Topics topics = (Topics) ctx.getAttribute("topics");
+		if (topics == null) {
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			topicsData();
+			topics = DataManager.getInstance().readTopics();
+			ctx.setAttribute("topics", topics);
 		}
-		return allTopics;
+		return topics;
 	}
 
 	private Users getUsers() {
@@ -476,4 +483,18 @@ public class HomePageService {
 		DataManager.getInstance().saveUser(u3);
 	}
 
+	private void topicsData() {
+
+		Topic t1 = new Topic(1l, TopicType.TEXT, 1, "Prodajem golfa dvojku povoljno!", 2,
+				"Prodaje golfa dvojku, crvene boje, dizelas, '88 godiste. Cena 200e, nije fiksna.",
+				Utils.getCurrentDate(), 0, 0);
+		Topic t2 = new Topic(2l, TopicType.LINK, 1, "Testing new Audi A4!", 2,
+				"https://www.youtube.com/watch?v=H7yGMvLtINs", Utils.getCurrentDate(), 0, 0);
+		Topic t3 = new Topic(3l, TopicType.IMAGE, 2, "Slika palme na plazi!", 1, "resources/drvo.jpg",
+				Utils.getCurrentDate(), 0, 0);
+
+		DataManager.getInstance().saveTopic(t1);
+		DataManager.getInstance().saveTopic(t2);
+		DataManager.getInstance().saveTopic(t3);
+	}
 }

@@ -29,85 +29,6 @@ public class Topics implements Serializable{
 	public Topics() {
 		super();
 	}
-	
-	public Topics(String path) {
-		
-		BufferedReader in = null;
-		try {
-			File file = new File(path + "/data/topics.txt");
-			in = new BufferedReader(new FileReader(file));
-			readTopics(in);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
-			if ( in != null ) {
-				try {
-					in.close();
-				}
-				catch (Exception e) { }
-			}
-		}
-	}
-
-	
-	/**
-	 * Cita subforume iz datoteke i smesta ih u asocijativnu listu subforuma.
-	 * Kljuc je naziv subforuma.
-	 */
-	private void readTopics(BufferedReader in) {
-		String line, id = "", title = "", type = "", subforumId = "", authorId = "", content = "", creationDate = "", likes = "", dislikes = "";
-		StringTokenizer st;
-		try {
-			while ((line = in.readLine()) != null) {
-				line = line.trim();
-				if (line.equals("") || line.indexOf('#') == 0)
-					continue;
-				st = new StringTokenizer(line, ";");
-				
-				id = st.nextToken().trim();
-				type = st.nextToken().trim();
-				subforumId = st.nextToken().trim();
-				title = st.nextToken().trim();
-				authorId = st.nextToken().trim();
-				content = st.nextToken().trim();
-				creationDate = st.nextToken().trim();
-				likes = st.nextToken().trim();
-				dislikes = st.nextToken().trim();
-				
-				
-				int likesInt=-1, dislikesInt=-1;
-				long idNumber=-1, subforumIdNumber = -1, authorIdNumber = -1;
-				
-				try {
-					idNumber = Long.parseLong(id);
-					subforumIdNumber = Long.parseLong(subforumId);
-					authorIdNumber = Long.parseLong(authorId);
-					likesInt = Integer.parseInt(likes);
-					dislikesInt = Integer.parseInt(dislikes);
-				} catch (NumberFormatException e) {
-					System.out.println("Can't parse likes and dislikes to integer.");
-					e.printStackTrace();
-				}
-
-				
-				Topic entry = new Topic(idNumber, Utils.stringToTopicType(type),
-						new Subforum(subforumIdNumber),
-						title,
-						new User(authorIdNumber),
-						content,
-						creationDate,
-						likesInt,
-						dislikesInt);
-
-				topicsList.add(entry);
-				topicsMap.put(idNumber, entry);
-				
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-	}
 
 	public ArrayList<Topic> getTopicsList() {
 		return topicsList;
@@ -125,6 +46,20 @@ public class Topics implements Serializable{
 		this.topicsMap = topicsMap;
 	}
 	
+	public void addTopic(Topic entry) {
+		
+		topicsList.add(entry);
+		topicsMap.put(entry.getTopicId(), entry);
+	}
+
+	public boolean updateTopic(Topic topic) {
+
+		topicsList.remove(topic);
+		topicsMap.remove(topic.getTopicId());
+		topicsList.add(topic);
+		topicsMap.put(topic.getTopicId(), topic);
+		return true;
+	}
 	
 
 }

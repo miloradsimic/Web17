@@ -160,7 +160,57 @@ function renderTopicAndComments(data) {
 	//var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 
 	console.log("TOPIC: " + topic.title);
+	//----------------------------------------
 
+/*
+	var mediaRoot = $('<div class="media"></div>');
+	var mediaLeft = $('<div class="media-left"></div>');
+	var mediaLike;
+	if (userLogged()) {
+		var used = "unused";
+		if (rating != undefined && rating.value == 1) {
+			used = "used";
+		}
+		mediaLike = $('<div class="comment-like comment-like-' + used + ' glyphicon glyphicon-menu-up" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
+	}
+	//var rating = parseInt(comment.likes) - parseInt(comment.dislikes);
+	//		var commentClass = "neutral"
+	//		if (rating > 0) {
+	//			commentClass = "likes";
+	//		} else if (rating < 0) {
+	//			commentClass = "dislikes";
+	//		}
+	//	var padding;
+	//	if (userLogged()) {
+	//		padding = " comment-rating-padding";
+	//	}
+	//var mediaRating = $('<div class="comment-rating comment-' + commentClass + ' ' + padding + '">' + rating + '</div>');
+	
+	var mediaDislike;
+	if (userLogged()) {
+		var used = "unused";
+		if (rating != undefined && rating.value == -1) {
+			used = "used";
+		}
+		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
+	}
+	var mediaBody = $('<div class="media-body"></div>');
+
+
+
+
+
+	mediaLeft.append(mediaLike);
+	mediaLeft.append(mediaRating);
+	mediaLeft.append(mediaDislike);
+	mediaBody.append(commentAuthor);
+	mediaBody.append(commentText);
+	mediaBody.append(reply);
+	media.append(mediaLeft);
+	media.append(mediaBody);
+*/
+
+	//-----------------------------------------
 	var well = $('<div id="' + topic.topicId + '" class="topic-root well well-sm"></div>');
 	var media = $('<div class="media"></div>');
 	var heading = $('<h4 class="media-heading media-top">' + topic.title + '</div>');
