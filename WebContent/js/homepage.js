@@ -152,17 +152,13 @@ function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');
 	console.log(data);
 
-	//	setActiveMenuItem("menu_homepage");
 	var topic = data.topic;
 	var comment_ratings = data.comment_ratings;
 	var topic_rating = data.topic_rating;
 
-//	console.log("Whole object data! :" + data);
-
-//	console.log("Whole object data stringify! :" + JSON.stringify(data));
+	//	console.log("Whole object data stringify! :" + JSON.stringify(data));
 
 	console.log("TOPIC: " + topic.title);
-	//----------------------------------------
 
 	var mediaRoot = $('<div class="media"></div>');
 	var mediaLeft = $('<div id="t' + topic.topicId + '" class="media-left"></div>');
@@ -176,19 +172,6 @@ function renderTopicAndComments(data) {
 		console.log("renderTopicAndComments(): like used=" + used);
 		mediaLike = $('<div class="comment-like comment-like-' + used + ' glyphicon glyphicon-menu-up" onclick="submitTopicRating($(this),' + topic.topicId + ')"></div>');
 	}
-	//var rating = parseInt(comment.likes) - parseInt(comment.dislikes);
-	//		var commentClass = "neutral"
-	//		if (rating > 0) {
-	//			commentClass = "likes";
-	//		} else if (rating < 0) {
-	//			commentClass = "dislikes";
-	//		}
-	//	var padding;
-	//	if (userLogged()) {
-	//		padding = " comment-rating-padding";
-	//	}
-	//var mediaRating = $('<div class="comment-rating comment-' + commentClass + ' ' + padding + '">' + rating + '</div>');
-
 	var mediaDislike;
 	if (userLogged()) {
 		var used = "unused";
@@ -200,19 +183,9 @@ function renderTopicAndComments(data) {
 	}
 	var mediaBody = $('<div class="media-body"></div>');
 
-
-
-
-
 	mediaLeft.append(mediaLike);
-	//	mediaLeft.append(mediaRating);
 	mediaLeft.append(mediaDislike);
-	//	mediaBody.append(commentAuthor);
-	//	mediaBody.append(commentText);
-	//	mediaBody.append(reply);
 
-
-	//-----------------------------------------
 	var well = $('<div class="topic-root well well-sm"></div>');
 	var media = $('<div class="media"></div>');
 	var heading = $('<h4 class="media-heading media-top">' + topic.title + '</div>');
@@ -260,8 +233,6 @@ function renderTopicAndComments(data) {
 	commentsContainer.append(commentsContainer1);
 
 	$.each(topic.comments, function(index, comment) {
-		console.log("printAll : " + comment + "***********************" + comment_ratings + "***********************" + commentsContainer);
-
 		printAll(comment, comment_ratings, commentsContainer);
 	});
 
@@ -277,11 +248,11 @@ function printAll(comment, ratings, commentsContainer) {
 	$.each(ratings, function(index, tempRating) {
 		if (tempRating.commentId == comment.commentId) {
 			rating = tempRating;
-		console.log("Rating for comment id="+comment.commentId + " is-->" + JSON.stringify(rating));
+			console.log("Rating for comment id=" + comment.commentId + " is-->" + JSON.stringify(rating));
 		}
 	});
 
-//	console.log("Comment id: " + comment.commentId);
+	//	console.log("Comment id: " + comment.commentId);
 	var commentListItem = $('<li></li>');
 	var media = $('<div class="media" id="c' + comment.commentId + '"></div>');
 	var mediaLeft = $('<div class="media-left"></div>');
@@ -311,7 +282,7 @@ function printAll(comment, ratings, commentsContainer) {
 		if (rating != undefined && rating.value == -1) {
 			used = "used";
 		}
-		console.log("used rating: "+ rating);
+		console.log("used rating: " + rating);
 		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
@@ -322,7 +293,7 @@ function printAll(comment, ratings, commentsContainer) {
 	var commentAuthor = $('<span class="comment-author">' + comment.author.username + '</span>' +
 		'<span class="comment-date">' + comment.commentDate + '</span>');
 	var commentText = $('<p class="comment-text">' + comment.text + '</p>');
-//	console.log("Comment text: " + comment.text);
+	//	console.log("Comment text: " + comment.text);
 	var reply;
 
 	if (userLogged()) {
@@ -415,39 +386,11 @@ function renderManageUsersPage(data) {
 	});
 }
 function renderProfilePage(user) {
-
-
-	//	setActiveMenuItem("menu_profile");
-	/*var menu = $('<div class="profile-menu menu" id="menu"></div>');
-	var ul = $('<ul class="profile-list-inline list-inline"></ul>');
-	var li1 = $('<li><a href="#">profile</a></li>');
-	var li2 = $('<li><a href="#">messages</a></li>');
-	var li3 = $('<li><a href="#">manage users</a></li>');
-	var li4 = $('<li><a href="#">manage topics</a></li>');
-	var li5 = $('<li><a href="#">manage subforums</a></li>');
-
-	ul.append(li1);
-	ul.append(li2);
-	ul.append(li3);
-	ul.append(li4);
-	ul.append(li5);
-	menu.append(ul);
-	
-	$("#mediaContainer").append(menu);
-	
-	
-	<div class="col-md-2 hidden-xs">
-	<img src="http://websamplenow.com/30/userprofile/images/avatar.jpg" class="img-responsive img-thumbnail ">
-	  </div>*/
 	if (user == undefined) {
 		console.log("User is undefined!");
 	}
 	if (!userLogged(user.username)) { // Public profile data
 		console.log("User not logged! Username:" + user.username);
-
-		//showLoginButons();
-		/* Show unlogged user profile page. */
-		//return;
 
 		if (userLogged()) { // Ako je bilo koji user logovan prikazi i profile button
 			console.log("One of users is logged.");
@@ -523,7 +466,7 @@ function renderProfilePage(user) {
 }
 
 function buildCommentReplyBox(reply) {
-//	console.log("reply hide " + reply.name);
+	//	console.log("reply hide " + reply.name);
 	reply.hide();
 
 	var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
@@ -531,7 +474,7 @@ function buildCommentReplyBox(reply) {
 	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent().parent())">Comment</button>');
 	container.append(textArea);
 	container.append(submitButton);
-//	console.log("reply hide ");
+	//	console.log("reply hide ");
 	reply.parent().append(container);
 //	console.log("reply hide ");
 }

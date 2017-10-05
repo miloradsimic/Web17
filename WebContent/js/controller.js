@@ -97,57 +97,7 @@ function setUpProfileAvatar(input) {
 				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 			}
 		});
-	/*
 
-	//		var data = new FormData();
-	var file = input.files[0];
-	//		data.append('file', file);
-	//		data.append('name', file.name);
-	//		var formData = new FormData();
-	//		formData.append('uploadfile', file);
-	var reader = new FileReader();
-	reader.readAsDataURL(file);
-	reader.onload = function() {
-		console.log(reader.result);
-
-		var data = {
-			image : reader
-		};
-		console.log("JSON upload data type:" + reader.result.constructor.name);
-		console.log("TRUE");
-		$.ajax({
-			url : upload_avatarURL,
-			type : "POST",
-			contentType : "application/json",
-			data : data,
-			processData : false,
-			success : function(isDone) {
-				var reader = new FileReader();
-
-				reader.onload = function(e) {
-					$('#avatar')
-						.attr('src', e.target.result);
-				//                .width(150)
-				//                .height(200);
-				};
-
-				reader.readAsDataURL(input.files[0]);
-			},
-			error : function(XMLHttpRequest, textStatus, errorThrown) {
-				var OriginalString = XMLHttpRequest.responseText;
-				var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
-				console.log(StrippedString);
-				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
-			}
-		});
-
-	};
-	reader.onerror = function(error) {
-		console.log('Error: ', error);
-	};
-
-	//var extension = file.fileName.substr('.', file.name.length);
-	*/
 	}
 }
 /** Loaded on click on Profile*/
@@ -175,12 +125,6 @@ function loadProfileData() {
 }
 function submitProfileData(form) {
 	console.log('Submiting form: ' + form.find("#upload_avatar").val());
-
-	//	if (form.find("#upload_avatar").files) {
-	//
-	//		console.log("It works!");
-	//	}
-
 
 	var data = {
 		firstName : form.find("#first_name").val(),
@@ -404,7 +348,7 @@ function submitLike(element, commentId) {
 }
 
 function submitTopicRating(element, topicId) {
-	console.log('submitTopicRating(): \ntopicId=' + topicId );
+	console.log('submitTopicRating(): \ntopicId=' + topicId);
 	var rate = -1;
 	if (element.hasClass("comment-like")) {
 		rate = 1;
@@ -481,15 +425,15 @@ function getUrlParameter(sParam) {
 }
 function userLogged(username) {
 	if (arguments.length == 0) {
-//		console.log('userLogged()');
+		//		console.log('userLogged()');
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
 
-//		console.log('return userLogged(): ' + isLogged);
+		//		console.log('return userLogged(): ' + isLogged);
 		return isLogged;
 	} else {
-//		console.log('userLogged(username): ' + username);
+		//		console.log('userLogged(username): ' + username);
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).username === username;
-//		console.log('return userLogged(username): ' + isLogged);
+		//		console.log('return userLogged(username): ' + isLogged);
 		return isLogged;
 	}
 }

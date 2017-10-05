@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
@@ -15,8 +14,6 @@ import beans.Comment;
 import beans.CommentRating;
 import beans.CommentRatings;
 import beans.Comments;
-import beans.Message;
-import beans.Subforum;
 import beans.Topic;
 import beans.TopicRating;
 import beans.TopicRatings;
@@ -33,19 +30,18 @@ public class DataManager {
 	private static String stringCommentRatings = "/data/comment_ratings";
 	private static String stringTopics = "/data/topics.txt";
 	private static String stringTopicRatings = "/data/topic_ratings";
-//	private String stringSubforums = "/data/subforums.txt";
-//	private String stringMessages = "/data/messages.txt";
+	// private String stringSubforums = "/data/subforums.txt";
+	// private String stringMessages = "/data/messages.txt";
 	private static String rootPath = "";
 
-	
 	private Users users = new Users();
 	private Comments comments = new Comments();
 	private Topics topics = new Topics();
 	private CommentRatings commentRatings = new CommentRatings();
 	private TopicRatings topicRatings = new TopicRatings();
-//	private ArrayList<Topic> tpics;
-//	private ArrayList<Subforum> subforums;
-//	private ArrayList<Message> messages;
+	// private ArrayList<Topic> tpics;
+	// private ArrayList<Subforum> subforums;
+	// private ArrayList<Message> messages;
 
 	public static DataManager getInstance() {
 		if (instance == null) {
@@ -100,29 +96,29 @@ public class DataManager {
 
 		return true;
 	}
-	
+
 	public Boolean saveAvatar(File img, String name, String username) {
-		
+
 		User user = users.getUsersMapByUsername().get(username);
 
 		String localPath = "resources/" + user.getUserId() + name;
 		try {
-		    // retrieve image
+			// retrieve image
 			BufferedImage bi = ImageIO.read(img);
-		    File outputfile = new File(rootPath + '/' + localPath);
-		    ImageIO.write(bi, name.substring(name.lastIndexOf('.')+1), outputfile);
-		    
+			File outputfile = new File(rootPath + '/' + localPath);
+			ImageIO.write(bi, name.substring(name.lastIndexOf('.') + 1), outputfile);
+
 		} catch (IOException e) {
-		    e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		user.setAvatar(localPath);
-		
+
 		updateUser(user);
-		
+
 		return true;
 	}
-	
+
 	public Boolean saveComments(Comments comments) {
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
@@ -161,7 +157,7 @@ public class DataManager {
 
 		return true;
 	}
-	
+
 	public Comments readComments() {
 
 		FileInputStream fin = null;
@@ -206,7 +202,7 @@ public class DataManager {
 
 	public CommentRatings saveCommentRating(CommentRating entry) {
 		CommentRating old = commentRatings.getRating(entry.getCommentId(), entry.getUserId());
-		
+
 		// If it's already rated before.
 		if (old != null) {
 			System.out.println("If it's already rated before.");
@@ -254,9 +250,9 @@ public class DataManager {
 
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
-		
+
 		saveComments(comments);
-		
+
 		try {
 
 			fout = new FileOutputStream(rootPath + stringCommentRatings);
@@ -291,6 +287,7 @@ public class DataManager {
 
 		return commentRatings;
 	}
+
 	public CommentRatings readCommentRatings() {
 
 		FileInputStream fin = null;
@@ -332,7 +329,7 @@ public class DataManager {
 	}
 
 	public boolean updateProfile(User edited) {
-		if(users == null) {
+		if (users == null) {
 			readUsers();
 		}
 		users.updateUser(edited);
@@ -412,6 +409,7 @@ public class DataManager {
 
 		return users;
 	}
+
 	public Boolean saveUser(User entry) {
 		users.addUser(entry);
 		FileOutputStream fout = null;
@@ -451,6 +449,7 @@ public class DataManager {
 
 		return true;
 	}
+
 	public Boolean updateUser(User entry) {
 		users.updateUser(entry);
 		FileOutputStream fout = null;
@@ -490,8 +489,7 @@ public class DataManager {
 
 		return true;
 	}
-	
-	//---------------
+
 	public Topics readTopics() {
 		FileInputStream fin = null;
 		ObjectInputStream ois = null;
@@ -530,6 +528,7 @@ public class DataManager {
 
 		return topics;
 	}
+
 	public Boolean saveTopic(Topic entry) {
 		topics.addTopic(entry);
 		FileOutputStream fout = null;
@@ -569,6 +568,7 @@ public class DataManager {
 
 		return true;
 	}
+
 	public Boolean saveTopics(Topics topics) {
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
@@ -647,10 +647,10 @@ public class DataManager {
 
 		return true;
 	}
-	
+
 	public TopicRatings saveTopicRating(TopicRating entry) {
 		TopicRating old = topicRatings.getRating(entry.getTopicId(), entry.getUserId());
-		
+
 		// If it's already rated before.
 		if (old != null) {
 			System.out.println("If it's already rated before.");
@@ -659,32 +659,24 @@ public class DataManager {
 				System.out.println("If it's already liked");
 				// Remove old like
 				topics.getTopicsMap().get(entry.getTopicId()).removeLike();
-//				comments.getComment(entry.getCommentId()).removeLike();
 				topicRatings.remove(entry.getTopicId(), entry.getUserId());
-//				commentRatings.remove(entry.getCommentId(), entry.getUserId());
 				// If it's now disliked
 				if (entry.getValue() == -1) {
 					System.out.println("If it's now disliked");
 					topics.getTopicsMap().get(entry.getTopicId()).dislike();
-//					comments.getComment(entry.getCommentId()).dislike();
 					topicRatings.add(entry);
-//					commentRatings.add(entry);
 				}
 				// If it's already disliked
 			} else {
 				System.out.println();
 				// Remove old dislike
 				topics.getTopicsMap().get(entry.getTopicId()).removeDislike();
-//				comments.getComment(entry.getCommentId()).removeDislike();
 				topicRatings.remove(entry.getTopicId(), entry.getUserId());
-//				commentRatings.remove(entry.getCommentId(), entry.getUserId());
 				// If it's now liked
 				if (entry.getValue() == 1) {
 					System.out.println("If it's now liked");
 					topics.getTopicsMap().get(entry.getTopicId()).like();
-//					comments.getComment(entry.getCommentId()).like();
 					topicRatings.add(entry);
-//					commentRatings.add(entry);
 				}
 			}
 			// If it's not rated before
@@ -695,28 +687,23 @@ public class DataManager {
 			if (entry.getValue() == 1) {
 				System.out.println("If it's now liked");
 				topics.getTopicsMap().get(entry.getTopicId()).like();
-//				comments.getComment(entry.getCommentId()).like();
 				topicRatings.add(entry);
-//				commentRatings.add(entry);
 				// If it's now disliked
 			} else {
 				System.out.println("If it's now disliked");
 				topics.getTopicsMap().get(entry.getTopicId()).dislike();
-//				comments.getComment(entry.getCommentId()).dislike();
 				topicRatings.add(entry);
-//				commentRatings.add(entry);
 			}
 		}
 
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
-		
+
 		topics.getTopicList().clear();
 		topics.getTopicList().addAll(topics.getTopicsMap().values());
-		
+
 		saveTopics(topics);
-//		saveComments(comments);
-		
+
 		try {
 
 			fout = new FileOutputStream(rootPath + stringTopicRatings);
@@ -751,6 +738,7 @@ public class DataManager {
 
 		return topicRatings;
 	}
+
 	public TopicRatings readTopicRatings() {
 
 		FileInputStream fin = null;

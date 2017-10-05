@@ -1,28 +1,12 @@
 package services;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 
-import javax.imageio.ImageIO;
-import javax.jws.soap.SOAPBinding.Use;
-import javax.print.attribute.ResolutionSyntax;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,9 +17,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import com.sun.org.apache.xml.internal.security.keys.content.KeyValue;
-
-import beans.AvatarBean;
 import beans.Comment;
 import beans.CommentLikeBean;
 import beans.CommentRating;
@@ -57,10 +38,8 @@ import beans.UserPublicBean;
 import beans.Users;
 import controller.DataManager;
 import controller.Utils;
-import javassist.bytecode.ByteArray;
 import model.enums.Role;
 import model.enums.TopicType;
-import sun.misc.BASE64Decoder;
 
 @Path("/homepage")
 public class HomePageService {
@@ -88,7 +67,8 @@ public class HomePageService {
 	@Path("/topics/{subforum}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<TopicBean> getTopicsList(@Context HttpServletRequest request, @PathParam("subforum") long subforum) {
+	public ArrayList<TopicBean> getTopicsList(@Context HttpServletRequest request,
+			@PathParam("subforum") long subforum) {
 		// System.out.println("Reading topics from " + subforum + " subforum.");
 		ArrayList<Topic> topics = getTopics().getTopicList();
 		HashMap<Long, User> users = getUsers().getUsersMap();
@@ -142,9 +122,11 @@ public class HomePageService {
 		// Topic rating
 		TopicRating topicRating = null;
 		if (loggedUser != null) {
-			topicRating = new TopicRating(topicId, getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId(), 0);
+			topicRating = new TopicRating(topicId,
+					getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId(), 0);
 			for (TopicRating rating : getTopicRatings().getRatingsList()) {
-				if (rating.getTopicId() == topicId && rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
+				if (rating.getTopicId() == topicId && rating.getUserId() == getUsers().getUsersMapByUsername()
+						.get(loggedUser.getUsername()).getUserId()) {
 					topicRating = rating;
 				}
 			}
@@ -154,7 +136,7 @@ public class HomePageService {
 		retVal.put("topic", topic);
 		retVal.put("comment_ratings", commentRatings);
 		retVal.put("topic_rating", topicRating);
-		
+
 		return retVal;
 	}
 
@@ -191,6 +173,7 @@ public class HomePageService {
 		}
 		return retValList;
 	}
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -256,6 +239,7 @@ public class HomePageService {
 			return null;
 		}
 	}
+
 	@POST
 	@Path("/add_comment")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -316,6 +300,7 @@ public class HomePageService {
 			return retVal;
 		}
 	}
+
 	@POST
 	@Path("/rate_topic_toogle")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -447,6 +432,7 @@ public class HomePageService {
 		}
 		return ratings;
 	}
+
 	private TopicRatings getTopicRatings() {
 		TopicRatings ratings = (TopicRatings) ctx.getAttribute("topic_ratings");
 		if (ratings == null) {
@@ -456,7 +442,6 @@ public class HomePageService {
 		}
 		return ratings;
 	}
-	
 
 	private void commentRatingsData() {
 
@@ -470,6 +455,7 @@ public class HomePageService {
 		DataManager.getInstance().saveCommentRating(r3);
 		DataManager.getInstance().saveCommentRating(r4);
 	}
+
 	private void topicRatingsData() {
 
 		TopicRating r1 = new TopicRating(1l, 1l, 1);
