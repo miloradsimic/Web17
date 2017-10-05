@@ -48,6 +48,9 @@ import beans.Subforum;
 import beans.Subforums;
 import beans.Topic;
 import beans.TopicBean;
+import beans.TopicRating;
+import beans.TopicRatingBean;
+import beans.TopicRatings;
 import beans.Topics;
 import beans.User;
 import beans.UserPublicBean;
@@ -85,26 +88,21 @@ public class HomePageService {
 	@Path("/topics/{subforum}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<TopicBean> test3(@Context HttpServletRequest request, @PathParam("subforum") long subforum) {
+	public ArrayList<TopicBean> getTopicsList(@Context HttpServletRequest request, @PathParam("subforum") long subforum) {
 		// System.out.println("Reading topics from " + subforum + " subforum.");
-		ArrayList<Topic> topics = getTopics().getTopicsList();
+		ArrayList<Topic> topics = getTopics().getTopicList();
 		HashMap<Long, User> users = getUsers().getUsersMap();
 		ArrayList<TopicBean> topicsFromSubforum = new ArrayList<>();
 		for (Topic topic : topics) {
 			// trebaju nam samo teme tog podforuma
-			if (topic.getSubforumId() == subforum) { 
+			if (topic.getSubforumId() == subforum) {
 				if (users.containsKey(topic.getAuthorId())) {
-//					topic.setAuthorId(users.get(topic.getAuthorId().getUserId()));
+					// topic.setAuthorId(users.get(topic.getAuthorId().getUserId()));
 					topicsFromSubforum.add(new TopicBean(topic, users.get(topic.getAuthorId())));
 				}
 			}
 		}
 		return topicsFromSubforum;
-		// HashMap<String, Object> retVal = new HashMap<>();
-		// retVal.put("topics", topicsFromSubforum);
-		// retVal.put("ratings", ratings);
-		//
-		// return retVal;
 	}
 
 	/**
@@ -114,7 +112,7 @@ public class HomePageService {
 	@Path("/topic/{topic}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public HashMap<String, Object> test4(@Context HttpServletRequest request,
+	public HashMap<String, Object> getTopic(@Context HttpServletRequest request,
 			/* @PathParam("subforum") long subforumId, */ @PathParam("topic") long topicId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
@@ -131,20 +129,32 @@ public class HomePageService {
 				topic.getComments().add(comment);
 			}
 		}
-		ArrayList<CommentRating> ratings = new ArrayList<>();
+		// Comment ratings
+		ArrayList<CommentRating> commentRatings = new ArrayList<>();
 		if (loggedUser != null) {
-			for (CommentRating rating : getRatings().getRatingsList()) {
+			for (CommentRating rating : getCommentRatings().getRatingsList()) {
 				if (getComments().getComment(rating.getCommentId()).getTopicId() == topicId && rating
 						.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
-					ratings.add(rating);
+					commentRatings.add(rating);
+				}
+			}
+		}
+		// Topic rating
+		TopicRating topicRating = null;
+		if (loggedUser != null) {
+			topicRating = new TopicRating(topicId, getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId(), 0);
+			for (TopicRating rating : getTopicRatings().getRatingsList()) {
+				if (rating.getTopicId() == topicId && rating.getUserId() == getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId()) {
+					topicRating = rating;
 				}
 			}
 		}
 
 		HashMap<String, Object> retVal = new HashMap<>();
 		retVal.put("topic", topic);
-		retVal.put("ratings", ratings);
-
+		retVal.put("comment_ratings", commentRatings);
+		retVal.put("topic_rating", topicRating);
+		
 		return retVal;
 	}
 
@@ -181,7 +191,6 @@ public class HomePageService {
 		}
 		return retValList;
 	}
-
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -247,34 +256,6 @@ public class HomePageService {
 			return null;
 		}
 	}
-
-	/**
-	 * Demonstrira injektovanje HTTP zahteva u parametre metode. Injektovani
-	 * zahtev �emo iskoristiti da iz njega izvu�emo sesiju, a nju �emo
-	 * iskoristiti da ve�emo objekat klase User na sesiju, pod imenom 'user'.
-	 * 
-	 * @param request
-	 *            Injektovano zaglavlje HTTP zahteva.
-	 * @param request
-	 *            JSON string koji reprezentuje objekat klase User.
-	 * @return JSON string koji reprezentuje objekat klase User.
-	 */
-	@POST
-	@Path("/login")
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public User login(@Context HttpServletRequest request, LoginBean user) {
-		LoginBean retVal = null;
-		retVal = (LoginBean) request.getSession().getAttribute("user");
-
-		if (retVal == null) {
-			System.out.println("No previous logged users.");
-		} else {
-			System.out.println("User " + retVal.getUsername() + " is already logged!");
-		}
-		return null;
-	}
-
 	@POST
 	@Path("/add_comment")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -306,7 +287,7 @@ public class HomePageService {
 	@Path("/like_comment_toogle")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public HashMap<String, Object> addLike(@Context HttpServletRequest request, CommentLikeBean comment) {
+	public HashMap<String, Object> addCommentRating(@Context HttpServletRequest request, CommentLikeBean comment) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
@@ -317,8 +298,8 @@ public class HomePageService {
 
 			long userId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
 			DataManager.getInstance()
-					.saveRating(new CommentRating(comment.getCommentId(), userId, comment.getRatingValue()));
-			ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
+					.saveCommentRating(new CommentRating(comment.getCommentId(), userId, comment.getRatingValue()));
+			ctx.setAttribute("comment_ratings", DataManager.getInstance().readCommentRatings());
 
 			int likes = getComments().getComment(comment.getCommentId()).getLikes();
 			int dislikes = getComments().getComment(comment.getCommentId()).getDislikes();
@@ -328,8 +309,39 @@ public class HomePageService {
 			retVal.put("total", total);
 
 			int value = 0;
-			if (getRatings().getRating(comment.getCommentId(), userId) != null) {
-				value = getRatings().getRating(comment.getCommentId(), userId).getValue();
+			if (getCommentRatings().getRating(comment.getCommentId(), userId) != null) {
+				value = getCommentRatings().getRating(comment.getCommentId(), userId).getValue();
+			}
+			retVal.put("rated", value);
+			return retVal;
+		}
+	}
+	@POST
+	@Path("/rate_topic_toogle")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public HashMap<String, Object> addTopicRating(@Context HttpServletRequest request, TopicRatingBean topicRating) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (loggedUser == null) {
+			System.out.println("You can't rate because you're not logged.");
+			return null;
+		} else {
+
+			long userId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
+			DataManager.getInstance()
+					.saveTopicRating(new TopicRating(topicRating.getTopicId(), userId, topicRating.getRatingValue()));
+			ctx.setAttribute("topic_ratings", DataManager.getInstance().readTopicRatings());
+
+			int likes = getTopics().getTopicsMap().get(topicRating.getTopicId()).getLikes();
+			int dislikes = getTopics().getTopicsMap().get(topicRating.getTopicId()).getDislikes();
+
+			HashMap<String, Object> retVal = new HashMap<>();
+
+			int value = 0;
+			if (getTopicRatings().getRating(topicRating.getTopicId(), userId) != null) {
+				value = getTopicRatings().getRating(topicRating.getTopicId(), userId).getValue();
 			}
 			retVal.put("rated", value);
 			return retVal;
@@ -396,6 +408,7 @@ public class HomePageService {
 		if (topics == null) {
 			DataManager.setUpRootPath(ctx.getRealPath(""));
 			topicsData();
+			topicRatingsData();
 			topics = DataManager.getInstance().readTopics();
 			ctx.setAttribute("topics", topics);
 		}
@@ -418,34 +431,54 @@ public class HomePageService {
 		if (comments == null) {
 			DataManager.setUpRootPath(ctx.getRealPath(""));
 			commentsData();
-			ratingsData();
+			commentRatingsData();
 			comments = DataManager.getInstance().readComments();
 			ctx.setAttribute("comments", comments);
 		}
 		return comments;
 	}
 
-	private CommentRatings getRatings() {
-		CommentRatings ratings = (CommentRatings) ctx.getAttribute("ratings");
+	private CommentRatings getCommentRatings() {
+		CommentRatings ratings = (CommentRatings) ctx.getAttribute("comment_ratings");
 		if (ratings == null) {
 			DataManager.setUpRootPath(ctx.getRealPath(""));
-			ratings = DataManager.getInstance().readRatings();
-			ctx.setAttribute("ratings", ratings);
+			ratings = DataManager.getInstance().readCommentRatings();
+			ctx.setAttribute("comment_ratings", ratings);
 		}
 		return ratings;
 	}
+	private TopicRatings getTopicRatings() {
+		TopicRatings ratings = (TopicRatings) ctx.getAttribute("topic_ratings");
+		if (ratings == null) {
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			ratings = DataManager.getInstance().readTopicRatings();
+			ctx.setAttribute("topic_ratings", ratings);
+		}
+		return ratings;
+	}
+	
 
-	private void ratingsData() {
+	private void commentRatingsData() {
 
 		CommentRating r1 = new CommentRating(1l, 1l, 1);
 		CommentRating r2 = new CommentRating(1l, 2l, 1);
 		CommentRating r3 = new CommentRating(1l, 3l, 1);
 		CommentRating r4 = new CommentRating(2l, 1l, -1);
 
-		DataManager.getInstance().saveRating(r1);
-		DataManager.getInstance().saveRating(r2);
-		DataManager.getInstance().saveRating(r3);
-		DataManager.getInstance().saveRating(r4);
+		DataManager.getInstance().saveCommentRating(r1);
+		DataManager.getInstance().saveCommentRating(r2);
+		DataManager.getInstance().saveCommentRating(r3);
+		DataManager.getInstance().saveCommentRating(r4);
+	}
+	private void topicRatingsData() {
+
+		TopicRating r1 = new TopicRating(1l, 1l, 1);
+		TopicRating r2 = new TopicRating(1l, 2l, 1);
+		TopicRating r3 = new TopicRating(1l, 3l, -1);
+
+		DataManager.getInstance().saveTopicRating(r1);
+		DataManager.getInstance().saveTopicRating(r2);
+		DataManager.getInstance().saveTopicRating(r3);
 	}
 
 	private void commentsData() {

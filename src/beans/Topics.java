@@ -30,7 +30,7 @@ public class Topics implements Serializable{
 		super();
 	}
 
-	public ArrayList<Topic> getTopicsList() {
+	public ArrayList<Topic> getTopicList() {
 		return topicsList;
 	}
 

@@ -6,6 +6,7 @@ var profileURL = "rest/homepage/profile";
 var users_listURL = "rest/homepage/users_list";
 var upload_avatarURL = "rest/homepage/upload_avatar";
 var submitProfileDataURL = "rest/homepage/submit_profile_data";
+var sumbpitTopicRatingURL = "rest/homepage/rate_topic_toogle";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -402,6 +403,57 @@ function submitLike(element, commentId) {
 
 }
 
+function submitTopicRating(element, topicId) {
+	console.log('submitTopicRating(): \ntopicId=' + topicId );
+	var rate = -1;
+	if (element.hasClass("comment-like")) {
+		rate = 1;
+	}
+	var data = {
+		topicId : topicId,
+		ratingValue : rate
+	};
+
+	var s = JSON.stringify(data);
+	console.log("REST sending: " + s);
+	$.ajax({
+		url : sumbpitTopicRatingURL,
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(rating) {
+
+			console.log("Successful rating: \nrated=" + rating.rated);
+			// Icon color ~ farbanje strelica
+			if (rate == 1) {
+				if (rating.rated == 1) {
+					$('#t' + topicId).find(".comment-like-unused").removeClass("comment-like-unused").addClass("comment-like-used");
+				} else {
+					$('#t' + topicId).find(".comment-like-used").removeClass("comment-like-used").addClass("comment-like-unused");
+				}
+				$('#t' + topicId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
+
+			} else if (rate == -1) {
+				if (rating.rated == -1) {
+					$('#t' + topicId).find(".comment-dislike-unused").removeClass("comment-dislike-unused").addClass("comment-dislike-used");
+				} else {
+					$('#t' + topicId).find(".comment-dislike-used").removeClass("comment-dislike-used").addClass("comment-dislike-unused");
+				}
+				$('#t' + topicId).find(".comment-like-used").removeClass("comment-like-used").addClass("comment-like-unused");
+			}
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+
+}
+
+
+
+
 //Helper functions
 //Helper function to serialize all the form fields into a JSON string
 /** Saves last selected tab, if you go F5 it selects same tab (optional) */
@@ -429,15 +481,15 @@ function getUrlParameter(sParam) {
 }
 function userLogged(username) {
 	if (arguments.length == 0) {
-		console.log('userLogged()');
+//		console.log('userLogged()');
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
 
-		console.log('return userLogged(): ' + isLogged);
+//		console.log('return userLogged(): ' + isLogged);
 		return isLogged;
 	} else {
-		console.log('userLogged(username): ' + username);
+//		console.log('userLogged(username): ' + username);
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).username === username;
-		console.log('return userLogged(username): ' + isLogged);
+//		console.log('return userLogged(username): ' + isLogged);
 		return isLogged;
 	}
 }

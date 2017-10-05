@@ -8,7 +8,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import model.enums.TopicType;
 
-public class Topic implements Serializable{
+public class Topic implements Serializable {
 
 	/**
 	 * 
@@ -22,29 +22,29 @@ public class Topic implements Serializable{
 	private String title;
 	private TopicType type;
 	private long authorId;
-	//napravi novi rest call za dobijanje komentara
+	// napravi novi rest call za dobijanje komentara
 	private ArrayList<Comment> comments;
 	private String content;
 	private String creationDate;
 	private int likes;
 	private int dislikes;
 
-//	public Topic(long id) {
-//		super();
-//		this.topicId = id;
-//		this.type = null;
-//		this.subforumId = -1;
-//		this.title = null;
-//		this.authorId = -1;
-//		this.content = null;
-//		this.creationDate = null;
-//		this.likes = -1;
-//		this.dislikes = -1;
-//		comments = new ArrayList<>();
-//	}
-	
-	public Topic(long id, TopicType type, long subforumId, String title, long authorId, String content, String creationDate,
-			int likes, int dislikes) {
+	// public Topic(long id) {
+	// super();
+	// this.topicId = id;
+	// this.type = null;
+	// this.subforumId = -1;
+	// this.title = null;
+	// this.authorId = -1;
+	// this.content = null;
+	// this.creationDate = null;
+	// this.likes = -1;
+	// this.dislikes = -1;
+	// comments = new ArrayList<>();
+	// }
+
+	public Topic(long id, TopicType type, long subforumId, String title, long authorId, String content,
+			String creationDate, int likes, int dislikes) {
 		super();
 		this.topicId = id;
 		this.type = type;
@@ -82,7 +82,6 @@ public class Topic implements Serializable{
 		this.type = type;
 	}
 
-
 	public String getTitle() {
 		return title;
 	}
@@ -90,7 +89,6 @@ public class Topic implements Serializable{
 	public void setTitle(String title) {
 		this.title = title;
 	}
-
 
 	public ArrayList<Comment> getComments() {
 		return comments;
@@ -138,6 +136,22 @@ public class Topic implements Serializable{
 
 	public void setTopicId(long topicId) {
 		this.topicId = topicId;
+	}
+
+	public void like() {
+		likes++;
+	}
+
+	public void removeLike() {
+		likes--;
+	}
+
+	public void dislike() {
+		dislikes++;
+	}
+
+	public void removeDislike() {
+		dislikes--;
 	}
 
 }

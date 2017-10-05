@@ -18,6 +18,8 @@ import beans.Comments;
 import beans.Message;
 import beans.Subforum;
 import beans.Topic;
+import beans.TopicRating;
+import beans.TopicRatings;
 import beans.Topics;
 import beans.User;
 import beans.Users;
@@ -28,8 +30,9 @@ public class DataManager {
 
 	private static String stringUsers = "/data/users.txt";
 	private static String stringComments = "/data/comments.txt";
-	private static String stringRatings = "/data/ratings";
+	private static String stringCommentRatings = "/data/comment_ratings";
 	private static String stringTopics = "/data/topics.txt";
+	private static String stringTopicRatings = "/data/topic_ratings";
 //	private String stringSubforums = "/data/subforums.txt";
 //	private String stringMessages = "/data/messages.txt";
 	private static String rootPath = "";
@@ -39,6 +42,7 @@ public class DataManager {
 	private Comments comments = new Comments();
 	private Topics topics = new Topics();
 	private CommentRatings commentRatings = new CommentRatings();
+	private TopicRatings topicRatings = new TopicRatings();
 //	private ArrayList<Topic> tpics;
 //	private ArrayList<Subforum> subforums;
 //	private ArrayList<Message> messages;
@@ -200,7 +204,7 @@ public class DataManager {
 		return comments;
 	}
 
-	public CommentRatings saveRating(CommentRating entry) {
+	public CommentRatings saveCommentRating(CommentRating entry) {
 		CommentRating old = commentRatings.getRating(entry.getCommentId(), entry.getUserId());
 		
 		// If it's already rated before.
@@ -255,7 +259,7 @@ public class DataManager {
 		
 		try {
 
-			fout = new FileOutputStream(rootPath + stringRatings);
+			fout = new FileOutputStream(rootPath + stringCommentRatings);
 			oos = new ObjectOutputStream(fout);
 			oos.writeObject(commentRatings);
 
@@ -287,14 +291,13 @@ public class DataManager {
 
 		return commentRatings;
 	}
-
-	public CommentRatings readRatings() {
+	public CommentRatings readCommentRatings() {
 
 		FileInputStream fin = null;
 		ObjectInputStream ois = null;
 		try {
 
-			fin = new FileInputStream(rootPath + stringRatings);
+			fin = new FileInputStream(rootPath + stringCommentRatings);
 			ois = new ObjectInputStream(fin);
 			Object o = ois.readObject();
 			commentRatings = (CommentRatings) o;
@@ -566,6 +569,45 @@ public class DataManager {
 
 		return true;
 	}
+	public Boolean saveTopics(Topics topics) {
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringTopics);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(topics);
+
+			System.out.println("Write Topics Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
+
 	public Boolean updateTopic(Topic entry) {
 		topics.updateTopic(entry);
 		FileOutputStream fout = null;
@@ -606,4 +648,147 @@ public class DataManager {
 		return true;
 	}
 	
+	public TopicRatings saveTopicRating(TopicRating entry) {
+		TopicRating old = topicRatings.getRating(entry.getTopicId(), entry.getUserId());
+		
+		// If it's already rated before.
+		if (old != null) {
+			System.out.println("If it's already rated before.");
+			// If it's already liked
+			if (old.getValue() == 1) {
+				System.out.println("If it's already liked");
+				// Remove old like
+				topics.getTopicsMap().get(entry.getTopicId()).removeLike();
+//				comments.getComment(entry.getCommentId()).removeLike();
+				topicRatings.remove(entry.getTopicId(), entry.getUserId());
+//				commentRatings.remove(entry.getCommentId(), entry.getUserId());
+				// If it's now disliked
+				if (entry.getValue() == -1) {
+					System.out.println("If it's now disliked");
+					topics.getTopicsMap().get(entry.getTopicId()).dislike();
+//					comments.getComment(entry.getCommentId()).dislike();
+					topicRatings.add(entry);
+//					commentRatings.add(entry);
+				}
+				// If it's already disliked
+			} else {
+				System.out.println();
+				// Remove old dislike
+				topics.getTopicsMap().get(entry.getTopicId()).removeDislike();
+//				comments.getComment(entry.getCommentId()).removeDislike();
+				topicRatings.remove(entry.getTopicId(), entry.getUserId());
+//				commentRatings.remove(entry.getCommentId(), entry.getUserId());
+				// If it's now liked
+				if (entry.getValue() == 1) {
+					System.out.println("If it's now liked");
+					topics.getTopicsMap().get(entry.getTopicId()).like();
+//					comments.getComment(entry.getCommentId()).like();
+					topicRatings.add(entry);
+//					commentRatings.add(entry);
+				}
+			}
+			// If it's not rated before
+		} else {
+			System.out.println("If it's not rated before");
+
+			// If it's now liked
+			if (entry.getValue() == 1) {
+				System.out.println("If it's now liked");
+				topics.getTopicsMap().get(entry.getTopicId()).like();
+//				comments.getComment(entry.getCommentId()).like();
+				topicRatings.add(entry);
+//				commentRatings.add(entry);
+				// If it's now disliked
+			} else {
+				System.out.println("If it's now disliked");
+				topics.getTopicsMap().get(entry.getTopicId()).dislike();
+//				comments.getComment(entry.getCommentId()).dislike();
+				topicRatings.add(entry);
+//				commentRatings.add(entry);
+			}
+		}
+
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+		
+		topics.getTopicList().clear();
+		topics.getTopicList().addAll(topics.getTopicsMap().values());
+		
+		saveTopics(topics);
+//		saveComments(comments);
+		
+		try {
+
+			fout = new FileOutputStream(rootPath + stringTopicRatings);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(topicRatings);
+
+			System.out.println("Write Topic Ratings Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return topicRatings;
+	}
+	public TopicRatings readTopicRatings() {
+
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
+
+			fin = new FileInputStream(rootPath + stringTopicRatings);
+			ois = new ObjectInputStream(fin);
+			Object o = ois.readObject();
+			topicRatings = (TopicRatings) o;
+			System.out.println("Read Topic Ratings Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+			return null;
+
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return topicRatings;
+	}
+
 }
