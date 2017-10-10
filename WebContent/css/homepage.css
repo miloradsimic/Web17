@@ -37,10 +37,16 @@
 	color: #333333;
 }
 
-.comment-replay {
+.comment-reply {
 	color: #0048c1;
 	padding-top: 4px;
 	font-size: 9px;
+}
+.comment-edit {
+	color: #0048c1;
+	padding-top: 4px;
+	font-size: 9px;
+	margin-left: 3px;
 }
 
 .comment-rating-padding {

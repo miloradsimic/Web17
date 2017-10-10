@@ -11,9 +11,11 @@ import java.io.ObjectOutputStream;
 import javax.imageio.ImageIO;
 
 import beans.Comment;
+import beans.CommentEditBean;
 import beans.CommentRating;
 import beans.CommentRatings;
 import beans.Comments;
+import beans.Subforums;
 import beans.Topic;
 import beans.TopicRating;
 import beans.TopicRatings;
@@ -30,7 +32,7 @@ public class DataManager {
 	private static String stringCommentRatings = "/data/comment_ratings";
 	private static String stringTopics = "/data/topics.txt";
 	private static String stringTopicRatings = "/data/topic_ratings";
-	// private String stringSubforums = "/data/subforums.txt";
+	private static String stringSubforums = "/data/subforums";
 	// private String stringMessages = "/data/messages.txt";
 	private static String rootPath = "";
 
@@ -39,8 +41,7 @@ public class DataManager {
 	private Topics topics = new Topics();
 	private CommentRatings commentRatings = new CommentRatings();
 	private TopicRatings topicRatings = new TopicRatings();
-	// private ArrayList<Topic> tpics;
-	// private ArrayList<Subforum> subforums;
+	private Subforums subforums = new Subforums();
 	// private ArrayList<Message> messages;
 
 	public static DataManager getInstance() {
@@ -779,4 +780,78 @@ public class DataManager {
 		return topicRatings;
 	}
 
+	public boolean updateComment(CommentEditBean entry, boolean isMainModerator) {
+		//subforums should be implemented like other data is, and then no parameter is needed
+		comments.updateComment(entry, isMainModerator);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringComments);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(comments);
+
+			System.out.println("Update Comment Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

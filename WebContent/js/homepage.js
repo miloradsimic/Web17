@@ -155,13 +155,14 @@ function renderTopicAndComments(data) {
 	var topic = data.topic;
 	var comment_ratings = data.comment_ratings;
 	var topic_rating = data.topic_rating;
+	var moderator = data.main_moderator;
 
 	//	console.log("Whole object data stringify! :" + JSON.stringify(data));
 
 	console.log("TOPIC: " + topic.title);
 
 	var mediaRoot = $('<div class="media"></div>');
-	var mediaLeft = $('<div id="t' + topic.topicId + '" class="media-left"></div>');
+	var mediaLeft = $('<div id="t' + topic.topicId + '" class="topic-root media-left"></div>');
 	var mediaLike;
 	if (userLogged()) {
 		var used = "unused";
@@ -186,7 +187,7 @@ function renderTopicAndComments(data) {
 	mediaLeft.append(mediaLike);
 	mediaLeft.append(mediaDislike);
 
-	var well = $('<div class="topic-root well well-sm"></div>');
+	var well = $('<div class="well well-sm"></div>');
 	var media = $('<div class="media"></div>');
 	var heading = $('<h4 class="media-heading media-top">' + topic.title + '</div>');
 	var commentsContainer1;
@@ -233,7 +234,7 @@ function renderTopicAndComments(data) {
 	commentsContainer.append(commentsContainer1);
 
 	$.each(topic.comments, function(index, comment) {
-		printAll(comment, comment_ratings, commentsContainer);
+		printAll(comment, moderator, comment_ratings, commentsContainer);
 	});
 
 
@@ -242,7 +243,7 @@ function renderTopicAndComments(data) {
 
 }
 
-function printAll(comment, ratings, commentsContainer) {
+function printAll(comment, moderator, ratings, commentsContainer) {
 	var rating;
 
 	$.each(ratings, function(index, tempRating) {
@@ -282,7 +283,7 @@ function printAll(comment, ratings, commentsContainer) {
 		if (rating != undefined && rating.value == -1) {
 			used = "used";
 		}
-		console.log("used rating: " + rating);
+		//		console.log("used rating: " + rating);
 		mediaDislike = $('<div class="comment-dislike comment-dislike-' + used + ' glyphicon glyphicon-menu-down" onclick="submitLike($(this),' + comment.commentId + ')"></div>');
 	}
 	var mediaBody = $('<div class="media-body"></div>');
@@ -290,22 +291,42 @@ function printAll(comment, ratings, commentsContainer) {
 
 
 	//	var well = $('<div class="comment well well-sm"></div>');
+	var edited = comment.edited == true? ' edited':'';
 	var commentAuthor = $('<span class="comment-author">' + comment.author.username + '</span>' +
-		'<span class="comment-date">' + comment.commentDate + '</span>');
+		'<span class="comment-date">' + comment.commentDate + '</span>' + 
+		'<span class="comment-edited">' + edited + '</span>');
 	var commentText = $('<p class="comment-text">' + comment.text + '</p>');
 	//	console.log("Comment text: " + comment.text);
 	var reply;
+	var edit;
+	var paragraph;
 
 	if (userLogged()) {
-		reply = $('<a role="button" class="comment-replay" onclick="buildCommentReplyBox($(this))">Reply</a>');
-	//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
+		paragraph = $('<p></p>');
+		reply = $('<a role="button" class="comment-reply" onclick="buildCommentReplyBox($(this))">Reply</a>');
+		edit = $('<a role="button" class="comment-edit" onclick="editComment($(this))">Edit</a>');
+		//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
+		paragraph.append(reply);
+		//		paragraph.append(edit);
+		if (userAdmin()) {
+			console.log('User is admin');
+			paragraph.append(edit);
+		}
+		if (userMainModerator(moderator)) {
+			console.log('User is moderator');
+			paragraph.append(edit);
+		}
+		if (userLogged(comment.author.username)) {
+			console.log('User is author');
+			paragraph.append(edit);
+		}
 	}
 
 
 	if (typeof comment.childComments != 'undefined') {
 		var commentsContainerChild = $('<ul class="commentsContainer"></ul>');
 		$.each(comment.childComments, function(index, commentChild) {
-			printAll(commentChild, ratings, commentsContainerChild);
+			printAll(commentChild, moderator, ratings, commentsContainerChild);
 		});
 		commentListItem.append(commentsContainerChild);
 	}
@@ -315,7 +336,7 @@ function printAll(comment, ratings, commentsContainer) {
 	mediaLeft.append(mediaDislike);
 	mediaBody.append(commentAuthor);
 	mediaBody.append(commentText);
-	mediaBody.append(reply);
+	mediaBody.append(paragraph);
 	media.append(mediaLeft);
 	media.append(mediaBody);
 	commentListItem.prepend(media);
@@ -325,6 +346,12 @@ function printAll(comment, ratings, commentsContainer) {
 	//	commentListItem.prepend(commentAuthor);
 	//	well.append(commentListItem);
 	commentsContainer.append(commentListItem);
+}
+function renderEditedComment(data) {
+	var comment = data.comment;
+	if (comment.edited == true) {
+		$('#c' + comment.commentId).find('.comment-date').append(' edited');
+	}
 }
 function renderManageUsersPage(data) {
 	//data: list of users with attributes {id, role, username, firstname, lastname, email, telephone}
@@ -467,14 +494,40 @@ function renderProfilePage(user) {
 
 function buildCommentReplyBox(reply) {
 	//	console.log("reply hide " + reply.name);
-	reply.hide();
+	//reply.hide();
 
-	var container = $('<div class="row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
-	var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
-	var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent().parent())">Comment</button>');
-	container.append(textArea);
-	container.append(submitButton);
-	//	console.log("reply hide ");
-	reply.parent().append(container);
-//	console.log("reply hide ");
+	if (reply.parent().parent().find("textarea").parent().html() == undefined) {
+		//		console.dir(reply.parent().parent().find("textarea").parent().html());
+		var container = $('<div class="comment-reply-container row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
+		var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
+		var submitButton = $('<button class="submitComment pull-right" onclick="submitComment($(this).parent().parent().parent())">Comment</button>');
+		container.append(textArea);
+		container.append(submitButton);
+		//console.log("reply hide ");
+		reply.parent().parent().append(container);
+		//console.log("reply hide ");
+
+	} else {
+		reply.parent().parent().find("textarea").parent().remove();
+	}
+
+
+}
+function editComment(editButton) {
+	if (editButton.parent().parent().find("textarea").parent().html() == undefined) {
+		//		console.dir(reply.parent().parent().find("textarea").parent().html());
+		var container = $('<div class="comment-reply-container row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
+		var textArea = $('<textarea name="text" class="comment-reply-area form-control" rows="2" placeholder="Write your comment here" ></textarea>');
+		var submitButton = $('<button class="submitComment pull-right" onclick="submitEditComment($(this).parent().parent().parent())">Save</button>');
+		textArea.val(editButton.parent().parent().children().eq(3).text());
+
+		container.append(textArea);
+		container.append(submitButton);
+		//console.log("reply hide ");
+		editButton.parent().parent().append(container);
+		//console.log("reply hide ");
+
+	} else {
+		editButton.parent().parent().find("textarea").parent().remove();
+	}
 }

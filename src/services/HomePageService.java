@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import beans.Comment;
+import beans.CommentEditBean;
 import beans.CommentLikeBean;
 import beans.CommentRating;
 import beans.CommentRatings;
@@ -131,11 +132,14 @@ public class HomePageService {
 				}
 			}
 		}
+		
+		long mainModerator = getSubforums().getSubforumsMap().get(topic.getSubforumId()).getMainModerator().getUserId();
 
 		HashMap<String, Object> retVal = new HashMap<>();
 		retVal.put("topic", topic);
 		retVal.put("comment_ratings", commentRatings);
 		retVal.put("topic_rating", topicRating);
+		retVal.put("main_moderator", mainModerator);
 
 		return retVal;
 	}
@@ -248,6 +252,8 @@ public class HomePageService {
 		LoginBean retVal = null;
 		retVal = (LoginBean) request.getSession().getAttribute("user");
 
+		System.out.println("Coment: " + comment.getTopicId() + " " + comment.getText());
+
 		if (retVal == null) {
 			System.out.println("You can't comment because you're not logged.");
 			return false;
@@ -264,6 +270,33 @@ public class HomePageService {
 				ctx.setAttribute("comments", DataManager.getInstance().readComments());
 			}
 			return true;
+		}
+	}
+
+	@POST
+	@Path("/update_comment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public HashMap<String, Object> updateComment(@Context HttpServletRequest request, CommentEditBean newComment) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		// System.out.println("Coment: " + newComment.getTopicId() + " " +
+		// newComment.getText());
+
+		if (loggedUser == null) {
+			System.out.println("You can't comment because you're not logged.");
+			return null;
+		} else {
+			Comment comment = getComments().getComment(newComment.getCommentId());
+			boolean isMainModerator = comment.getAuthor().getUserId() == getSubforums().getSubforumsMap().get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator().getUserId();
+			if (DataManager.getInstance().updateComment(newComment, isMainModerator)) {
+				ctx.setAttribute("comments", DataManager.getInstance().readComments());
+			}
+			
+			HashMap<String, Object> retVal = new HashMap<>();
+			retVal.put("comment", comment);
+			return retVal;
 		}
 	}
 

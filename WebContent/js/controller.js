@@ -6,7 +6,8 @@ var profileURL = "rest/homepage/profile";
 var users_listURL = "rest/homepage/users_list";
 var upload_avatarURL = "rest/homepage/upload_avatar";
 var submitProfileDataURL = "rest/homepage/submit_profile_data";
-var sumbpitTopicRatingURL = "rest/homepage/rate_topic_toogle";
+var submitTopicRatingURL = "rest/homepage/rate_topic_toogle";
+var updateCommentURL = "rest/homepage/update_comment";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -248,12 +249,49 @@ function loadTopics() {
 		}
 	});
 }
+function submitEditComment(comment) {
+
+	//	console.dir(comment.parent().html()); 
+
+	console.log('Submiting comment.');
+	var data = {
+		text : comment.find(".comment-reply-area").val(),
+		commentId : comment.attr("id").replace('c', ''),
+		topicId : $('.topic-root').attr("id").replace('t', '')
+	};
+
+	var s = JSON.stringify(data);
+	console.log(s);
+		$.ajax({
+			url : updateCommentURL,
+			type : "POST",
+			data : s,
+			contentType : "application/json",
+			dataType : "json",
+			success : function(data) {
+	
+				if (data == undefined) {
+					alert("Undefined!");
+					return;
+				} else {
+					renderEditedComment(data);
+				}
+				// Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+				location.reload();
+	
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+			}
+		});
+
+}
 function submitComment(comment) {
 	console.log('Submiting comment.');
 	var data = {
 		text : comment.find(".comment-reply-area").val(),
 		parentId : comment.attr("id").replace('c', ''),
-		topicId : $('.topic-root').attr("id")
+		topicId : $('.topic-root').attr("id").replace('t', '')
 	};
 
 	var s = JSON.stringify(data);
@@ -361,7 +399,7 @@ function submitTopicRating(element, topicId) {
 	var s = JSON.stringify(data);
 	console.log("REST sending: " + s);
 	$.ajax({
-		url : sumbpitTopicRatingURL,
+		url : submitTopicRatingURL,
 		type : "POST",
 		data : s,
 		contentType : "application/json",
@@ -423,17 +461,61 @@ function getUrlParameter(sParam) {
 		}
 	}
 }
-function userLogged(username) {
+function userLogged(username, userId) {
 	if (arguments.length == 0) {
 		//		console.log('userLogged()');
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
 
 		//		console.log('return userLogged(): ' + isLogged);
 		return isLogged;
-	} else {
+	} else if (arguments.length == 1) {
 		//		console.log('userLogged(username): ' + username);
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).username === username;
 		//		console.log('return userLogged(username): ' + isLogged);
 		return isLogged;
 	}
 }
+
+function userAdmin(){
+	if (JSON.parse(sessionStorage.getItem('user')).role === 'ADMIN') {
+		return true;
+	}
+	return false;
+}
+function userModerator(){
+	if (JSON.parse(sessionStorage.getItem('user')).role === 'MODERATOR') {
+		return true;
+	}
+	return false;
+}
+function userMainModerator(moderator){
+	if (JSON.parse(sessionStorage.getItem('user')).userId == moderator) {
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

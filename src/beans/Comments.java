@@ -4,18 +4,21 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.jdt.internal.compiler.env.ISourceMethod;
+
+import model.enums.Role;
+
 public class Comments implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Comment> commentList;
 	private HashMap<Long, Comment> commentsMap;
 
-
 	public Comments() {
 		commentList = new ArrayList<>();
-		commentsMap = new HashMap<>();	
+		commentsMap = new HashMap<>();
 	}
-	
+
 	public ArrayList<Comment> getCommentList() {
 		return commentList;
 	}
@@ -35,21 +38,21 @@ public class Comments implements Serializable {
 	public void addComment(Comment entry) {
 		Boolean isSuccessful = false;
 		// No parent
-		if(entry.getParentComment() == 0) {
+		if (entry.getParentComment() == 0) {
 			commentList.add(entry);
 			commentsMap.put(entry.getCommentId(), entry);
 			return;
 		}
 		// Finding parent in list
-		for (int i=0; i<commentList.size(); i++) {
+		for (int i = 0; i < commentList.size(); i++) {
 			// First in root (commentList.get(i) has no parent)
-			if(commentList.get(i).getCommentId() == entry.getParentComment()) {
+			if (commentList.get(i).getCommentId() == entry.getParentComment()) {
 				commentList.get(i).getChildComments().add(entry);
 				isSuccessful = true;
-//				return;
+				// return;
 			} else {
 				// Looking in children
-				if ( addToChildren(commentList.get(i), entry) ) {
+				if (addToChildren(commentList.get(i), entry)) {
 					isSuccessful = true;
 				}
 			}
@@ -60,13 +63,15 @@ public class Comments implements Serializable {
 			}
 		}
 	}
+
 	/**
-	 * Looks for entries parent in comments children. If founds than connects them
+	 * Looks for entries parent in comments children. If founds than connects
+	 * them
 	 */
 	private Boolean addToChildren(Comment parent, Comment entry) {
-		//Boolean retVal = false;
+		// Boolean retVal = false;
 		for (Comment comment : parent.getChildComments()) {
-			if(comment.getCommentId() == entry.getParentComment()) {
+			if (comment.getCommentId() == entry.getParentComment()) {
 				comment.getChildComments().add(entry);
 				return true;
 			} else {
@@ -75,42 +80,57 @@ public class Comments implements Serializable {
 		}
 		return false;
 	}
-	
-	public Comment getComment(long id){
+
+	public Comment getComment(long id) {
 		Comment retVal = null;
 		// Finding comment in list
-		for (int i=0; i<commentList.size(); i++) {
+		for (int i = 0; i < commentList.size(); i++) {
 			// First in root (commentList.get(i) has no parent)
-			if(commentList.get(i).getCommentId() == id) {
+			if (commentList.get(i).getCommentId() == id) {
 				return commentList.get(i);
 			} else {
 				// Looking in children
-				if ( (retVal = getFromChildren(commentList.get(i), id)) != null ) {
+				if ((retVal = getFromChildren(commentList.get(i), id)) != null) {
 					return retVal;
 				}
 			}
 		}
 		return null;
 	}
-	
+
 	private Comment getFromChildren(Comment parent, long id) {
 		for (Comment comment : parent.getChildComments()) {
-			if(comment.getCommentId() == id) {
+			if (comment.getCommentId() == id) {
 				return comment;
 			} else {
 				Comment retVal;
-				if ( (retVal = getFromChildren(comment, id)) != null) {
+				if ((retVal = getFromChildren(comment, id)) != null) {
 					return retVal;
 				}
 			}
 		}
 		return null;
 	}
-	
+
+	public Boolean updateComment(CommentEditBean entry, boolean isMainModerator) {
+
+		System.out.println("BEFORE: " + getComment(entry.getCommentId()).toString());
+		if (getComment(entry.getCommentId()).getAuthor().role == Role.ADMIN || isMainModerator) {
+			getComment(entry.getCommentId()).setEdited(false);
+		} else {
+			getComment(entry.getCommentId()).setEdited(true);
+		}
+		getComment(entry.getCommentId()).setText(entry.getText());
+
+		System.out.println("AFTER: " + getComment(entry.getCommentId()).toString());
+
+		return false;
+	}
 
 	public void liked(long id) {
 		getComment(id).like();
 	}
+
 	public void disliked(long id) {
 		getComment(id).dislike();
 	}

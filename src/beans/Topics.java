@@ -1,31 +1,18 @@
 package beans;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.Serializable;
-import java.text.ParseException;
-import java.time.DateTimeException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
+public class Topics implements Serializable {
 
-import controller.Utils;
-import model.enums.Role;
-import model.enums.TopicType;
-
-public class Topics implements Serializable{
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private ArrayList<Topic> topicsList = new ArrayList<>();
 	private HashMap<Long, Topic> topicsMap = new HashMap<>();
-	
+
 	public Topics() {
 		super();
 	}
@@ -45,9 +32,9 @@ public class Topics implements Serializable{
 	public void setTopicsMap(HashMap<Long, Topic> topicsMap) {
 		this.topicsMap = topicsMap;
 	}
-	
+
 	public void addTopic(Topic entry) {
-		
+
 		topicsList.add(entry);
 		topicsMap.put(entry.getTopicId(), entry);
 	}
@@ -60,6 +47,5 @@ public class Topics implements Serializable{
 		topicsMap.put(topic.getTopicId(), topic);
 		return true;
 	}
-	
 
 }
