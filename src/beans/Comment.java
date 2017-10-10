@@ -26,6 +26,7 @@ public class Comment implements Serializable {
 	private int likes;
 	private int dislikes;
 	private boolean edited;
+	private boolean deleted;
 
 	public Comment(long commentId, long topicId) {
 		super();
@@ -38,6 +39,7 @@ public class Comment implements Serializable {
 		this.likes = -1;
 		this.dislikes = -1;
 		this.edited = false;
+		this.deleted = false;
 		this.childComments = new ArrayList<>();
 	}
 
@@ -68,6 +70,7 @@ public class Comment implements Serializable {
 		this.likes = likes;
 		this.dislikes = dislikes;
 		this.edited = edited;
+		this.deleted = false;
 		this.childComments = new ArrayList<>();
 	}
 
@@ -172,6 +175,14 @@ public class Comment implements Serializable {
 	}
 	public void removeDislike() {
 		dislikes--;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 }

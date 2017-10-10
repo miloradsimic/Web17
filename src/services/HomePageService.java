@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import beans.Comment;
+import beans.CommentDeleteBean;
 import beans.CommentEditBean;
 import beans.CommentLikeBean;
 import beans.CommentRating;
@@ -132,7 +133,7 @@ public class HomePageService {
 				}
 			}
 		}
-		
+
 		long mainModerator = getSubforums().getSubforumsMap().get(topic.getSubforumId()).getMainModerator().getUserId();
 
 		HashMap<String, Object> retVal = new HashMap<>();
@@ -289,14 +290,46 @@ public class HomePageService {
 			return null;
 		} else {
 			Comment comment = getComments().getComment(newComment.getCommentId());
-			boolean isMainModerator = comment.getAuthor().getUserId() == getSubforums().getSubforumsMap().get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator().getUserId();
+			boolean isMainModerator = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId() == getSubforums().getSubforumsMap()
+					.get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator()
+					.getUserId();
+			System.out.println("IS MAIN MODERATOR" + isMainModerator);
 			if (DataManager.getInstance().updateComment(newComment, isMainModerator)) {
 				ctx.setAttribute("comments", DataManager.getInstance().readComments());
 			}
-			
+
 			HashMap<String, Object> retVal = new HashMap<>();
 			retVal.put("comment", comment);
 			return retVal;
+		}
+	}
+
+	@POST
+	@Path("/delete_comment")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public boolean deleteComment(@Context HttpServletRequest request, CommentDeleteBean comment) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		// System.out.println("Coment: " + newComment.getTopicId() + " " +
+		// newComment.getText());
+
+		if (loggedUser == null) {
+			System.out.println("You can't comment because you're not logged.");
+			return false;
+		} else {
+			// Comment comment =
+			// getComments().getComment(newComment.getCommentId());
+			// boolean isMainModerator = comment.getAuthor().getUserId() ==
+			// getSubforums().getSubforumsMap().get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator().getUserId();
+			if (DataManager.getInstance().deleteComment(comment.getCommentId())) {
+				ctx.setAttribute("comments", DataManager.getInstance().readComments());
+			}
+
+			// HashMap<String, Object> retVal = new HashMap<>();
+			// retVal.put("comment", comment);
+			return true;
 		}
 	}
 

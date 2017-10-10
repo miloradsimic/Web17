@@ -781,7 +781,8 @@ public class DataManager {
 	}
 
 	public boolean updateComment(CommentEditBean entry, boolean isMainModerator) {
-		//subforums should be implemented like other data is, and then no parameter is needed
+		// subforums should be implemented like other data is, and then no
+		// parameter is needed
 		comments.updateComment(entry, isMainModerator);
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
@@ -820,38 +821,44 @@ public class DataManager {
 
 		return true;
 	}
+
+	public boolean deleteComment(long commentId) {
+		comments.getComment(commentId).setDeleted(true);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringComments);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(comments);
+
+			System.out.println("Delete Comment Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

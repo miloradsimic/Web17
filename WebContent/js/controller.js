@@ -8,6 +8,7 @@ var upload_avatarURL = "rest/homepage/upload_avatar";
 var submitProfileDataURL = "rest/homepage/submit_profile_data";
 var submitTopicRatingURL = "rest/homepage/rate_topic_toogle";
 var updateCommentURL = "rest/homepage/update_comment";
+var deleteCommentURL = "rest/homepage/delete_comment";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -262,29 +263,60 @@ function submitEditComment(comment) {
 
 	var s = JSON.stringify(data);
 	console.log(s);
-		$.ajax({
-			url : updateCommentURL,
-			type : "POST",
-			data : s,
-			contentType : "application/json",
-			dataType : "json",
-			success : function(data) {
-	
-				if (data == undefined) {
-					alert("Undefined!");
-					return;
-				} else {
-					renderEditedComment(data);
-				}
-				// Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
-				location.reload();
-	
-			},
-			error : function(XMLHttpRequest, textStatus, errorThrown) {
-				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
-			}
-		});
+	$.ajax({
+		url : updateCommentURL,
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(data) {
 
+			if (data == undefined) {
+				alert("Undefined!");
+				return;
+			} else {
+				renderEditedComment(data);
+			}
+			// Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+			location.reload();
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+
+}
+function deleteComment(comment) {
+	console.log('Deleting comment.');
+	var data = {
+		commentId : comment.attr("id").replace('c', ''),
+	};
+	
+	var s = JSON.stringify(data);
+	console.log(s);
+	$.ajax({
+		url : deleteCommentURL,
+		type : "POST", //FIX: Some day here'll be DELETE
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(data) {
+
+			if (data == undefined) {
+				alert("Undefined!");
+				return;
+			} else {
+				renderDeletedComment(data, comment);
+			}
+			//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+			location.reload();
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
 }
 function submitComment(comment) {
 	console.log('Submiting comment.');
@@ -476,46 +508,21 @@ function userLogged(username, userId) {
 	}
 }
 
-function userAdmin(){
+function userAdmin() {
 	if (JSON.parse(sessionStorage.getItem('user')).role === 'ADMIN') {
 		return true;
 	}
 	return false;
 }
-function userModerator(){
+function userModerator() {
 	if (JSON.parse(sessionStorage.getItem('user')).role === 'MODERATOR') {
 		return true;
 	}
 	return false;
 }
-function userMainModerator(moderator){
+function userMainModerator(moderator) {
 	if (JSON.parse(sessionStorage.getItem('user')).userId == moderator) {
 		return true;
 	}
 	return false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

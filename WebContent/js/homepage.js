@@ -291,37 +291,41 @@ function printAll(comment, moderator, ratings, commentsContainer) {
 
 
 	//	var well = $('<div class="comment well well-sm"></div>');
-	var edited = comment.edited == true? ' edited':'';
+	var edited = comment.edited == true ? ' edited' : '';
 	var commentAuthor = $('<span class="comment-author">' + comment.author.username + '</span>' +
-		'<span class="comment-date">' + comment.commentDate + '</span>' + 
+		'<span class="comment-date">' + comment.commentDate + '</span>' +
 		'<span class="comment-edited">' + edited + '</span>');
 	var commentText = $('<p class="comment-text">' + comment.text + '</p>');
 	//	console.log("Comment text: " + comment.text);
 	var reply;
 	var edit;
+	var deleteButton;
 	var paragraph;
 
 	if (userLogged()) {
 		paragraph = $('<p></p>');
 		reply = $('<a role="button" class="comment-reply" onclick="buildCommentReplyBox($(this))">Reply</a>');
-		edit = $('<a role="button" class="comment-edit" onclick="editComment($(this))">Edit</a>');
+		edit = $('<a role="button" class="comment-edit" onclick="buildCommentEditBox($(this))">Edit</a>');
+		deleteButton = $('<a role="button" class="comment-delete" onclick="deleteComment($(this).parent().parent().parent())">Delete</a>');
 		//		console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
 		paragraph.append(reply);
 		//		paragraph.append(edit);
 		if (userAdmin()) {
 			console.log('User is admin');
-			paragraph.append(edit);
+			//			paragraph.append(edit);
+			paragraph.append(deleteButton);
 		}
 		if (userMainModerator(moderator)) {
 			console.log('User is moderator');
 			paragraph.append(edit);
+			paragraph.append(deleteButton);
 		}
 		if (userLogged(comment.author.username)) {
 			console.log('User is author');
 			paragraph.append(edit);
+			paragraph.append(deleteButton);
 		}
 	}
-
 
 	if (typeof comment.childComments != 'undefined') {
 		var commentsContainerChild = $('<ul class="commentsContainer"></ul>');
@@ -331,14 +335,18 @@ function printAll(comment, moderator, ratings, commentsContainer) {
 		commentListItem.append(commentsContainerChild);
 	}
 
-	mediaLeft.append(mediaLike);
-	mediaLeft.append(mediaRating);
-	mediaLeft.append(mediaDislike);
-	mediaBody.append(commentAuthor);
-	mediaBody.append(commentText);
-	mediaBody.append(paragraph);
-	media.append(mediaLeft);
-	media.append(mediaBody);
+	if (comment.deleted == true) {
+		var media = $('<div class="media comment-deleted" id="c' + comment.commentId + '">Comment is deleted</div>');
+	} else {
+		mediaLeft.append(mediaLike);
+		mediaLeft.append(mediaRating);
+		mediaLeft.append(mediaDislike);
+		mediaBody.append(commentAuthor);
+		mediaBody.append(commentText);
+		mediaBody.append(paragraph);
+		media.append(mediaLeft);
+		media.append(mediaBody);
+	}
 	commentListItem.prepend(media);
 
 	//TODO: Srediti malo redosled komentara
@@ -351,6 +359,11 @@ function renderEditedComment(data) {
 	var comment = data.comment;
 	if (comment.edited == true) {
 		$('#c' + comment.commentId).find('.comment-date').append(' edited');
+	}
+}
+function renderDeletedComment(data, comment) {
+	if (data == true) {
+		comment.html('<div class="media" id="c' + comment.commentId + '">Comment is deleted</div>');
 	}
 }
 function renderManageUsersPage(data) {
@@ -513,7 +526,7 @@ function buildCommentReplyBox(reply) {
 
 
 }
-function editComment(editButton) {
+function buildCommentEditBox(editButton) {
 	if (editButton.parent().parent().find("textarea").parent().html() == undefined) {
 		//		console.dir(reply.parent().parent().find("textarea").parent().html());
 		var container = $('<div class="comment-reply-container row no-gutter col-xs-12 col-sm-8 col-md-6 col-lg-4" ></div>');
