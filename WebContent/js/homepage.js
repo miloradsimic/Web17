@@ -108,6 +108,10 @@ function renderTopicsList(data) {
 	console.log(data);
 	//	setActiveMenuItem("menu_homepage");
 
+	if (userLogged()) {
+		$('.topics-header').prepend('<a role="button" class="topics-new-topic" onclick="renderNewTopic()">Create new topic</a>');
+		$('.topics-header').prepend('<div id="topic_new_topic_container"></div>');
+	}
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 	var container = $("#topicContainer");
@@ -116,6 +120,7 @@ function renderTopicsList(data) {
 
 		console.log("TOPIC: " + topic.title);
 		console.log("TOPIC user: " + topic.author.username);
+
 
 		var media = $('<div class="topic media" onclick="goToTopic(\'' + topic.topicId + '\')"></div>');
 
@@ -147,6 +152,90 @@ function renderTopicsList(data) {
 
 		$("#mediaContainer").append(media);
 	});
+}
+function renderNewTopic() {
+	if (!userLogged()) {
+		console.log("User is not logged!");
+	} else {
+		$("#topic_new_topic_container").load("topic_new.html", function() {
+			$(this).find("#text").hide();
+			$(this).find("#link").hide();
+			$(this).find("#image").hide();
+			$(this).find("#new_topic_form").change(function() {
+				$(this).find("#text").hide();
+				$(this).find("#link").hide();
+				$(this).find("#image").hide();
+				if ($(this).find("#text_radio").is(":checked") == true) {
+					$(this).find("#text").show();
+				}
+				if ($(this).find("#link_radio").is(":checked") == true) {
+					$(this).find("#link").show();
+				}
+				if ($(this).find("#image_radio").is(":checked") == true) {
+					$(this).find("#image").show();
+					if ($(this).find("#topic_img_tag").attr('src') === "") {
+						$(this).find("#topic_image").hide();
+					} else {
+						$(this).find("#topic_image").show();
+					}
+				}
+			});
+
+			// fixes bug of validator with placeholders, he parses placeholder as inputed text
+			// removes placeholder before submit, and returns after is submited
+			var placeholders = {};
+			$(this).find("#new_topic_form").validate({
+				submitHandler : function() {
+					$(this).find("#new_topic_form").find(':input[placeholder]').each(function() {
+						var placeholder = $(this).attr('placeholder');
+						placeholders[placeholder] = this;
+						$(this).removeAttr('placeholder');
+					});
+					$(this).find("#new_topic_form").submit();
+				},
+				invalidHandler : function() {
+					$.each(placeholders, function(placeholder, element) {
+						$(element).attr('placeholder', placeholder);
+					});
+
+				},
+				// important rules
+				rules : {
+					topic_title : {
+						minlength : 3,
+						required : true
+					},
+					type : {
+						required : true
+					},
+					link : {
+						required : $("#link_radio :checked")
+					},
+					text : {
+						required : $("#text_radio :checked")
+					},
+					image : {
+						required : $("#image_radio :checked")
+					}
+				},
+				messages : {
+					topic_title : {
+						minlength : "Minimal length is 3",
+						required : "Topic title is required"
+					}
+				},
+				// puts error under radio buttons
+				errorPlacement : function(error, element) {
+					if (element.attr("name") == "type") {
+						error.insertAfter("#image_radio_label");
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+
+		});
+	}
 }
 function renderTopicAndComments(data) {
 	console.log('renderTopicAndComments form file into page.');

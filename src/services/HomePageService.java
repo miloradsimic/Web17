@@ -31,6 +31,7 @@ import beans.Subforum;
 import beans.Subforums;
 import beans.Topic;
 import beans.TopicBean;
+import beans.TopicNewBean;
 import beans.TopicRating;
 import beans.TopicRatingBean;
 import beans.TopicRatings;
@@ -87,6 +88,39 @@ public class HomePageService {
 		return topicsFromSubforum;
 	}
 
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("upload_new_topic")
+	public Boolean uploadNewTopicData(@Context HttpServletRequest request, TopicNewBean topicBean) {
+
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		long authorId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
+
+		String content = "";
+		if (topicBean.getContent().startsWith("https://") || topicBean.getContent().startsWith("http://")) {
+			content = topicBean.getContent();
+		} else {
+			if (topicBean.getContent().startsWith("www.")) {
+				content = "http://" + topicBean.getContent();
+			} else {
+				content = "http://www." + topicBean.getContent();
+			}
+		}
+		
+		Topic entry = new Topic(Utils.stringToTopicType(topicBean.getTopic_type()), topicBean.getSubforum_id(),
+				topicBean.getTopic_title(), authorId, content);
+
+		if (DataManager.getInstance().saveTopic(entry)) {
+			ctx.setAttribute("topics", DataManager.getInstance().readTopics());
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Returns full topic object with loaded comments
 	 */
@@ -141,6 +175,8 @@ public class HomePageService {
 		retVal.put("comment_ratings", commentRatings);
 		retVal.put("topic_rating", topicRating);
 		retVal.put("main_moderator", mainModerator);
+
+		System.out.println("Image path: " + topic.getContent());
 
 		return retVal;
 	}
@@ -224,6 +260,23 @@ public class HomePageService {
 		return true;
 	}
 
+	@POST
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@Path("upload_image")
+	public Boolean uploadImage(@Context HttpServletRequest request, @FormDataParam("image") File image,
+			@FormDataParam("name") String name) throws Exception {
+		System.out.println(name);
+
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		if (loggedUser == null) {
+			return null;
+		}
+
+		DataManager.getInstance().saveImage(image, name);
+		return true;
+	}
+
 	@GET
 	@Path("/profile/{profile}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -290,9 +343,10 @@ public class HomePageService {
 			return null;
 		} else {
 			Comment comment = getComments().getComment(newComment.getCommentId());
-			boolean isMainModerator = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId() == getSubforums().getSubforumsMap()
-					.get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator()
-					.getUserId();
+			boolean isMainModerator = getUsers().getUsersMapByUsername().get(loggedUser.getUsername())
+					.getUserId() == getSubforums().getSubforumsMap()
+							.get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId())
+							.getMainModerator().getUserId();
 			System.out.println("IS MAIN MODERATOR" + isMainModerator);
 			if (DataManager.getInstance().updateComment(newComment, isMainModerator)) {
 				ctx.setAttribute("comments", DataManager.getInstance().readComments());

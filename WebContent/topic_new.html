@@ -1,0 +1,78 @@
+
+<div class="container" style="margin-top: 20px">
+	<div class="row">
+		<div class="col-md-10 ">
+			<form class="form-horizontal" id="new_topic_form">
+				<fieldset>
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">Topic Title</label>
+						<div class="col-md-4">
+							<input id="topic_title" name="topic_title" type="text"
+								placeholder="Topic Title" class="form-control input-md">
+						</div>
+					</div>
+					<!-- Multiple Radios (inline) -->
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="type">Choose
+							type of media:</label>
+						<div class="col-md-4">
+							<label class="radio-inline" for="text"> <input
+								id="text_radio" type="radio" name="type" value="TEXT"> Text
+							</label> <label class="radio-inline" for="link"> <input
+								id="link_radio" type="radio" name="type" value="LINK"> Link
+							</label> <label id="image_radio_label" class="radio-inline" for="image">
+								<input id="image_radio" type="radio" name="type" value="IMAGE">
+								Image
+							</label>
+						</div>
+					</div>
+
+					<div id="link" class="form-group">
+						<label class="col-md-4 control-label">Enter link</label>
+						<div class="col-md-4">
+							<input name="link" type="text" placeholder="Enter link"
+								class="form-control input-md">
+						</div>
+					</div>
+					<div id="text" class="form-group">
+						<label class="col-md-4 control-label">Enter text</label>
+						<div class="col-md-4">
+							<textarea name="text" placeholder="Enter text" cols="60" rows="2"
+								class="form-control input-md"></textarea>
+						</div>
+
+					</div>
+					<div id="image">
+						<div id="topic_image" class="form-group">
+							<label class="col-md-4 control-label"></label>
+							<div class="col-md-4">
+								<img id="topic_img_tag"
+									src=""
+									style="height: 100px; width: auto;"
+									class="img-responsive img-thumbnail form-control">
+							</div>
+						</div>
+						<div id="topic_upload_new_image" class="form-group">
+							<label class="col-md-4 control-label">Upload image</label>
+							<div class="col-md-4">
+								<input id="upload_image" onchange="setUpTopicImage(this);"
+									name="image" class="input-file" type="file">
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label"></label>
+						<div class="col-md-4">
+							<a href="#" class="btn btn-success"
+								onclick=submitNewTopic($(this).parent().parent().parent().parent())><span
+								class="glyphicon glyphicon-thumbs-up"></span> Submit</a>
+
+						</div>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</div>

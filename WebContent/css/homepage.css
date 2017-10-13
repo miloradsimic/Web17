@@ -202,6 +202,9 @@ span .pull-right {
 input[type='file'] {
   color: transparent;
 }
+.input-file {
+	width: 91px;
+}
 
 .center-verticaly {
     vertical-align: middle;
@@ -254,6 +257,13 @@ input[type='file'] {
 .profile-menu a:visited {
 	background-color: #AAAAFF;
 }*/
+.topics-new-topic {
+	margin-right:5px;
+}
+.topic-image img {
+	height:20px;
+	width:auto;
+}
 
 
 form .error {

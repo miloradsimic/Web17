@@ -102,7 +102,7 @@ public class DataManager {
 
 		User user = users.getUsersMapByUsername().get(username);
 
-		String localPath = "resources/" + user.getUserId() + name;
+		String localPath = "resources/user_" + user.getUserId() + name;
 		try {
 			// retrieve image
 			BufferedImage bi = ImageIO.read(img);
@@ -116,6 +116,33 @@ public class DataManager {
 		user.setAvatar(localPath);
 
 		updateUser(user);
+
+		return true;
+	}
+
+	public Boolean saveImage(File img, String name) {
+		String localPath = "resources/topic_" + name;
+		try {
+			// retrieve image
+			BufferedImage bi = ImageIO.read(img);
+			File outputfile = new File(rootPath + '/' + localPath);
+			ImageIO.write(bi, name.substring(name.lastIndexOf('.') + 1), outputfile);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+//		
+//		String localPath = "topics/" + name;
+//		try {
+//			// retrieve image
+//			BufferedImage bi = ImageIO.read(img);
+//			File outputfile = new File(rootPath + '/' + localPath);
+//			ImageIO.write(bi, name.substring(name.lastIndexOf('.') + 1), outputfile);
+//
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		return true;
 	}
@@ -541,7 +568,7 @@ public class DataManager {
 			oos = new ObjectOutputStream(fout);
 			oos.writeObject(topics);
 
-			System.out.println("Write Topics Done");
+			System.out.println("Write Topic Done");
 
 		} catch (Exception ex) {
 

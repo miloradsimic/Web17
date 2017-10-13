@@ -2,18 +2,18 @@ package beans;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.codehaus.jackson.annotate.JsonBackReference;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
+import controller.Utils;
 import model.enums.TopicType;
 
 public class Topic implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	private static final AtomicLong count = new AtomicLong(100);
+
 	private long topicId;
 	private long subforumId;
 	/**
@@ -29,19 +29,19 @@ public class Topic implements Serializable {
 	private int likes;
 	private int dislikes;
 
-	// public Topic(long id) {
-	// super();
-	// this.topicId = id;
-	// this.type = null;
-	// this.subforumId = -1;
-	// this.title = null;
-	// this.authorId = -1;
-	// this.content = null;
-	// this.creationDate = null;
-	// this.likes = -1;
-	// this.dislikes = -1;
-	// comments = new ArrayList<>();
-	// }
+	public Topic(TopicType type, long subforumId, String title, long authorId, String content) {
+
+		this.topicId = count.incrementAndGet();
+		this.type = type;
+		this.subforumId = subforumId;
+		this.title = title;
+		this.authorId = authorId;
+		this.content = content;
+		this.creationDate = Utils.getCurrentDate();
+		this.likes = 0;
+		this.dislikes = 0;
+		this.comments = new ArrayList<>();
+	}
 
 	public Topic(long id, TopicType type, long subforumId, String title, long authorId, String content,
 			String creationDate, int likes, int dislikes) {

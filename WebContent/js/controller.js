@@ -9,6 +9,8 @@ var submitProfileDataURL = "rest/homepage/submit_profile_data";
 var submitTopicRatingURL = "rest/homepage/rate_topic_toogle";
 var updateCommentURL = "rest/homepage/update_comment";
 var deleteCommentURL = "rest/homepage/delete_comment";
+var uploadImageURL = "rest/homepage/upload_image";
+var submitNewTopicURL = "rest/homepage/upload_new_topic";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -167,9 +169,6 @@ function submitProfileData(form) {
 			}
 		});
 	}
-
-//
-//	
 }
 function loadUsersList() {
 	saveProfileMenuTab(3); //not implemented
@@ -227,6 +226,104 @@ function loadSubforums() {
 			alert("AJAX ERROR6: " + errorThrown + "\nTextStatus: " + textStatus);
 		}
 	});
+}
+function setUpTopicImage(input) {
+	if (input.files && input.files[0]) {
+		var objFormData = new FormData();
+		var objFile = input.files[0]
+		objFormData.append('image', objFile);
+		var name = 't' + $.now() + objFile.name.substr(objFile.name.length - 4);
+		console.log("name is : " + name);
+		objFormData.append('name', name);
+
+		$.ajax({
+			url : uploadImageURL,
+			type : 'POST',
+			contentType : false,
+			data : objFormData,
+			processData : false,
+			success : function(data) {
+				var reader = new FileReader();
+
+				reader.onload = function(e) {
+					$('#topic_img_tag').attr('src', e.target.result);
+					$('#topic_image').show();
+
+					console.log("upload image value: " + $('#upload_image').attr('value'));
+					$('#upload_image').attr('value', 'resources/topic_' + name);
+					console.log("upload image value: " + $('#upload_image').attr('value'));
+				};
+
+				reader.readAsDataURL(input.files[0]);
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				var OriginalString = XMLHttpRequest.responseText;
+				var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+				console.log(StrippedString);
+				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+			}
+		});
+
+	}
+}
+function submitNewTopic(form) {
+	var content;
+	switch (form.find("input[name=type]:checked").val()) {
+	case "TEXT": {
+		console.log("Found TEXT bre, returning");
+		content = form.find("#text textarea").val();
+		break;
+	}
+	case "LINK": {
+		content = form.find("#link input").val();
+		break;
+	}
+	case "IMAGE": {
+		content = $("#upload_image").attr("value");
+		break;
+	}
+	}
+
+	// author is logged user
+	var data = {
+		topic_title : form.find("#topic_title").val(),
+		subforum_id : getUrlParameter("id"),
+		topic_type : form.find("input[name=type]:checked").val(),
+		content : content
+	};
+	if (form.valid()) {
+		console.log("submitNewTopic valid");
+		console.log("Submiting data object" + JSON.stringify(data));
+
+		var s = JSON.stringify(data);
+		console.log(s);
+		$.ajax({
+			url : submitNewTopicURL,
+			type : "POST",
+			data : s,
+			contentType : "application/json",
+			dataType : "json",
+			success : function(flag) {
+
+				if (flag == undefined) {
+					alert("Undefined! Not successful!");
+					return;
+				}
+				if (flag == true) {
+					console.log("Topic submited successfully!");
+				} else {
+					alert("False! Not successful!");
+				}
+				location.reload();
+
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+			}
+		});
+	} else {
+		console.log("submitNewTopic NOT valid");
+	}
 }
 function loadTopics() {
 	if (userLogged() == false) {
@@ -292,7 +389,7 @@ function deleteComment(comment) {
 	var data = {
 		commentId : comment.attr("id").replace('c', ''),
 	};
-	
+
 	var s = JSON.stringify(data);
 	console.log(s);
 	$.ajax({
