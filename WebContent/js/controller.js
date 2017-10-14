@@ -9,6 +9,7 @@ var submitProfileDataURL = "rest/homepage/submit_profile_data";
 var submitTopicRatingURL = "rest/homepage/rate_topic_toogle";
 var updateCommentURL = "rest/homepage/update_comment";
 var deleteCommentURL = "rest/homepage/delete_comment";
+var deleteTopicURL = "rest/homepage/delete_topic";
 var uploadImageURL = "rest/homepage/upload_image";
 var submitNewTopicURL = "rest/homepage/upload_new_topic";
 
@@ -343,6 +344,38 @@ function submitNewTopic(form) {
 		console.log("submitNewTopic NOT valid");
 	}
 }
+function deleteTopic(topicId) {
+	console.log('Deleting topic with id: ' + topicId);
+	
+	$.ajax({
+		url : deleteTopicURL + '/' + topicId,
+		type : "DELETE", //FIX: Some day here'll be DELETE
+		contentType : "application/json",
+		dataType : "json",
+		success : function(data) {
+
+			if (data == undefined) {
+				alert("Undefined!");
+				return;
+			} else if(data == false) {
+				alert("FALSE!");
+				return;
+			} else {
+				console.log('Deleted topic successfully.');
+				
+				$("#t" + topicId).html("");
+				$("#topic_new_topic_container").html("");
+				
+				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+				//location.reload();
+			}
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
 function loadTopics() {
 	if (userLogged() == false) {
 		showLoginButons();
@@ -579,9 +612,6 @@ function submitTopicRating(element, topicId) {
 	});
 
 }
-
-
-
 
 //Helper functions
 //Helper function to serialize all the form fields into a JSON string

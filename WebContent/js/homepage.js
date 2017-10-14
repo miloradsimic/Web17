@@ -125,7 +125,7 @@ function renderTopicsList(data) {
 		console.log("TOPIC user: " + topic.author.username);
 
 
-		var media = $('<div class="topic media"></div>');
+		var media = $('<div class="topic media" id="t' + topic.topicId + '"></div>');
 
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
 		var slika = DEFAULT_IMAGE;
@@ -153,7 +153,7 @@ function renderTopicsList(data) {
 		if (userLogged() && ( userAdmin() || userMainModerator(main_moderator) || userLogged(topic.author.userId))) { 
 			paragraph = $('<p></p>');
 			edit = $('<a role="button" class="topic-edit" onclick="loadTopicData(\'' + topic.topicId + '\');">Edit</a>');
-			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic($(this).parent().parent().parent());">Delete</a>');
+			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic(\'' + topic.topicId + '\');">Delete</a>');
 			paragraph.append(edit);
 			paragraph.append(deleteButton);
 		}

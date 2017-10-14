@@ -7,6 +7,7 @@ import java.util.HashMap;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -199,33 +200,22 @@ public class HomePageService {
 
 		return retVal;
 	}
-	@POST
-	@Path("/delete_topic")
+	@DELETE
+	@Path("/delete_topic/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean deleteTopic(@Context HttpServletRequest request, CommentDeleteBean comment) {
+	public boolean deleteTopic(@Context HttpServletRequest request, @PathParam("id") long topicId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
-		// System.out.println("Coment: " + newComment.getTopicId() + " " +
-		// newComment.getText());
-
 		if (loggedUser == null) {
-			System.out.println("You can't comment because you're not logged.");
-			return false;
+			System.out.println("You're not logged.");
 		} else {
-			// Comment comment =
-			// getComments().getComment(newComment.getCommentId());
-			// boolean isMainModerator = comment.getAuthor().getUserId() ==
-			// getSubforums().getSubforumsMap().get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator().getUserId();
-			if (DataManager.getInstance().deleteComment(comment.getCommentId())) {
-				ctx.setAttribute("comments", DataManager.getInstance().readComments());
+			if (DataManager.getInstance().deleteTopic(topicId)) {
+				ctx.setAttribute("topics", DataManager.getInstance().readTopics());
+				return true;
 			}
-
-			// HashMap<String, Object> retVal = new HashMap<>();
-			// retVal.put("comment", comment);
-			return true;
 		}
+		return false;
 	}
 	/**
 	 * Returns registered users

@@ -26,6 +26,7 @@ public class Topic implements Serializable {
 	private ArrayList<Comment> comments;
 	private String content;
 	private String creationDate;
+	private boolean deleted = false;
 	private int likes;
 	private int dislikes;
 
@@ -152,6 +153,14 @@ public class Topic implements Serializable {
 
 	public void removeDislike() {
 		dislikes--;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 }

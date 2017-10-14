@@ -48,4 +48,14 @@ public class Topics implements Serializable {
 		return true;
 	}
 
+	public void remove(long topicId) {
+		// physically
+		topicsList.remove(topicsMap.get(topicId));
+		topicsMap.remove(topicId);
+		//logic
+//		topicsMap.get(topicId).setDeleted(true);
+//		topicsList = new ArrayList<>(topicsMap.values());
+		
+	}
+
 }
