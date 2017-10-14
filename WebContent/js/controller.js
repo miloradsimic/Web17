@@ -210,6 +210,23 @@ function loadTopicDetailsAndComments() {
 		}
 	});
 }
+function loadTopicData(id) {
+	if (userLogged() == false) {
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
+
+	$.ajax({
+		type : 'GET',
+		url : topicURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderEditTopicForm,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
+	});
+}
 function loadSubforums() {
 	if (userLogged() == false) {
 		showLoginButons();
@@ -286,6 +303,7 @@ function submitNewTopic(form) {
 
 	// author is logged user
 	var data = {
+		topic_id : form.find(".id").attr("id"),
 		topic_title : form.find("#topic_title").val(),
 		subforum_id : getUrlParameter("id"),
 		topic_type : form.find("input[name=type]:checked").val(),

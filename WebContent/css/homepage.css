@@ -136,7 +136,7 @@ span .pull-right {
 }
 
 .topic.media:hover, .subforum.media:hover {
-	cursor: pointer;
+	/*cursor: pointer; */
 	background-color: #eee;
 }
 
@@ -263,6 +263,13 @@ input[type='file'] {
 .topic-image img {
 	height:20px;
 	width:auto;
+}
+.topic-ratings-value {
+	font-size: 9px;
+}
+.topic-edit,.topic-delete {
+	margin-right: 4px;
+	font-size: 12px;
 }
 
 

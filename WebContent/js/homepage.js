@@ -84,15 +84,15 @@ function renderSubforumsList(data) {
 
 		console.log(subforum);
 
-		var media = $('<div class="subforum media" onclick="goToSubforum(\'' + subforum.subforumId + '\')"></div>');
+		var media = $('<div class="subforum media"></div>');
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
 		var mediaThumbnail = $('<img class="media-object" src="' + subforum.icon + '">');
 
 		mediaFirstChild.append(mediaThumbnail);
 		media.append(mediaFirstChild);
 
-		var mediaBody = $('<div class="media-body"></div');
-		var heading = $('<div class="media-heading">' + subforum.name + '</div>');
+		var mediaBody = $('<div class="media-body"></div'); 
+		var heading = $('<div class="media-heading"><a role="button" onclick="goToSubforum(\'' + subforum.subforumId + '\')">' + subforum.name + '</div>');
 		var description = $('<p>' + subforum.description + '</p>')
 
 
@@ -108,8 +108,9 @@ function renderTopicsList(data) {
 	console.log(data);
 	//	setActiveMenuItem("menu_homepage");
 
+	// new topic
 	if (userLogged()) {
-		$('.topics-header').prepend('<a role="button" class="topics-new-topic" onclick="renderNewTopic()">Create new topic</a>');
+		$('.topics-header').prepend('<a role="button" class="topics-new-topic" onclick="renderNewTopic()">New</a>');
 		$('.topics-header').prepend('<div id="topic_new_topic_container"></div>');
 	}
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
@@ -122,7 +123,7 @@ function renderTopicsList(data) {
 		console.log("TOPIC user: " + topic.author.username);
 
 
-		var media = $('<div class="topic media" onclick="goToTopic(\'' + topic.topicId + '\')"></div>');
+		var media = $('<div class="topic media"></div>');
 
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
 		var slika = DEFAULT_IMAGE;
@@ -136,18 +137,33 @@ function renderTopicsList(data) {
 		media.append(mediaFirstChild);
 
 		var mediaBody = $('<div class="media-body"></div');
-		var heading = $('<div class="media-heading">' + topic.title + '</div>');
+		var heading = $('<div class="media-heading"><a role="button" onclick="goToTopic(\'' + topic.topicId + '\')">' + topic.title + '</a></div>');
 
 
-		var likes = $('<span class="media-left media-top">Likes: ' + topic.likes + '</span>');
-		var dislikes = $('<span class="media-left media-bottom">Dislikes: ' + topic.dislikes + '</span>');
+		var likes = $('<span class="media-left media-top topic-ratings-value">Likes: ' + topic.likes + '</span>');
+		var dislikes = $('<span class="media-left media-bottom topic-ratings-value">Dislikes: ' + topic.dislikes + '</span>');
 		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
 
+		
+		/**/
+		
+		var edit;
+		var deleteButton;
+		var paragraph;
+		if (userLogged()) { // TODO: Check for users
+			paragraph = $('<p></p>');
+			edit = $('<a role="button" class="topic-edit" onclick="loadTopicData(\'' + topic.topicId + '\');">Edit</a>');
+			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic($(this).parent().parent().parent());">Delete</a>');
+//			console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
+			paragraph.append(edit);
+			paragraph.append(deleteButton);
+		}
 
 		mediaBody.append(heading);
 		mediaBody.append(date);
 		mediaBody.append(likes);
 		mediaBody.append(dislikes);
+		mediaBody.append(paragraph);
 		media.append(mediaBody);
 
 		$("#mediaContainer").append(media);
@@ -631,5 +647,123 @@ function buildCommentEditBox(editButton) {
 
 	} else {
 		editButton.parent().parent().find("textarea").parent().remove();
+	}
+}
+function renderEditTopicForm(data){
+//	console.log('Topic type2: ' + JSON.stringify(topic).type);
+//	console.log('Topic type3: ' + JSON.parse(topic));
+	var topic = data.topic;
+	if (!userLogged()) {
+		console.log("User is not logged!");
+	} else {
+		$("#topic_new_topic_container").load("topic_new.html", function() {
+
+			$(this).find("#text").hide();
+			$(this).find("#link").hide();
+			$(this).find("#image").hide();
+			
+			// load data
+
+			$(this).find(".id").attr('id', topic.topicId);
+			console.log('Topic title: ' + topic.title);
+			$(this).find("#topic_title").val(topic.title);
+			console.log('Topic type: ' + topic.type);
+			switch (topic.type) {
+			case "TEXT": {
+				$(this).find("#text_radio").attr('checked', true);
+				$(this).find("#text textarea").val(topic.content);
+				$(this).find("#text").show();
+				break;
+			}
+			case "LINK": {
+				$(this).find("#link_radio").attr('checked', true);
+				$(this).find("#link input").val(topic.content);
+				$(this).find("#link").show();
+				break;
+			}
+			case "IMAGE": {
+				$(this).find("#image_radio").attr('checked', true);
+				$(this).find('#upload_image').attr('value', topic.content);
+				$(this).find('#topic_img_tag').attr('src', topic.content);
+				$(this).find("#image").show();
+				$(this).find("#topic_image").show();
+				break;
+			}
+			}
+			
+			$(this).find("#new_topic_form").change(function() {
+				$(this).find("#text").hide();
+				$(this).find("#link").hide();
+				$(this).find("#image").hide();
+				if ($(this).find("#text_radio").is(":checked") == true) {
+					$(this).find("#text").show();
+				}
+				if ($(this).find("#link_radio").is(":checked") == true) {
+					$(this).find("#link").show();
+				}
+				if ($(this).find("#image_radio").is(":checked") == true) {
+					$(this).find("#image").show();
+					if ($(this).find("#topic_img_tag").attr('src') === "") {
+						$(this).find("#topic_image").hide();
+					} else {
+						$(this).find("#topic_image").show();
+					}
+				}
+			});
+
+			// fixes bug of validator with placeholders, he parses placeholder as inputed text
+			// removes placeholder before submit, and returns after is submited
+			var placeholders = {};
+			$(this).find("#new_topic_form").validate({
+				submitHandler : function() {
+					$(this).find("#new_topic_form").find(':input[placeholder]').each(function() {
+						var placeholder = $(this).attr('placeholder');
+						placeholders[placeholder] = this;
+						$(this).removeAttr('placeholder');
+					});
+					$(this).find("#new_topic_form").submit();
+				},
+				invalidHandler : function() {
+					$.each(placeholders, function(placeholder, element) {
+						$(element).attr('placeholder', placeholder);
+					});
+
+				},
+				// important rules
+				rules : {
+					topic_title : {
+						minlength : 3,
+						required : true
+					},
+					type : {
+						required : true
+					},
+					link : {
+						required : $("#link_radio :checked")
+					},
+					text : {
+						required : $("#text_radio :checked")
+					},
+					image : {
+						required : $("#image_radio :checked")
+					}
+				},
+				messages : {
+					topic_title : {
+						minlength : "Minimal length is 3",
+						required : "Topic title is required"
+					}
+				},
+				// puts error under radio buttons
+				errorPlacement : function(error, element) {
+					if (element.attr("name") == "type") {
+						error.insertAfter("#image_radio_label");
+					} else {
+						error.insertAfter(element);
+					}
+				}
+			});
+
+		});
 	}
 }

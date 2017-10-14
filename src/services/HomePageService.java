@@ -99,24 +99,40 @@ public class HomePageService {
 
 		long authorId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
 
-		String content = "";
-		if (topicBean.getContent().startsWith("https://") || topicBean.getContent().startsWith("http://")) {
-			content = topicBean.getContent();
+		if(topicBean.getTopic_id() != -1) {
+			// Topic exist, editing topic
+			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setTitle(topicBean.getTopic_title());
+			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setType(Utils.stringToTopicType(topicBean.getTopic_type()));
+			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setContent(topicBean.getContent());
+			getTopics().setTopicsList(new ArrayList<>(getTopics().getTopicsMap().values()));
+			
+			if (DataManager.getInstance().saveTopics(getTopics())) {
+				ctx.setAttribute("topics", DataManager.getInstance().readTopics());
+				return true;
+			}
 		} else {
-			if (topicBean.getContent().startsWith("www.")) {
-				content = "http://" + topicBean.getContent();
+			// New topic
+			String content = "";
+			if (topicBean.getContent().startsWith("https://") || topicBean.getContent().startsWith("http://")
+					|| topicBean.getTopic_type().equals("IMAGE") || topicBean.getTopic_type().equals("TEXT")) {
+				content = topicBean.getContent();
 			} else {
-				content = "http://www." + topicBean.getContent();
+				if (topicBean.getContent().startsWith("www.")) {
+					content = "http://" + topicBean.getContent();
+				} else {
+					content = "http://www." + topicBean.getContent();
+				}
+			}
+
+			Topic entry = new Topic(Utils.stringToTopicType(topicBean.getTopic_type()), topicBean.getSubforum_id(),
+					topicBean.getTopic_title(), authorId, content);
+
+			if (DataManager.getInstance().saveTopic(entry)) {
+				ctx.setAttribute("topics", DataManager.getInstance().readTopics());
+				return true;
 			}
 		}
 		
-		Topic entry = new Topic(Utils.stringToTopicType(topicBean.getTopic_type()), topicBean.getSubforum_id(),
-				topicBean.getTopic_title(), authorId, content);
-
-		if (DataManager.getInstance().saveTopic(entry)) {
-			ctx.setAttribute("topics", DataManager.getInstance().readTopics());
-			return true;
-		}
 
 		return false;
 	}

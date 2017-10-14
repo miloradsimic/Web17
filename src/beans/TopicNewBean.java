@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class TopicNewBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	private long topic_id = -1;
 	private long subforum_id;
 	private String topic_title;
 	private String topic_type;
@@ -40,6 +41,14 @@ public class TopicNewBean implements Serializable {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public long getTopic_id() {
+		return topic_id;
+	}
+
+	public void setTopic_id(long topic_id) {
+		this.topic_id = topic_id;
 	}
 
 }
