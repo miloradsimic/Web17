@@ -70,7 +70,7 @@ public class HomePageService {
 	@Path("/topics/{subforum}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ArrayList<TopicBean> getTopicsList(@Context HttpServletRequest request,
+	public HashMap<String, Object> getTopicsList(@Context HttpServletRequest request,
 			@PathParam("subforum") long subforum) {
 		// System.out.println("Reading topics from " + subforum + " subforum.");
 		ArrayList<Topic> topics = getTopics().getTopicList();
@@ -85,7 +85,11 @@ public class HomePageService {
 				}
 			}
 		}
-		return topicsFromSubforum;
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("topics", topicsFromSubforum);
+		retVal.put("main_moderator", getSubforums().getSubforumsMap().get(subforum).getMainModerator().getUserId());
+		
+		return retVal;
 	}
 
 	@POST
@@ -136,7 +140,6 @@ public class HomePageService {
 
 		return false;
 	}
-
 	/**
 	 * Returns full topic object with loaded comments
 	 */
@@ -196,7 +199,34 @@ public class HomePageService {
 
 		return retVal;
 	}
+	@POST
+	@Path("/delete_topic")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public boolean deleteTopic(@Context HttpServletRequest request, CommentDeleteBean comment) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
+		// System.out.println("Coment: " + newComment.getTopicId() + " " +
+		// newComment.getText());
+
+		if (loggedUser == null) {
+			System.out.println("You can't comment because you're not logged.");
+			return false;
+		} else {
+			// Comment comment =
+			// getComments().getComment(newComment.getCommentId());
+			// boolean isMainModerator = comment.getAuthor().getUserId() ==
+			// getSubforums().getSubforumsMap().get(getTopics().getTopicsMap().get(newComment.getTopicId()).getSubforumId()).getMainModerator().getUserId();
+			if (DataManager.getInstance().deleteComment(comment.getCommentId())) {
+				ctx.setAttribute("comments", DataManager.getInstance().readComments());
+			}
+
+			// HashMap<String, Object> retVal = new HashMap<>();
+			// retVal.put("comment", comment);
+			return true;
+		}
+	}
 	/**
 	 * Returns registered users
 	 */

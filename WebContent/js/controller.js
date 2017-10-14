@@ -608,7 +608,7 @@ function getUrlParameter(sParam) {
 		}
 	}
 }
-function userLogged(username, userId) {
+function userLogged(usernameOrId) {
 	if (arguments.length == 0) {
 		//		console.log('userLogged()');
 		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined;
@@ -617,9 +617,12 @@ function userLogged(username, userId) {
 		return isLogged;
 	} else if (arguments.length == 1) {
 		//		console.log('userLogged(username): ' + username);
-		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).username === username;
+		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && 
+		( JSON.parse(sessionStorage.getItem('user')).username === usernameOrId || JSON.parse(sessionStorage.getItem('user')).userId == usernameOrId);
 		//		console.log('return userLogged(username): ' + isLogged);
 		return isLogged;
+//	} else if (arguments.length == 2) {
+//		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).userID === username;
 	}
 }
 

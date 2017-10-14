@@ -105,7 +105,9 @@ function renderSubforumsList(data) {
 }
 function renderTopicsList(data) {
 	console.log('renderTopicsList form file into page.');
-	console.log(data);
+	var topics = data.topics;
+	var main_moderator = data.main_moderator;
+	console.log(topics);
 	//	setActiveMenuItem("menu_homepage");
 
 	// new topic
@@ -114,7 +116,7 @@ function renderTopicsList(data) {
 		$('.topics-header').prepend('<div id="topic_new_topic_container"></div>');
 	}
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
-	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
+	var list = topics == null ? [] : (topics instanceof Array ? topics : [ topics ]);
 	var container = $("#topicContainer");
 
 	$.each(list, function(index, topic) {
@@ -145,16 +147,13 @@ function renderTopicsList(data) {
 		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
 
 		
-		/**/
-		
 		var edit;
 		var deleteButton;
 		var paragraph;
-		if (userLogged()) { // TODO: Check for users
+		if (userLogged() && ( userAdmin() || userMainModerator(main_moderator) || userLogged(topic.author.userId))) { 
 			paragraph = $('<p></p>');
 			edit = $('<a role="button" class="topic-edit" onclick="loadTopicData(\'' + topic.topicId + '\');">Edit</a>');
 			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic($(this).parent().parent().parent());">Delete</a>');
-//			console.log("Currently logged as: " + sessionStorage.getItem("user").role + " with username: " + sessionStorage.getItem("user").username);
 			paragraph.append(edit);
 			paragraph.append(deleteButton);
 		}
