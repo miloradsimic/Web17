@@ -94,6 +94,15 @@ public class Subforums implements Serializable {
 		this.subforumsList = subforumsList;
 	}
 	
+	public void addSubforum(Subforum entry) {
+		subforumsList.add(entry);
+		subforumsMap.put(entry.getSubforumId(), entry);
+	}
 	
+	public void remove(long subforumId) {
+		// physically
+		subforumsList.remove(subforumsMap.get(subforumId));
+		subforumsMap.remove(subforumId);		
+	}
 
 }

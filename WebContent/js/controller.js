@@ -1,5 +1,6 @@
 
 var subforumsURL = "rest/homepage/subforums";
+var subforumURL = "rest/homepage/subforum";
 var topicsURL = "rest/homepage/topics";
 var topicURL = "rest/homepage/topic";
 var profileURL = "rest/homepage/profile";
@@ -12,6 +13,7 @@ var deleteCommentURL = "rest/homepage/delete_comment";
 var deleteTopicURL = "rest/homepage/delete_topic";
 var uploadImageURL = "rest/homepage/upload_image";
 var submitNewTopicURL = "rest/homepage/upload_new_topic";
+var submitNewSubforumURL = "rest/homepage/upload_new_subforum";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -211,18 +213,23 @@ function loadTopicDetailsAndComments() {
 		}
 	});
 }
-function loadTopicData(id) {
-	if (userLogged() == false) {
-		showLoginButons();
-	} else {
-		showLogoutButons();
-	}
-
+function loadEditTopicData(id) {
 	$.ajax({
 		type : 'GET',
 		url : topicURL + "/" + id,
 		dataType : "json", // data type of response
 		success : renderEditTopicForm,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
+	});
+}
+function loadEditSubforumData(id) {
+	$.ajax({
+		type : 'GET',
+		url : subforumURL + "/" + id,
+		dataType : "json", // data type of response
+		success : renderEditSubforumForm,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
 		}
@@ -250,8 +257,8 @@ function setUpTopicImage(input) {
 		var objFormData = new FormData();
 		var objFile = input.files[0]
 		objFormData.append('image', objFile);
-		var name = 't' + $.now() + objFile.name.substr(objFile.name.length - 4);
-		console.log("name is : " + name);
+		var name = 'resources/topic_t' + $.now() + objFile.name.substr(objFile.name.length - 4);
+		
 		objFormData.append('name', name);
 
 		$.ajax({
@@ -268,7 +275,7 @@ function setUpTopicImage(input) {
 					$('#topic_image').show();
 
 					console.log("upload image value: " + $('#upload_image').attr('value'));
-					$('#upload_image').attr('value', 'resources/topic_' + name);
+					$('#upload_image').attr('value', name);
 					console.log("upload image value: " + $('#upload_image').attr('value'));
 				};
 
@@ -282,6 +289,91 @@ function setUpTopicImage(input) {
 			}
 		});
 
+	}
+}
+//##############################################
+function setUpSubforumAvatar(input) {
+	if (input.files && input.files[0]) {
+		var objFormData = new FormData();
+		var objFile = input.files[0]
+		objFormData.append('image', objFile);
+		var name = 'resources/subforum_' +  + $.now() + objFile.name.substr(objFile.name.length - 4);
+		console.log("name is : " + name);
+		objFormData.append('name', name);
+
+		$.ajax({
+			url : uploadImageURL,
+			type : 'POST',
+			contentType : false,
+			data : objFormData,
+			processData : false,
+			success : function(data) {
+				var reader = new FileReader();
+
+				reader.onload = function(e) {
+					$('#subforum_img_tag').attr('src', e.target.result);
+					$('#subforum_image').show();
+
+					console.log("upload image value: " + $('#upload_image').attr('value'));
+					$('#upload_image').attr('value', name);
+					console.log("upload image value: " + $('#upload_image').attr('value'));
+				};
+
+				reader.readAsDataURL(input.files[0]);
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				var OriginalString = XMLHttpRequest.responseText;
+				var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+				console.log(StrippedString);
+				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+			}
+		});
+
+	}
+}
+function submitNewSubforum(form) {
+	var content = form.find("#description textarea").val();
+	
+	// author is logged user
+	var data = {
+		subforum_id : form.find(".id").attr("id"),
+		subforum_title : form.find("#subforum_title").val(),
+		description : form.find("#description textarea").val(),
+		image : $("#upload_image").attr("value")
+	};
+	
+	
+	if (form.valid()) {
+		console.log("submitNewSubforum valid");
+
+		var s = JSON.stringify(data);
+		console.log(s);
+		$.ajax({
+			url : submitNewSubforumURL,
+			type : "POST",
+			data : s,
+			contentType : "application/json",
+			dataType : "json",
+			success : function(flag) {
+
+				if (flag == undefined) {
+					alert("Undefined! Not successful!");
+					return;
+				}
+				if (flag == true) {
+					console.log("Subforum submited successfully!");
+				} else {
+					alert("False! Not successful!");
+				}
+				location.reload();
+
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+			}
+		});
+	} else {
+		console.log("submitNewTopic NOT valid");
 	}
 }
 function submitNewTopic(form) {
@@ -349,7 +441,7 @@ function deleteTopic(topicId) {
 	
 	$.ajax({
 		url : deleteTopicURL + '/' + topicId,
-		type : "DELETE", //FIX: Some day here'll be DELETE
+		type : "DELETE", 
 		contentType : "application/json",
 		dataType : "json",
 		success : function(data) {
@@ -365,6 +457,38 @@ function deleteTopic(topicId) {
 				
 				$("#t" + topicId).html("");
 				$("#topic_new_topic_container").html("");
+				
+				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+				//location.reload();
+			}
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
+function deleteSubforum(subforumId) {
+	console.log('Deleting subforum with id: ' + subforumId);
+	
+	$.ajax({
+		url : subforumURL + '/' + subforumId,
+		type : "DELETE", 
+		contentType : "application/json",
+		dataType : "json",
+		success : function(data) {
+
+			if (data == undefined) {
+				alert("Undefined!");
+				return;
+			} else if(data == false) {
+				alert("FALSE!");
+				return;
+			} else {
+				console.log('Deleted topic successfully.');
+				
+				$("#s" + subforumId).html("");
+				$("#subforum_new_subforum_container").html("");
 				
 				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
 				//location.reload();
@@ -669,8 +793,5 @@ function userModerator() {
 	return false;
 }
 function userMainModerator(moderator) {
-	if (JSON.parse(sessionStorage.getItem('user')).userId == moderator) {
-		return true;
-	}
-	return false;
+	return JSON.parse(sessionStorage.getItem('user')).userId == moderator;
 }

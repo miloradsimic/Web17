@@ -29,6 +29,7 @@ import beans.Comments;
 import beans.EditProfileBean;
 import beans.LoginBean;
 import beans.Subforum;
+import beans.SubforumNewBean;
 import beans.Subforums;
 import beans.Topic;
 import beans.TopicBean;
@@ -89,7 +90,7 @@ public class HomePageService {
 		HashMap<String, Object> retVal = new HashMap<>();
 		retVal.put("topics", topicsFromSubforum);
 		retVal.put("main_moderator", getSubforums().getSubforumsMap().get(subforum).getMainModerator().getUserId());
-		
+
 		return retVal;
 	}
 
@@ -102,15 +103,21 @@ public class HomePageService {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return false;
+		}
+		
 		long authorId = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
 
-		if(topicBean.getTopic_id() != -1) {
+		if (topicBean.getTopic_id() != -1) {
 			// Topic exist, editing topic
 			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setTitle(topicBean.getTopic_title());
-			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setType(Utils.stringToTopicType(topicBean.getTopic_type()));
+			getTopics().getTopicsMap().get(topicBean.getTopic_id())
+					.setType(Utils.stringToTopicType(topicBean.getTopic_type()));
 			getTopics().getTopicsMap().get(topicBean.getTopic_id()).setContent(topicBean.getContent());
 			getTopics().setTopicsList(new ArrayList<>(getTopics().getTopicsMap().values()));
-			
+
 			if (DataManager.getInstance().saveTopics(getTopics())) {
 				ctx.setAttribute("topics", DataManager.getInstance().readTopics());
 				return true;
@@ -137,10 +144,51 @@ public class HomePageService {
 				return true;
 			}
 		}
-		
 
 		return false;
 	}
+
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("upload_new_subforum")
+	public Boolean uploadNewSubforumData(@Context HttpServletRequest request, SubforumNewBean subforumBean) {
+
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return false;
+		}
+
+		if (subforumBean.getSubforum_id() != -1) {
+			// Topic exist, editing topic
+			getSubforums().getSubforumsMap().get(subforumBean.getSubforum_id())
+					.setName(subforumBean.getSubforum_title());
+			getSubforums().getSubforumsMap().get(subforumBean.getSubforum_id())
+					.setDescription(subforumBean.getDescription());
+			getSubforums().getSubforumsMap().get(subforumBean.getSubforum_id()).setIcon(subforumBean.getImage());
+			getSubforums().setSubforumsList(new ArrayList<>(getSubforums().getSubforumsMap().values()));
+
+			if (DataManager.getInstance().saveSubforums(getSubforums())) {
+				ctx.setAttribute("subforums", DataManager.getInstance().readSubforums());
+				return true;
+			}
+		} else {
+			// New topic
+			long mainModerator = getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
+			Subforum entry = new Subforum(subforumBean.getSubforum_title(), subforumBean.getDescription(),
+					subforumBean.getImage(), "Add rules to frontend", mainModerator);
+
+			if (DataManager.getInstance().saveSubforum(entry)) {
+				ctx.setAttribute("subforums", DataManager.getInstance().readSubforums());
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Returns full topic object with loaded comments
 	 */
@@ -153,6 +201,11 @@ public class HomePageService {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return null;
+		}
+		
 		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
 		Topic topic = getTopics().getTopicsMap().get(topicId);
 		ArrayList<Comment> allComments = getComments().getCommentList();
@@ -200,6 +253,31 @@ public class HomePageService {
 
 		return retVal;
 	}
+	
+	/**
+	 * Returns subforum data for filling edit form
+	 */
+	@GET
+	@Path("/subforum/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public HashMap<String, Object> getSubforum(@Context HttpServletRequest request, @PathParam("id") long subforumId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return null;
+		}
+
+		Subforum subforum = getSubforums().getSubforumsMap().get(subforumId);
+
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("subforum", subforum);
+
+		return retVal;
+	}
+
 	@DELETE
 	@Path("/delete_topic/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -217,6 +295,25 @@ public class HomePageService {
 		}
 		return false;
 	}
+	@DELETE
+	@Path("/subforum/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean deleteSubforum(@Context HttpServletRequest request, @PathParam("id") long subforumId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return false;
+		}
+	
+		if (DataManager.getInstance().deleteSubforum(subforumId)) {
+			ctx.setAttribute("subforums", DataManager.getInstance().readSubforums());
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Returns registered users
 	 */
@@ -306,7 +403,7 @@ public class HomePageService {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 		if (loggedUser == null) {
-			return null;
+			return false;
 		}
 
 		DataManager.getInstance().saveImage(image, name);
@@ -489,56 +586,12 @@ public class HomePageService {
 		}
 	}
 
-	// TODO: Not gonna happen, only edit exit in specs
-	// @DELETE
-	// @Path("/user/{id}")
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public Boolean removeUser(@Context HttpServletRequest request, long id) {
-	// LoginBean loggedUser = null;
-	// loggedUser = (LoginBean) request.getSession().getAttribute("user");
-	// User userLogged =
-	// getUsers().getUsersMapByUsername().get((loggedUser.getUsername()));
-	// User userDelete = getUsers().getUsersMap().get(id);
-	//
-	// if (loggedUser == null) {
-	// System.out.println("You're not logged.");
-	// return false;
-	// } else if (id != userClient.getUserId() && ){
-	// System.out.println("You don't have privileges to do that.");
-	// return false;
-	// } else {
-	//
-	// long userId =
-	// getUsers().getUsersMapByUsername().get(loggedUser.getUsername()).getUserId();
-	// DataManager.getInstance()
-	// .saveRating(new CommentRating(comment.getCommentId(), userId,
-	// comment.getRatingValue()));
-	// ctx.setAttribute("ratings", DataManager.getInstance().readRatings());
-	//
-	// int likes = getComments().getComment(comment.getCommentId()).getLikes();
-	// int dislikes =
-	// getComments().getComment(comment.getCommentId()).getDislikes();
-	// int total = likes - dislikes;
-	//
-	// HashMap<String, Object> retVal = new HashMap<>();
-	// retVal.put("total", total);
-	//
-	// int value = 0;
-	// if (getRatings().getRating(comment.getCommentId(), userId) != null) {
-	// value = getRatings().getRating(comment.getCommentId(),
-	// userId).getValue();
-	// }
-	// retVal.put("rated", value);
-	// return retVal;
-	// }
-	//
-	// return false;
-	// }
-
 	private Subforums getSubforums() {
 		Subforums subforums = (Subforums) ctx.getAttribute("subforums");
 		if (subforums == null) {
-			subforums = new Subforums(ctx.getRealPath(""));
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			subforumsData();
+			subforums = DataManager.getInstance().readSubforums();
 			ctx.setAttribute("subforums", subforums);
 		}
 		return subforums;
@@ -671,5 +724,16 @@ public class HomePageService {
 		DataManager.getInstance().saveTopic(t1);
 		DataManager.getInstance().saveTopic(t2);
 		DataManager.getInstance().saveTopic(t3);
+	}
+
+	private void subforumsData() {
+
+		Subforum s1 = new Subforum(1l, "Cars", "Topics about all kind of vehicles.", "resources/cars.jpg",
+				"Standard rules.", 2);
+		Subforum s2 = new Subforum(2l, "Sport", "Topics about all kind of sport.", "resources/sport.png", "No spamming",
+				2);
+
+		DataManager.getInstance().saveSubforum(s1);
+		DataManager.getInstance().saveSubforum(s2);
 	}
 }

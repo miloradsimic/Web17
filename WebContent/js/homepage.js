@@ -77,6 +77,12 @@ function renderSubforumsList(data) {
 	console.log(data);
 	//	setActiveMenuItem("menu_homepage");
 
+	// new subforum
+	if (userLogged() && (userAdmin() || userModerator())) {
+		$('.subforums-header').prepend('<a role="button" class="subforums-new-subforum" onclick="renderNewSubforum()">New</a>');
+		$('.subforums-header').prepend('<div id="subforum_new_subforum_container"></div>');
+	}
+
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
 
@@ -84,20 +90,32 @@ function renderSubforumsList(data) {
 
 		console.log(subforum);
 
-		var media = $('<div class="subforum media"></div>');
+		var media = $('<div id="s' + subforum.subforumId + '" class="subforum media"></div>');
 		var mediaFirstChild = $('<div class="media-left media-top"></div>');
 		var mediaThumbnail = $('<img class="media-object" src="' + subforum.icon + '">');
 
 		mediaFirstChild.append(mediaThumbnail);
 		media.append(mediaFirstChild);
 
-		var mediaBody = $('<div class="media-body"></div'); 
+		var mediaBody = $('<div class="media-body"></div');
 		var heading = $('<div class="media-heading"><a role="button" onclick="goToSubforum(\'' + subforum.subforumId + '\')">' + subforum.name + '</div>');
 		var description = $('<p>' + subforum.description + '</p>')
 
+		var edit;
+		var deleteButton;
+		var paragraph;
+		if (userLogged() && (userAdmin() || userMainModerator(subforum.mainModerator.userId))) {
+			
+			paragraph = $('<p></p>');
+			edit = $('<a role="button" class="subforum-edit" onclick="loadEditSubforumData(\'' + subforum.subforumId + '\');">Edit</a>');
+			deleteButton = $('<a role="button" class="subforum-delete" onclick="deleteSubforum(\'' + subforum.subforumId + '\');">Delete</a>');
+			paragraph.append(edit);
+			paragraph.append(deleteButton);
+		}
 
 		mediaBody.append(heading);
 		mediaBody.append(description);
+		mediaBody.append(paragraph);
 		media.append(mediaBody);
 
 		$('#mediaContainer').append(media);
@@ -111,7 +129,7 @@ function renderTopicsList(data) {
 	//	setActiveMenuItem("menu_homepage");
 
 	// new topic
-	if (userLogged()) {
+	if (userLogged()) { //TODO: admins and administators
 		$('.topics-header').prepend('<a role="button" class="topics-new-topic" onclick="renderNewTopic()">New</a>');
 		$('.topics-header').prepend('<div id="topic_new_topic_container"></div>');
 	}
@@ -146,13 +164,13 @@ function renderTopicsList(data) {
 		var dislikes = $('<span class="media-left media-bottom topic-ratings-value">Dislikes: ' + topic.dislikes + '</span>');
 		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
 
-		
+
 		var edit;
 		var deleteButton;
 		var paragraph;
-		if (userLogged() && ( userAdmin() || userMainModerator(main_moderator) || userLogged(topic.author.userId))) { 
+		if (userLogged() && (userAdmin() || userMainModerator(main_moderator) || userLogged(topic.author.userId))) {
 			paragraph = $('<p></p>');
-			edit = $('<a role="button" class="topic-edit" onclick="loadTopicData(\'' + topic.topicId + '\');">Edit</a>');
+			edit = $('<a role="button" class="topic-edit" onclick="loadEditTopicData(\'' + topic.topicId + '\');">Edit</a>');
 			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic(\'' + topic.topicId + '\');">Delete</a>');
 			paragraph.append(edit);
 			paragraph.append(deleteButton);
@@ -245,6 +263,60 @@ function renderNewTopic() {
 						error.insertAfter("#image_radio_label");
 					} else {
 						error.insertAfter(element);
+					}
+				}
+			});
+
+		});
+	}
+}
+//#################################
+function renderNewSubforum() {
+	if (!userLogged()) {
+		console.log("User is not logged!");
+	} else {
+		$("#subforum_new_subforum_container").load("subforum_new.html", function() {
+			if ($(this).find("#subforum_img_tag").attr('src') === "") {
+				$(this).find("#subforum_image").hide();
+			} else {
+				$(this).find("#subforum_image").show();
+			}
+
+			// fixes bug of validator with placeholders, he parses placeholder as inputed text
+			// removes placeholder before submit, and returns after is submited
+			var placeholders = {};
+			$(this).find("#new_subforum_form").validate({
+				submitHandler : function() {
+					$(this).find("#new_subforum_form").find(':input[placeholder]').each(function() {
+						var placeholder = $(this).attr('placeholder');
+						placeholders[placeholder] = this;
+						$(this).removeAttr('placeholder');
+					});
+					$(this).find("#new_subforum_form").submit();
+				},
+				invalidHandler : function() {
+					$.each(placeholders, function(placeholder, element) {
+						$(element).attr('placeholder', placeholder);
+					});
+
+				},
+				// important rules
+				rules : {
+					subforum_title : {
+						minlength : 3,
+						required : true
+					},
+					description : {
+						required : true
+					},
+					image : {
+						required : true
+					}
+				},
+				messages : {
+					subforum_title : {
+						minlength : "Minimal length is 3",
+						required : "Subforum title is required"
 					}
 				}
 			});
@@ -648,9 +720,9 @@ function buildCommentEditBox(editButton) {
 		editButton.parent().parent().find("textarea").parent().remove();
 	}
 }
-function renderEditTopicForm(data){
-//	console.log('Topic type2: ' + JSON.stringify(topic).type);
-//	console.log('Topic type3: ' + JSON.parse(topic));
+function renderEditTopicForm(data) {
+	//	console.log('Topic type2: ' + JSON.stringify(topic).type);
+	//	console.log('Topic type3: ' + JSON.parse(topic));
 	var topic = data.topic;
 	if (!userLogged()) {
 		console.log("User is not logged!");
@@ -660,7 +732,7 @@ function renderEditTopicForm(data){
 			$(this).find("#text").hide();
 			$(this).find("#link").hide();
 			$(this).find("#image").hide();
-			
+
 			// load data
 
 			$(this).find(".id").attr('id', topic.topicId);
@@ -689,7 +761,7 @@ function renderEditTopicForm(data){
 				break;
 			}
 			}
-			
+
 			$(this).find("#new_topic_form").change(function() {
 				$(this).find("#text").hide();
 				$(this).find("#link").hide();
@@ -759,6 +831,67 @@ function renderEditTopicForm(data){
 						error.insertAfter("#image_radio_label");
 					} else {
 						error.insertAfter(element);
+					}
+				}
+			});
+
+		});
+	}
+}
+function renderEditSubforumForm(data) {
+	var subforum = data.subforum;
+	if (!userLogged()) {
+		console.log("User is not logged!");
+	} else {
+		$("#subforum_new_subforum_container").load("subforum_new.html", function() {
+			 console.log(arguments.length);
+
+			// load data
+			$(this).find(".id").attr('id', subforum.subforumId);
+			$(this).find("#subforum_title").val(subforum.name);
+			$(this).find("#description textarea").val(subforum.description);
+
+			console.log("Image" + subforum.icon);
+			
+			$(this).find('#upload_image').attr('value', subforum.icon);
+			$(this).find('#subforum_img_tag').attr('src', subforum.icon);
+
+			// fixes bug of validator with placeholders, he parses placeholder as inputed text
+			// removes placeholder before submit, and returns after is submited
+			var placeholders = {};
+			$(this).find("#new_subforum_form").validate({
+				submitHandler : function() {
+					$(this).find("#new_subforum_form").find(':input[placeholder]').each(function() {
+						var placeholder = $(this).attr('placeholder');
+						placeholders[placeholder] = this;
+						$(this).removeAttr('placeholder');
+					});
+					$(this).find("#new_subforum_form").submit();
+				},
+				invalidHandler : function() {
+					$.each(placeholders, function(placeholder, element) {
+						$(element).attr('placeholder', placeholder);
+					});
+
+				},
+				
+				// important rules
+				rules : {
+					subforum_title : {
+						minlength : 3,
+						required : true
+					},
+					description : {
+						required : true
+					},
+					image : {
+						required : true
+					}
+				},
+				messages : {
+					subforum_title : {
+						minlength : "Minimal length is 3",
+						required : "Subforum title is required"
 					}
 				}
 			});

@@ -15,6 +15,7 @@ import beans.CommentEditBean;
 import beans.CommentRating;
 import beans.CommentRatings;
 import beans.Comments;
+import beans.Subforum;
 import beans.Subforums;
 import beans.Topic;
 import beans.TopicRating;
@@ -121,7 +122,7 @@ public class DataManager {
 	}
 
 	public Boolean saveImage(File img, String name) {
-		String localPath = "resources/topic_" + name;
+		String localPath = name;
 		try {
 			// retrieve image
 			BufferedImage bi = ImageIO.read(img);
@@ -556,7 +557,44 @@ public class DataManager {
 
 		return topics;
 	}
+	public Subforums readSubforums() {
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
 
+			fin = new FileInputStream(rootPath + stringSubforums);
+			ois = new ObjectInputStream(fin);
+			Object o = ois.readObject();
+			subforums = (Subforums) o;
+			System.out.println("Read Subforums Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+			return null;
+
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return subforums;
+	}
 	public Boolean saveTopic(Topic entry) {
 		topics.addTopic(entry);
 		FileOutputStream fout = null;
@@ -596,7 +634,45 @@ public class DataManager {
 
 		return true;
 	}
+	public Boolean saveSubforum(Subforum entry) {
+		subforums.addSubforum(entry);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
 
+		try {
+
+			fout = new FileOutputStream(rootPath + stringSubforums);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(subforums);
+
+			System.out.println("Write Subforum Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
 	public Boolean saveTopics(Topics topics) {
 		FileOutputStream fout = null;
 		ObjectOutputStream oos = null;
@@ -635,7 +711,44 @@ public class DataManager {
 
 		return true;
 	}
+	public Boolean saveSubforums(Subforums subforums) {
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
 
+		try {
+
+			fout = new FileOutputStream(rootPath + stringSubforums);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(subforums);
+
+			System.out.println("Write Subforums Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
 	public Boolean updateTopic(Topic entry) {
 		topics.updateTopic(entry);
 		FileOutputStream fout = null;
@@ -926,6 +1039,38 @@ public class DataManager {
 
 		}
 
+		return true;
+	}
+	
+	public boolean deleteSubforum(long subforumId) {
+		subforums.remove(subforumId);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+			fout = new FileOutputStream(rootPath + stringSubforums);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(subforums);
+
+			System.out.println("Delete Subforum Done");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		} finally {
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return true;
 	}
 }

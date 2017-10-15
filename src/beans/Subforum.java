@@ -1,13 +1,12 @@
 package beans;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Subforum implements Serializable{
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+	private static final AtomicLong count = new AtomicLong(100); 
+	
 	private long subforumId;
 	/**
 	 * Unique
@@ -37,6 +36,24 @@ public class Subforum implements Serializable{
 		this.icon = icon;
 		this.rules = rules;
 		this.mainModerator = mainModerator;
+	}
+
+	public Subforum(long subforumId, String name, String description, String icon, String rules, long moderatorsId) {
+		this.subforumId = subforumId;
+		this.name = name;
+		this.description = description;
+		this.icon = icon;
+		this.rules = rules;
+		this.mainModerator = new User(moderatorsId);
+	}
+	
+	public Subforum(String name, String description, String icon, String rules, long moderatorsId) {
+		this.subforumId = count.incrementAndGet();
+		this.name = name;
+		this.description = description;
+		this.icon = icon;
+		this.rules = rules;
+		this.mainModerator = new User(moderatorsId);
 	}
 
 	public String getName() {

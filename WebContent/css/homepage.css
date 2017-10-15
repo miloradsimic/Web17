@@ -42,6 +42,7 @@
 	padding-top: 4px;
 	font-size: 9px;
 }
+
 .comment-edit {
 	color: #0048c1;
 	padding-top: 4px;
@@ -200,14 +201,15 @@ span .pull-right {
 }
 
 input[type='file'] {
-  color: transparent;
+	color: transparent;
 }
+
 .input-file {
 	width: 91px;
 }
 
 .center-verticaly {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 /*-------------------End of Profile menu */
 /*-------------------Public profile */
@@ -222,28 +224,28 @@ input[type='file'] {
  * this is called a clearfix. it makes sure that the container's children floats are cleared, without using extra markup
  */
 .clearfix {
-    *zoom:1 /* for IE */
+	*zoom: 1 /* for IE */
 }
 
-.clearfix:before,
-.clearfix:after {
-    content: " ";
-    display: table;
+.clearfix:before, .clearfix:after {
+	content: " ";
+	display: table;
 }
 
 .clearfix:after {
-    clear: both;
+	clear: both;
 }
 
 /* end clearfix*/
 
 /* tell the container's children to float left: */
-.float-my-children > * {
-    float:left;
-    margin-right:5px;
+.float-my-children>* {
+	float: left;
+	margin-right: 5px;
 }
+
 .small-paragraph {
-  margin: 0px;
+	margin: 0px;
 }
 
 /*-------------------End of Public profile */
@@ -257,22 +259,24 @@ input[type='file'] {
 .profile-menu a:visited {
 	background-color: #AAAAFF;
 }*/
-.topics-new-topic {
-	margin-right:5px;
+.topics-new-topic, .subforums-new-subforum {
+	margin-right: 5px;
 }
-.topic-image img {
-	height:20px;
-	width:auto;
+
+.topic-image img, .subforum-image img {
+	height: 20px;
+	width: auto;
 }
+
 .topic-ratings-value {
 	font-size: 9px;
 }
-.topic-edit,.topic-delete {
+
+.topic-edit, .topic-delete, .subforum-edit, .subforum-delete {
 	margin-right: 4px;
 	font-size: 12px;
 }
 
-
 form .error {
-  color: #ff0000;
+	color: #ff0000;
 }
