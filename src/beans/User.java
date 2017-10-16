@@ -225,6 +225,29 @@ public class User implements Serializable {
 		this.userId = userId;
 	}
 	
+	public void roleUp() {
+		switch(role) {
+		case USER: {
+			role = Role.MODERATOR;
+			break;
+		}
+		case MODERATOR: {
+			role = Role.ADMIN;
+		}
+		}
+	}
+	
+	public void roleDown() {
+		switch(role) {
+		case ADMIN: {
+			role = Role.MODERATOR;
+			break;
+		}
+		case MODERATOR: {
+			role = Role.USER;
+		}
+		}
+	}
 	
 
 }

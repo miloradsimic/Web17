@@ -571,7 +571,7 @@ function renderManageUsersPage(data) {
 
 			console.log("LIST username: " + user.username);
 
-			var item = $('<li class="list-group-item" onclick="goToProfile(\'' + user.userId + '\')"></li>');
+			var item = $('<li class="list-group-item"></li>');
 
 			var media = $('<div class="media" id="' + user.userId + '"></div>');
 			var mediaLeft = $('<div class="media-left media-top"></div>');
@@ -584,17 +584,29 @@ function renderManageUsersPage(data) {
 			media.append(mediaLeft);
 
 			var mediaBody = $('<div class="media-body"></div>');
-			var heading = $('<div class="media-heading">' + user.firstName + ' ' + user.lastName + '</div>');
+			var heading = $('<div class="media-heading"><a role="button" onclick="goToProfile(\'' + user.userId + '\')" >' + user.firstName + ' ' + user.lastName + '</a></div>');
 			var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
 			mediaBody.append(heading);
 			mediaBody.append(details);
 			media.append(mediaBody);
 
+			var role = $('<div class="action-buttons media-right center-verticaly"><span id="user_role">' + user.role + '</span></div>');
+			var roleVote;
 			//TODO: U href treba ubaciti ID za poruke
+			if (userLogged() && userAdmin()) {
+				roleVote = $('<div class="action-buttons media-right center-verticaly"></div>');
+				var roleUp = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'-1\');"><a role="button"><span class="glyphicon glyphicon-triangle-bottom"></span></a></div>');
+				var roleDown = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'1\');"><a role="button"><span class="glyphicon glyphicon-triangle-top"></span></a></div>');
+				roleVote.append(roleUp);
+				roleVote.append(roleDown);
+			}
 			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com"><span class="glyphicon glyphicon-envelope"></span></a></div>');
-			var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
+			//var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
+			media.append(role);
+
+			media.append(roleVote);
 			media.append(envelope);
-			media.append(trash);
+			//media.append(trash);
 
 			item.append(media);
 			container.append(item);

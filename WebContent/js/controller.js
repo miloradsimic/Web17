@@ -14,6 +14,7 @@ var deleteTopicURL = "rest/homepage/delete_topic";
 var uploadImageURL = "rest/homepage/upload_image";
 var submitNewTopicURL = "rest/homepage/upload_new_topic";
 var submitNewSubforumURL = "rest/homepage/upload_new_subforum";
+var submitUserRoleChangeURL = "rest/homepage/user_change_role";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -291,7 +292,6 @@ function setUpTopicImage(input) {
 
 	}
 }
-//##############################################
 function setUpSubforumAvatar(input) {
 	if (input.files && input.files[0]) {
 		var objFormData = new FormData();
@@ -493,6 +493,42 @@ function deleteSubforum(subforumId) {
 				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
 				//location.reload();
 			}
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
+//##############################################
+function submitRoleChange(id, value) {
+//	console.dir(comment.parent().html()); 
+
+	console.log('Submiting user role change.');
+	var data = {
+		userId : id,
+		value : value
+	};
+
+	var s = JSON.stringify(data);
+	console.log(s);
+	$.ajax({
+		url : submitUserRoleChangeURL,
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "text",
+		success : function(data) {
+
+			if (data == "") {
+				alert("Undefined!");
+				return;
+			} else {
+				$(".media[id='" + id + "'] #user_role").text(data);
+//				alert("Done!");
+			}
+			// Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+//			location.reload();
 
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {

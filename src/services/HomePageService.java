@@ -39,6 +39,7 @@ import beans.TopicRatingBean;
 import beans.TopicRatings;
 import beans.Topics;
 import beans.User;
+import beans.UserChangeRoleBean;
 import beans.UserPublicBean;
 import beans.Users;
 import controller.DataManager;
@@ -313,7 +314,40 @@ public class HomePageService {
 		}
 		return false;
 	}
+	
 
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("user_change_role")
+	public String changeUsersRole(@Context HttpServletRequest request, UserChangeRoleBean changeRoleBean) {
+
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return null;
+		}
+		User user = getUsers().getUsersMap().get(changeRoleBean.getUserId());
+		
+		if(changeRoleBean.getValue() == -1) {
+			user.roleDown();
+		} else if(changeRoleBean.getValue() == 1) {
+			user.roleUp();
+		} else {
+			return null;
+		}
+		
+		if (DataManager.getInstance().updateUser(user)) {
+			ctx.setAttribute("users", DataManager.getInstance().readUsers());
+			return Utils.roleToString(user.getRole());
+		}
+	
+
+		return null;
+	}
+	
 	/**
 	 * Returns registered users
 	 */
