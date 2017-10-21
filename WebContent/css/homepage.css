@@ -280,3 +280,13 @@ input[type='file'] {
 form .error {
 	color: #ff0000;
 }
+.advanced-search {
+	margin-right: -25px !important;
+	
+}
+ .navbar-form.navbar-right button {
+	margin-right: -25px !important;
+ }
+/* .navbar-form.navbar-right {
+	margin-right: -35px !important;
+} */

@@ -23,14 +23,12 @@
 <title>Forum by Milorad Simic</title>
 
 </head>
-<body onload="loadTopics()">
-
-
-
+<body onload=loadSearchQuery()>
 	<!-- Collapsible Navigation Bar -->
 	<div class="container">
 
 		<div id="menuContainer"></div>
+
 
 		<!-- Trigger the modal with a button -->
 		<div id="loginButtons">
@@ -44,17 +42,12 @@
 		<!-- Logout -->
 		<div id="logoutButton" style="display: none;">
 			<span class="pull-right" id="welcomeUser"
-				style="font-size: 10px; margin-top: -20px;">
-				
-			</span>
+				style="font-size: 10px; margin-top: -20px;"> </span>
 		</div>
-
 
 		<!-- PAGE CONTENT -->
 		<div w3-include-html="login_dialog.html"></div>
 
-		<!-- TOPICS -->
-		<p class="topics-header">Topics available:</p>
 		<div class="container-fluid" id="mediaContainer"></div>
 
 		<br>
@@ -64,9 +57,7 @@
 		w3.includeHTML();
 	</script>
 	<script
-		src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-		<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
-		
+		src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
 
 </body>
 </html>

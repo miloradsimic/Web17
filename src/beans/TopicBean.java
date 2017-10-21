@@ -22,6 +22,7 @@ public class TopicBean implements Serializable{
 	private String creationDate;
 	private int likes;
 	private int dislikes;
+	private long mainModerator;
 	
 	public TopicBean(long topicId, long subforumId, String title, TopicType type, User author,
 			ArrayList<Comment> comments, String content, String creationDate, int likes, int dislikes) {
@@ -37,7 +38,7 @@ public class TopicBean implements Serializable{
 		this.likes = likes;
 		this.dislikes = dislikes;
 	}
-	public TopicBean(Topic topic, User author) {
+	public TopicBean(Topic topic, User author, long moderator) {
 		super();
 		this.topicId = topic.getTopicId();
 		this.subforumId = topic.getSubforumId();
@@ -49,6 +50,7 @@ public class TopicBean implements Serializable{
 		this.creationDate = topic.getCreationDate();
 		this.likes = topic.getLikes();
 		this.dislikes = topic.getDislikes();
+		this.mainModerator = moderator;
 	}
 	
 
@@ -130,6 +132,12 @@ public class TopicBean implements Serializable{
 
 	public void setDislikes(int dislikes) {
 		this.dislikes = dislikes;
+	}
+	public long getMainModerator() {
+		return mainModerator;
+	}
+	public void setMainModerator(long mainModerator) {
+		this.mainModerator = mainModerator;
 	}
 	
 	

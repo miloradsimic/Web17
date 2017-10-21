@@ -28,6 +28,7 @@ import beans.CommentSubmitBean;
 import beans.Comments;
 import beans.EditProfileBean;
 import beans.LoginBean;
+import beans.SearchBean;
 import beans.Subforum;
 import beans.SubforumNewBean;
 import beans.Subforums;
@@ -54,7 +55,87 @@ public class HomePageService {
 	HttpServletRequest request;
 	@Context
 	ServletContext ctx;
+	/**
+	 * Search by criterion
+	 */
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Path("search")
+	public HashMap<String, Object> search(@Context HttpServletRequest request, SearchBean bean) {
+		ArrayList<Subforum> subforumsResponse = new ArrayList<>();
+		ArrayList<Topic> topicsResponse = new ArrayList<>();
+		ArrayList<User> usersResponse = new ArrayList<>();
+		
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
 
+		for (Subforum subforum : getSubforums().getSubforumsList()) {
+			if((bean.getFields().contains("subforum_title") && 
+					subforum.getName().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().contains("subforum_description") && 
+					subforum.getDescription().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().contains("subforum_main_moderator") && 
+					getUsers().getUsersMap().get(subforum.getMainModerator().getUserId()).getUsername().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().size()==0) && 
+					(subforum.getName().toLowerCase().contains(bean.getText().toLowerCase()) ||
+					subforum.getDescription().toLowerCase().contains(bean.getText().toLowerCase()) ||
+					getUsers().getUsersMap().get(subforum.getMainModerator().getUserId()).getUsername().toLowerCase().contains(bean.getText().toLowerCase()))) {
+				subforumsResponse.add(subforum);
+			}
+		}
+		
+		for (Topic topic : getTopics().getTopicList()) {
+			if((bean.getFields().contains("topic_title") && 
+					topic.getTitle().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().contains("topic_content") && 
+					topic.getContent().toLowerCase().contains(bean.getText().toLowerCase())) ||	
+					(bean.getFields().contains("topic_author") && 
+					getUsers().getUsersMap().get(topic.getAuthorId()).getUsername().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().contains("topic_subforum") && 
+					getSubforums().getSubforumsMap().get(topic.getSubforumId()).getName().toLowerCase().contains(bean.getText().toLowerCase())) ||
+					(bean.getFields().size()==0) && 
+					(topic.getTitle().toLowerCase().contains(bean.getText().toLowerCase()) ||
+					topic.getContent().toLowerCase().contains(bean.getText().toLowerCase()) ||	
+					getUsers().getUsersMap().get(topic.getAuthorId()).getUsername().toLowerCase().contains(bean.getText().toLowerCase()) ||
+					getSubforums().getSubforumsMap().get(topic.getSubforumId()).getName().toLowerCase().contains(bean.getText().toLowerCase()))) {
+				topicsResponse.add(topic);
+			}
+		}
+		
+		for (User user : getUsers().getUsers()) {
+			if(bean.getFields().contains("username") && 
+					user.getUsername().toLowerCase().contains(bean.getText().toLowerCase()) ||
+					(bean.getFields().size()==0 && user.getUsername().toLowerCase().contains(bean.getText().toLowerCase()))) {
+				usersResponse.add(user);
+			}
+		}
+		
+		HashMap<Long, User> users = getUsers().getUsersMap();
+		ArrayList<TopicBean> topicsWithAuthors = new ArrayList<>();
+		
+		for (Topic topic : topicsResponse) {
+			if (users.containsKey(topic.getAuthorId())) {
+				// topic.setAuthorId(users.get(topic.getAuthorId().getUserId()));
+				topicsWithAuthors.add(new TopicBean(topic, 
+						users.get(topic.getAuthorId()), 
+						getSubforums().getSubforumsMap().get(topic.getSubforumId()).getMainModerator().getUserId()));
+			}	
+		}
+		
+		
+		
+		
+		
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("subforums", subforumsResponse);
+		retVal.put("topics", topicsWithAuthors);
+		retVal.put("users", usersResponse);
+
+		return retVal;
+	}
+	
+	
 	/**
 	 * Returns all subforums available on forum
 	 */
@@ -84,7 +165,9 @@ public class HomePageService {
 			if (topic.getSubforumId() == subforum) {
 				if (users.containsKey(topic.getAuthorId())) {
 					// topic.setAuthorId(users.get(topic.getAuthorId().getUserId()));
-					topicsFromSubforum.add(new TopicBean(topic, users.get(topic.getAuthorId())));
+					topicsFromSubforum.add(new TopicBean(topic, 
+							users.get(topic.getAuthorId()), 
+							getSubforums().getSubforumsMap().get(subforum).getMainModerator().getUserId()));
 				}
 			}
 		}
@@ -201,11 +284,6 @@ public class HomePageService {
 			/* @PathParam("subforum") long subforumId, */ @PathParam("topic") long topicId) {
 		LoginBean loggedUser = null;
 		loggedUser = (LoginBean) request.getSession().getAttribute("user");
-
-		if (loggedUser == null) {
-			System.out.println("You're not logged.");
-			return null;
-		}
 		
 		System.out.println("Reading topic with id:  " + topicId + ". Loading comments.");
 		Topic topic = getTopics().getTopicsMap().get(topicId);

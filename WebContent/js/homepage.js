@@ -5,6 +5,7 @@ function showLoginButons() {
 	console.log("Show login buttons");
 	$("#menuContainer").load("menu.html", function() {
 		$(this).find("#menu_profile").hide();
+		
 		setMainMenuTabSelected();
 
 	});
@@ -72,6 +73,157 @@ function showSignupModal() {
 	$("body").addClass("notScroll");
 	$("#signUpSubmit").on("click", signup);
 }
+
+function renderSearchResponse(data) {
+	console.log(data);
+	
+	var subforums = data.subforums;
+	var topics = data.topics;
+	var users = data.users;
+	
+	var subforums = subforums == null ? [] : (subforums instanceof Array ? subforums : [ subforums ]);
+	var topics = topics == null ? [] : (topics instanceof Array ? topics : [ topics ]);
+	var users = users == null ? [] : (users instanceof Array ? users : [ users ]);
+
+	console.log(JSON.stringify(subforums));
+	$('#mediaContainer').html("");
+	$('.subforums-header').html("");
+	$('.topics-header').html("");
+	
+	if(subforums.length != 0) {
+		$('#mediaContainer').append("<p class='subforums-header'>Subforums</p>");
+	}
+	$.each(subforums, function(index, subforum) {
+
+		console.log("Subforum: " + subforum.name);
+
+		var media = $('<div id="s' + subforum.subforumId + '" class="subforum media"></div>');
+		var mediaFirstChild = $('<div class="media-left media-top"></div>');
+		var mediaThumbnail = $('<img class="media-object" src="' + subforum.icon + '">');
+
+		mediaFirstChild.append(mediaThumbnail);
+		media.append(mediaFirstChild);
+
+		var mediaBody = $('<div class="media-body"></div');
+		var heading = $('<div class="media-heading"><a role="button" onclick="goToSubforum(\'' + subforum.subforumId + '\')">' + subforum.name + '</div>');
+		var description = $('<p>' + subforum.description + '</p>')
+
+		var edit;
+		var deleteButton;
+		var paragraph;
+		if (userLogged() && (userAdmin() || userMainModerator(subforum.mainModerator.userId))) {
+			
+			paragraph = $('<p></p>');
+			edit = $('<a role="button" class="subforum-edit" onclick="loadEditSubforumData(\'' + subforum.subforumId + '\');">Edit</a>');
+			deleteButton = $('<a role="button" class="subforum-delete" onclick="deleteSubforum(\'' + subforum.subforumId + '\');">Delete</a>');
+			paragraph.append(edit);
+			paragraph.append(deleteButton);
+		}
+
+		mediaBody.append(heading);
+		mediaBody.append(description);
+		mediaBody.append(paragraph);
+		media.append(mediaBody);
+
+		$('#mediaContainer').append(media);
+	});
+	
+	if(topics.length != 0) {
+		$('#mediaContainer').append("<p class='topics-header'>Topics</p>");
+	}
+	$.each(topics, function(index, topic) {
+
+		console.log("Topic: " + topic.title);
+
+		var media = $('<div class="topic media" id="t' + topic.topicId + '"></div>');
+
+		var mediaFirstChild = $('<div class="media-left media-top"></div>');
+		var slika = DEFAULT_IMAGE;
+
+		if (topic.author.avatar !== "") {
+			slika = topic.author.avatar;
+		}
+		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
+
+		mediaFirstChild.append(mediaThumbnail);
+		media.append(mediaFirstChild);
+
+		var mediaBody = $('<div class="media-body"></div');
+		var heading = $('<div class="media-heading"><a role="button" onclick="goToTopic(\'' + topic.topicId + '\')">' + topic.title + '</a></div>');
+
+
+		var likes = $('<span class="media-left media-top topic-ratings-value">Likes: ' + topic.likes + '</span>');
+		var dislikes = $('<span class="media-left media-bottom topic-ratings-value">Dislikes: ' + topic.dislikes + '</span>');
+		var date = $('<span class="media-meta pull-right">' + topic.creationDate + '</span>');
+
+
+		var edit;
+		var deleteButton;
+		var paragraph;
+		if (userLogged() && (userAdmin() || userMainModerator(topic.mainModerator) || userLogged(topic.author.userId))) {
+			paragraph = $('<p></p>');
+			edit = $('<a role="button" class="topic-edit" onclick="loadEditTopicData(\'' + topic.topicId + '\');">Edit</a>');
+			deleteButton = $('<a role="button" class="topic-delete" onclick="deleteTopic(\'' + topic.topicId + '\');">Delete</a>');
+			paragraph.append(edit);
+			paragraph.append(deleteButton);
+		}
+
+		mediaBody.append(heading);
+		mediaBody.append(date);
+		mediaBody.append(likes);
+		mediaBody.append(dislikes);
+		mediaBody.append(paragraph);
+		media.append(mediaBody);
+
+		$("#mediaContainer").append(media);
+	});
+	if(users.length != 0) {
+		$('#mediaContainer').append("<p>Users</p>");
+	}
+	$.each(users, function(index, user) {
+		console.log("username: " + user.username);
+		
+//		var item = $('<li class="list-group-item"></li>');
+
+		var media = $('<div class="media" id="' + user.userId + '"></div>');
+		var mediaLeft = $('<div class="media-left media-top"></div>');
+		var slika = DEFAULT_IMAGE;
+		if (user.avatar !== "") {
+			slika = user.avatar;
+		}
+		var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
+		mediaLeft.append(mediaThumbnail);
+		media.append(mediaLeft);
+
+		var mediaBody = $('<div class="media-body"></div>');
+		var heading = $('<div class="media-heading"><a role="button" onclick="goToProfile(\'' + user.userId + '\')" >' + user.firstName + ' ' + user.lastName + '</a></div>');
+		var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
+		mediaBody.append(heading);
+		mediaBody.append(details);
+		media.append(mediaBody);
+
+		var role = $('<div class="action-buttons media-right center-verticaly"><span id="user_role">' + user.role + '</span></div>');
+		var roleVote;
+		//TODO: U href treba ubaciti ID za poruke
+		if (userLogged() && userAdmin()) {
+			roleVote = $('<div class="action-buttons media-right center-verticaly"></div>');
+			var roleUp = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'-1\');"><a role="button"><span class="glyphicon glyphicon-triangle-bottom"></span></a></div>');
+			var roleDown = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'1\');"><a role="button"><span class="glyphicon glyphicon-triangle-top"></span></a></div>');
+			roleVote.append(roleUp);
+			roleVote.append(roleDown);
+		}
+		var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com"><span class="glyphicon glyphicon-envelope"></span></a></div>');
+		//var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
+		media.append(role);
+
+		media.append(roleVote);
+		media.append(envelope);
+		//media.append(trash);
+
+//		item.append(media);
+		$('#mediaContainer').append(media);
+	});
+}
 function renderSubforumsList(data) {
 	console.log('renderSubforumsList form file into page.');
 	console.log(data);
@@ -135,7 +287,6 @@ function renderTopicsList(data) {
 	}
 	// JAX-RS serializes an empty list as null, and a 'collection of one' as an object (not an 'array of one')
 	var list = topics == null ? [] : (topics instanceof Array ? topics : [ topics ]);
-	var container = $("#topicContainer");
 
 	$.each(list, function(index, topic) {
 
@@ -545,10 +696,7 @@ function renderDeletedComment(data, comment) {
 function renderManageUsersPage(data) {
 	//data: list of users with attributes {id, role, username, firstname, lastname, email, telephone}
 
-	console.log('renderUsersList start');
 	console.log("users: " + JSON.stringify(data));
-
-	console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
 
 	$("#menuContainer").load("menu.html", function() {
 		$(this).find("#menu_profile").show();

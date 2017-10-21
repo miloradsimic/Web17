@@ -1,5 +1,8 @@
 <!-- MENU -->
 <!-- .navbar-fixed-top, or .navbar-fixed-bottom can be added to keep the nav bar fixed on the screen -->
+<script>
+	$('select').selectpicker();
+</script>
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
 
@@ -24,11 +27,12 @@
 				height="50" width="100"></a>
 		</div>
 
+
 		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse"
-			id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li><a id="menu_homepage" href="./homepage.html">Home <span class="sr-only">(current)</span></a></li>
+		<div class="collapse navbar-collapse" id="collapse_navbar">
+			<ul class="nav navbar-nav pull-left">
+				<li><a id="menu_homepage" href="./homepage.html">Home <span
+						class="sr-only">(current)</span></a></li>
 				<li><a id="menu_profile" href="#" onclick=goToProfile(-1)>Profile</a></li>
 				<li class="dropdown"><a href="#" class="dropdown-toggle"
 					data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -40,15 +44,47 @@
 						<li><a href="#">Set Appointment</a></li>
 					</ul></li>
 			</ul>
-			<!-- navbar-left will move the search to the left -->
+
 			<form class="navbar-form navbar-right" role="search">
 				<div class="form-group navbar-form-top">
-					<input type="text" class="form-control" placeholder="Search">
-					<button type="submit" class="btn btn-default">Submit</button>
+
+					<input id="search_input" type="text" class="form-control"
+						placeholder="Search"> <a href="#" class="btn btn-default"
+						onclick="goToSearch($(this).parent().parent().parent())"> <span
+						class="glyphicon glyphicon-search"></span>
+					</a>
+
+					<!-- 					<button type="submit" class="btn btn-default" onclick="search($(this).parent().parent().parent())"><span class="glyphicon glyphicon-search"></span>&nbsp;</button>
+ -->
 				</div>
 			</form>
+
+			<form class="navbar-form navbar-right advanced-search" role="search">
+				<div class="form-group navbar-form-top">
+					<select class="selectpicker" data-title="Advanced"
+						data-width="145px" multiple data-selected-text-format="count>1">
+						<optgroup label="Subforums">
+							<option value="subforum_title">Title</option>
+							<option value="subforum_description">Description</option>
+							<option value="subforum_main_moderator">Main Moderator</option>
+						</optgroup>
+						<optgroup label="Topics">
+							<option value="topic_title">Title</option>
+							<option value="topic_content">Content</option>
+							<option value="topic_author">Author</option>
+							<option value="topic_subforum">Subforum Title</option>
+						</optgroup>
+						<optgroup label="Users">
+							<option value="username">Username</option>
+						</optgroup>
+					</select>
+				</div>
+			</form>
+
 		</div>
+
 		<!-- /.navbar-collapse -->
 	</div>
+
 	<!-- /.container-fluid -->
 </nav>

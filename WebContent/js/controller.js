@@ -15,39 +15,44 @@ var uploadImageURL = "rest/homepage/upload_image";
 var submitNewTopicURL = "rest/homepage/upload_new_topic";
 var submitNewSubforumURL = "rest/homepage/upload_new_subforum";
 var submitUserRoleChangeURL = "rest/homepage/user_change_role";
+var searchURL = "rest/homepage/search";
 
 executeOnLoad();
 function executeOnLoad() {
 	assignListeners();
 	loadLoggedUser();
-//	var user = JSON.parse(sessionStorage.getItem('user'));
-//	if (user != null) {
-//		//		console.log("ExecuteOnLoad executed not null!" + sessionStorage.getItem('user'));
-//		$(function() {
-//			showLogoutButons(user.firstName);
-//		});
-//	} else {
-//		showLoginButons();
-//		//		console.log("ExecuteOnLoad executed is null!" + sessionStorage.getItem('user'));
-//	}
-//	console.log("ExecuteOnLoad executed!" + sessionStorage.getItem('user'));
 }
 function assignListeners() {
 	$(function() {
 		$("#loginSubmit").on("click", login);
 		$("#signUpSubmit").on("click", signup);
 		$("#logout").on("click", logout);
-		//$("#homeButton").on( "click", logout);
-
 	});
 }
-
 //Redirect functions
 function goToSubforum(id) {
 	window.location.href = "subforum.html" + "?id=" + id;
 }
 function goToTopic(id) {
 	window.location.href = "topic.html" + "?id=" + id;
+}
+function goToSearch(div) {
+	
+	var q = div.find("#search_input").val().replace(/\ /g, '+');
+	var selectpicker = div.find(".selectpicker").val();
+	var advanced = selectpicker==null?null:selectpicker.toString().replace(/\,/g, '+');
+	
+	q = 'q=' + q;
+	if(advanced == null) {
+		advanced = "";
+	} else {
+		advanced = "&advanced=" + advanced;
+	}
+//	console.log("TEST" + q + '&' + advanced);
+	
+	window.location.href = "search.html?" + q + advanced;
+	
+	
 }
 // ------PROFILE-----
 function goToProfile(id) {
@@ -105,8 +110,54 @@ function setUpProfileAvatar(input) {
 				alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 			}
 		});
-
 	}
+}
+function loadSearchQuery(){
+
+	if (userLogged() == false) {
+		showLoginButons();
+	} else {
+		showLogoutButons();
+	}
+	
+	var query = getUrlParameter("q").replace(/\+/g, ' ');
+	var advanced = getUrlParameter('advanced');
+	if(advanced != undefined) {
+		advanced = advanced.split('+');
+	}
+	
+	data = {
+			text: query,
+			fields: advanced
+	}
+	
+	console.log(data);
+	console.log(JSON.stringify(data));
+	
+	var s = JSON.stringify(data);
+	console.log(s);
+	$.ajax({
+		url : searchURL,
+		type : "POST",
+		data : s,
+		contentType : "application/json",
+		dataType : "json",
+		success : function(response) {
+
+			if (response == undefined) {
+				alert("Undefined! Not successful!");
+				return;
+			}
+			
+//			alert("Search result: " + response);
+			renderSearchResponse(response);
+			
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
 }
 /** Loaded on click on Profile*/
 function loadProfileData() {

@@ -203,12 +203,6 @@ public class User implements Serializable {
 		this.savedComments = savedComments;
 	}
 
-	@Override
-	public String toString() {
-		return userId + ";" + Utils.roleToString(role) + ";" + username + ";" + password + ";" + firstName + ";" + lastName + ";"
-				+ telephone + ";" + email +  ";" + avatar;// + avatar==null?"":avatar
-	}
-
 	public String getAvatar() {
 		return avatar;
 	}
