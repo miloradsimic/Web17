@@ -166,6 +166,7 @@ function loadProfileData() {
 	} else {
 		showLogoutButons();
 	}
+	
 	console.log('Load Profile Data');
 	var id = getUrlParameter("id");
 	console.log('User id: ' + id);
@@ -224,6 +225,12 @@ function submitProfileData(form) {
 			}
 		});
 	}
+}
+function loadMessages(){
+	saveProfileMenuTab(2);
+	var id = getUrlParameter("id");
+	
+	renderMessages();
 }
 function loadUsersList() {
 	saveProfileMenuTab(3); //not implemented

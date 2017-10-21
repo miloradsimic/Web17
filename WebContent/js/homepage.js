@@ -760,6 +760,7 @@ function renderManageUsersPage(data) {
 			container.append(item);
 		});
 	});
+	
 }
 function renderProfilePage(user) {
 	if (user == undefined) {
@@ -784,8 +785,6 @@ function renderProfilePage(user) {
 		});
 	} else { // Logged user page
 		console.log(user.firstName);
-		//	
-		//
 		console.log("Logged user" + JSON.parse(sessionStorage.getItem('user')).username);
 		console.log("Provided user" + user.username);
 
@@ -1059,3 +1058,91 @@ function renderEditSubforumForm(data) {
 		});
 	}
 }
+
+function renderMessages() {
+//	console.log("users: " + JSON.stringify(data));
+
+	$("#menuContainer").load("menu.html", function() {
+		$(this).find("#menu_profile").show();
+		setMainMenuTabSelected();
+	});
+
+	$("#profileMenuContainer").load("profile_menu.html", function() {
+		$('profile-list-inline li').removeClass('active');
+		$("#messages").parent().addClass('active');
+	//		console.log(this.find("#first_name"));
+	});
+
+	$("#mediaContainer").load("profile_messages.html", function() {
+//		var list = data == null ? [] : (data instanceof Array ? data : [ data ]);
+//		var container = $(this).find("#profile_manage_users_list");
+//
+//		$.each(list, function(index, user) {
+//
+//			console.log("username: " + user.username);
+//
+//			console.log("LIST username: " + user.username);
+//
+//			var item = $('<li class="list-group-item"></li>');
+//
+//			var media = $('<div class="media" id="' + user.userId + '"></div>');
+//			var mediaLeft = $('<div class="media-left media-top"></div>');
+//			var slika = DEFAULT_IMAGE;
+//			if (user.avatar !== "") {
+//				slika = user.avatar;
+//			}
+//			var mediaThumbnail = $('<img class="media-object" src="' + slika + '"/>');
+//			mediaLeft.append(mediaThumbnail);
+//			media.append(mediaLeft);
+//
+//			var mediaBody = $('<div class="media-body"></div>');
+//			var heading = $('<div class="media-heading"><a role="button" onclick="goToProfile(\'' + user.userId + '\')" >' + user.firstName + ' ' + user.lastName + '</a></div>');
+//			var details = $('<span class="media-left media-top"> ' + user.username + '</span>');
+//			mediaBody.append(heading);
+//			mediaBody.append(details);
+//			media.append(mediaBody);
+//
+//			var role = $('<div class="action-buttons media-right center-verticaly"><span id="user_role">' + user.role + '</span></div>');
+//			var roleVote;
+//			//TODO: U href treba ubaciti ID za poruke
+//			if (userLogged() && userAdmin()) {
+//				roleVote = $('<div class="action-buttons media-right center-verticaly"></div>');
+//				var roleUp = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'-1\');"><a role="button"><span class="glyphicon glyphicon-triangle-bottom"></span></a></div>');
+//				var roleDown = $('<div class="action-buttons media-right center-horizontally" onclick="submitRoleChange(\'' + user.userId + '\', \'1\');"><a role="button"><span class="glyphicon glyphicon-triangle-top"></span></a></div>');
+//				roleVote.append(roleUp);
+//				roleVote.append(roleDown);
+//			}
+//			var envelope = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com"><span class="glyphicon glyphicon-envelope"></span></a></div>');
+//			//var trash = $('<div class="action-buttons media-right center-verticaly"><a href="http://www.google.com" class="trash"><span class="glyphicon glyphicon-trash"></span></a></div>');
+//			media.append(role);
+//
+//			media.append(roleVote);
+//			media.append(envelope);
+//			//media.append(trash);
+//
+//			item.append(media);
+//			container.append(item);
+//		});
+	});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
