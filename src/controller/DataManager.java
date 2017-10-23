@@ -15,6 +15,8 @@ import beans.CommentEditBean;
 import beans.CommentRating;
 import beans.CommentRatings;
 import beans.Comments;
+import beans.Message;
+import beans.Messages;
 import beans.Subforum;
 import beans.Subforums;
 import beans.Topic;
@@ -34,7 +36,7 @@ public class DataManager {
 	private static String stringTopics = "/data/topics.txt";
 	private static String stringTopicRatings = "/data/topic_ratings";
 	private static String stringSubforums = "/data/subforums";
-	// private String stringMessages = "/data/messages.txt";
+	private static String stringMessages = "/data/messages";
 	private static String rootPath = "";
 
 	private Users users = new Users();
@@ -43,7 +45,7 @@ public class DataManager {
 	private CommentRatings commentRatings = new CommentRatings();
 	private TopicRatings topicRatings = new TopicRatings();
 	private Subforums subforums = new Subforums();
-	// private ArrayList<Message> messages;
+	private Messages messages= new Messages();
 
 	public static DataManager getInstance() {
 		if (instance == null) {
@@ -920,6 +922,88 @@ public class DataManager {
 		return topicRatings;
 	}
 
+	public Messages readMessages() {
+
+		FileInputStream fin = null;
+		ObjectInputStream ois = null;
+		try {
+
+			fin = new FileInputStream(rootPath + stringMessages);
+			ois = new ObjectInputStream(fin);
+			Object o = ois.readObject();
+			messages = (Messages) o;
+			System.out.println("Read Messages Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+			return null;
+
+		} finally {
+
+			if (fin != null) {
+				try {
+					fin.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (ois != null) {
+				try {
+					ois.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return messages;
+	}
+
+	public Messages saveMessage(Message entry) {
+		messages.addMessage(entry);
+
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringMessages);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(messages);
+
+			System.out.println("Write Message Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return messages;
+	}
+
+	
 	public boolean updateComment(CommentEditBean entry, boolean isMainModerator) {
 		// subforums should be implemented like other data is, and then no
 		// parameter is needed
@@ -1071,6 +1155,86 @@ public class DataManager {
 				}
 			}
 		}
+		return true;
+	}
+
+	public boolean deleteMessage(long messageId) {
+		messages.remove(messageId);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+
+		try {
+
+			fout = new FileOutputStream(rootPath + stringMessages);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(messages);
+
+			System.out.println("Delete Message Done");
+
+		} catch (Exception ex) {
+
+			ex.printStackTrace();
+
+		} finally {
+
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+
+		return true;
+	}
+
+	public boolean updateMessage(Message entry) {
+		messages.updateMessage(entry);
+		FileOutputStream fout = null;
+		ObjectOutputStream oos = null;
+	
+		try {
+	
+			fout = new FileOutputStream(rootPath + stringMessages);
+			oos = new ObjectOutputStream(fout);
+			oos.writeObject(messages);
+	
+			System.out.println("Update Messages Done");
+	
+		} catch (Exception ex) {
+	
+			ex.printStackTrace();
+	
+		} finally {
+	
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+	
+			if (oos != null) {
+				try {
+					oos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+	
+		}
+	
 		return true;
 	}
 }

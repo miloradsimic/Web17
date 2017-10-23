@@ -28,6 +28,8 @@ import beans.CommentSubmitBean;
 import beans.Comments;
 import beans.EditProfileBean;
 import beans.LoginBean;
+import beans.Message;
+import beans.Messages;
 import beans.SearchBean;
 import beans.Subforum;
 import beans.SubforumNewBean;
@@ -45,6 +47,7 @@ import beans.UserPublicBean;
 import beans.Users;
 import controller.DataManager;
 import controller.Utils;
+import model.enums.MessageType;
 import model.enums.Role;
 import model.enums.TopicType;
 
@@ -392,7 +395,24 @@ public class HomePageService {
 		}
 		return false;
 	}
+	@DELETE
+	@Path("/messages/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean deleteMessage(@Context HttpServletRequest request, @PathParam("id") long messageId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return false;
+		}
 	
+		if (DataManager.getInstance().deleteMessage(messageId)) {
+			ctx.setAttribute("messages", DataManager.getInstance().readMessages());
+			return true;
+		}
+		return false;
+	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -541,6 +561,59 @@ public class HomePageService {
 			System.out.println("User doesn't exist dude!");
 			return null;
 		}
+	}
+	
+	@GET
+	@Path("/messages")
+	@Produces(MediaType.APPLICATION_JSON)
+	public HashMap<String, Object> getMessages(@Context HttpServletRequest request) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		if (loggedUser == null) {
+			return null;
+		}
+		ArrayList<Message> received = new ArrayList<>();
+		ArrayList<Message> sent = new ArrayList<>();
+		int newMessages = 0;
+		
+		User user = getUsers().getUsersMapByUsername().get(loggedUser.getUsername());
+		for (Message message : getMessages().getMessagesList()) {
+			if(message.getReceiver().getUserId() == user.getUserId() && message.getType() == MessageType.RECEIVED){
+				received.add(message);
+				if(!message.isRead()) {
+					newMessages++;
+				}
+			}
+			if(message.getSender().getUserId() == user.getUserId() && message.getType() == MessageType.SENT){
+				sent.add(message);
+			}
+		}
+		
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("new_messages", newMessages);
+		retVal.put("inbox", received);
+		retVal.put("sent", sent);
+		
+		return retVal;
+	}
+	
+	@GET
+	@Path("/messages/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean setRead(@Context HttpServletRequest request, @PathParam("id") long messageId) {
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		if (loggedUser == null) {
+			return false;
+		}
+		
+		getMessages().getMessagesMap().get(messageId).setRead(true);
+		if (DataManager.getInstance().updateMessage(getMessages().getMessagesMap().get(messageId))) {
+			ctx.setAttribute("messages", DataManager.getInstance().readMessages());
+			return true;
+		}
+		
+		return false;
 	}
 
 	@POST
@@ -698,6 +771,17 @@ public class HomePageService {
 		}
 	}
 
+	private Messages getMessages() {
+		Messages messages = (Messages) ctx.getAttribute("messages");
+		if (messages == null) {
+			DataManager.setUpRootPath(ctx.getRealPath(""));
+			messagesData();
+			messages = DataManager.getInstance().readMessages();
+			ctx.setAttribute("messages", messages);
+		}
+		return messages;
+	}
+	
 	private Subforums getSubforums() {
 		Subforums subforums = (Subforums) ctx.getAttribute("subforums");
 		if (subforums == null) {
@@ -839,7 +923,6 @@ public class HomePageService {
 	}
 
 	private void subforumsData() {
-
 		Subforum s1 = new Subforum(1l, "Cars", "Topics about all kind of vehicles.", "resources/cars.jpg",
 				"Standard rules.", 2);
 		Subforum s2 = new Subforum(2l, "Sport", "Topics about all kind of sport.", "resources/sport.png", "No spamming",
@@ -847,5 +930,15 @@ public class HomePageService {
 
 		DataManager.getInstance().saveSubforum(s1);
 		DataManager.getInstance().saveSubforum(s2);
+	}
+	
+	private void messagesData() {
+		Message m1 = new Message(getUsers().getUsersMap().get(1l), getUsers().getUsersMap().get(2l), "Ovo je prva poruka od admina ka moderatoru");
+		Message m2 = new Message(getUsers().getUsersMap().get(3l), getUsers().getUsersMap().get(2l), "Ovo je druga poruka od usera ka moderatoru");
+		Message m3 = new Message(getUsers().getUsersMap().get(2l), getUsers().getUsersMap().get(1l), "Ovo je treca poruka od moderatora ka adminu");
+
+		DataManager.getInstance().saveMessage(m1);
+		DataManager.getInstance().saveMessage(m2);
+		DataManager.getInstance().saveMessage(m3);
 	}
 }

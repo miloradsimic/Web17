@@ -16,6 +16,7 @@ var submitNewTopicURL = "rest/homepage/upload_new_topic";
 var submitNewSubforumURL = "rest/homepage/upload_new_subforum";
 var submitUserRoleChangeURL = "rest/homepage/user_change_role";
 var searchURL = "rest/homepage/search";
+var messagesURL = "rest/homepage/messages";
 
 executeOnLoad();
 function executeOnLoad() {
@@ -37,22 +38,21 @@ function goToTopic(id) {
 	window.location.href = "topic.html" + "?id=" + id;
 }
 function goToSearch(div) {
-	
 	var q = div.find("#search_input").val().replace(/\ /g, '+');
 	var selectpicker = div.find(".selectpicker").val();
-	var advanced = selectpicker==null?null:selectpicker.toString().replace(/\,/g, '+');
-	
+	var advanced = selectpicker == null ? null : selectpicker.toString().replace(/\,/g, '+');
+
 	q = 'q=' + q;
-	if(advanced == null) {
+	if (advanced == null) {
 		advanced = "";
 	} else {
 		advanced = "&advanced=" + advanced;
 	}
-//	console.log("TEST" + q + '&' + advanced);
-	
+	//	console.log("TEST" + q + '&' + advanced);
+
 	window.location.href = "search.html?" + q + advanced;
-	
-	
+
+
 }
 // ------PROFILE-----
 function goToProfile(id) {
@@ -112,28 +112,27 @@ function setUpProfileAvatar(input) {
 		});
 	}
 }
-function loadSearchQuery(){
-
+function loadSearchQuery() {
 	if (userLogged() == false) {
 		showLoginButons();
 	} else {
 		showLogoutButons();
 	}
-	
+
 	var query = getUrlParameter("q").replace(/\+/g, ' ');
 	var advanced = getUrlParameter('advanced');
-	if(advanced != undefined) {
+	if (advanced != undefined) {
 		advanced = advanced.split('+');
 	}
-	
+
 	data = {
-			text: query,
-			fields: advanced
+		text : query,
+		fields : advanced
 	}
-	
+
 	console.log(data);
 	console.log(JSON.stringify(data));
-	
+
 	var s = JSON.stringify(data);
 	console.log(s);
 	$.ajax({
@@ -148,10 +147,10 @@ function loadSearchQuery(){
 				alert("Undefined! Not successful!");
 				return;
 			}
-			
-//			alert("Search result: " + response);
+
+			//			alert("Search result: " + response);
 			renderSearchResponse(response);
-			
+
 
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
@@ -166,7 +165,7 @@ function loadProfileData() {
 	} else {
 		showLogoutButons();
 	}
-	
+
 	console.log('Load Profile Data');
 	var id = getUrlParameter("id");
 	console.log('User id: ' + id);
@@ -226,11 +225,21 @@ function submitProfileData(form) {
 		});
 	}
 }
-function loadMessages(){
+function loadMessages() {
+	console.log("loadMessages");
 	saveProfileMenuTab(2);
-	var id = getUrlParameter("id");
-	
-	renderMessages();
+	$.ajax({
+		type : 'GET',
+		url : messagesURL,
+		dataType : "json", // data type of response
+		success : renderMessages,
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+		}
+	});
 }
 function loadUsersList() {
 	saveProfileMenuTab(3); //not implemented
@@ -307,7 +316,10 @@ function loadSubforums() {
 		dataType : "json", // data type of response
 		success : renderSubforumsList,
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			alert("AJAX ERROR6: " + errorThrown + "\nTextStatus: " + textStatus);
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR7: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
 		}
 	});
 }
@@ -317,7 +329,7 @@ function setUpTopicImage(input) {
 		var objFile = input.files[0]
 		objFormData.append('image', objFile);
 		var name = 'resources/topic_t' + $.now() + objFile.name.substr(objFile.name.length - 4);
-		
+
 		objFormData.append('name', name);
 
 		$.ajax({
@@ -355,7 +367,7 @@ function setUpSubforumAvatar(input) {
 		var objFormData = new FormData();
 		var objFile = input.files[0]
 		objFormData.append('image', objFile);
-		var name = 'resources/subforum_' +  + $.now() + objFile.name.substr(objFile.name.length - 4);
+		var name = 'resources/subforum_' + +$.now() + objFile.name.substr(objFile.name.length - 4);
 		console.log("name is : " + name);
 		objFormData.append('name', name);
 
@@ -391,7 +403,7 @@ function setUpSubforumAvatar(input) {
 }
 function submitNewSubforum(form) {
 	var content = form.find("#description textarea").val();
-	
+
 	// author is logged user
 	var data = {
 		subforum_id : form.find(".id").attr("id"),
@@ -399,8 +411,8 @@ function submitNewSubforum(form) {
 		description : form.find("#description textarea").val(),
 		image : $("#upload_image").attr("value")
 	};
-	
-	
+
+
 	if (form.valid()) {
 		console.log("submitNewSubforum valid");
 
@@ -496,10 +508,10 @@ function submitNewTopic(form) {
 }
 function deleteTopic(topicId) {
 	console.log('Deleting topic with id: ' + topicId);
-	
+
 	$.ajax({
 		url : deleteTopicURL + '/' + topicId,
-		type : "DELETE", 
+		type : "DELETE",
 		contentType : "application/json",
 		dataType : "json",
 		success : function(data) {
@@ -507,17 +519,17 @@ function deleteTopic(topicId) {
 			if (data == undefined) {
 				alert("Undefined!");
 				return;
-			} else if(data == false) {
+			} else if (data == false) {
 				alert("FALSE!");
 				return;
 			} else {
 				console.log('Deleted topic successfully.');
-				
+
 				$("#t" + topicId).html("");
 				$("#topic_new_topic_container").html("");
-				
-				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
-				//location.reload();
+
+			//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+			//location.reload();
 			}
 
 		},
@@ -528,10 +540,10 @@ function deleteTopic(topicId) {
 }
 function deleteSubforum(subforumId) {
 	console.log('Deleting subforum with id: ' + subforumId);
-	
+
 	$.ajax({
 		url : subforumURL + '/' + subforumId,
-		type : "DELETE", 
+		type : "DELETE",
 		contentType : "application/json",
 		dataType : "json",
 		success : function(data) {
@@ -539,17 +551,17 @@ function deleteSubforum(subforumId) {
 			if (data == undefined) {
 				alert("Undefined!");
 				return;
-			} else if(data == false) {
+			} else if (data == false) {
 				alert("FALSE!");
 				return;
 			} else {
 				console.log('Deleted topic successfully.');
-				
+
 				$("#s" + subforumId).html("");
 				$("#subforum_new_subforum_container").html("");
-				
-				//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
-				//location.reload();
+
+			//FIX: Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
+			//location.reload();
 			}
 
 		},
@@ -560,7 +572,7 @@ function deleteSubforum(subforumId) {
 }
 //##############################################
 function submitRoleChange(id, value) {
-//	console.dir(comment.parent().html()); 
+	//	console.dir(comment.parent().html()); 
 
 	console.log('Submiting user role change.');
 	var data = {
@@ -583,10 +595,10 @@ function submitRoleChange(id, value) {
 				return;
 			} else {
 				$(".media[id='" + id + "'] #user_role").text(data);
-//				alert("Done!");
+			//				alert("Done!");
 			}
 			// Easy way to refresh page, NOT following ajax rules, I should update only that element without refreshing page
-//			location.reload();
+			//			location.reload();
 
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
@@ -684,6 +696,46 @@ function deleteComment(comment) {
 		}
 	});
 }
+function deleteMessage(id) {
+	console.log('Deleting message with id: ' + id);
+
+	$.ajax({
+		url : messagesURL + '/' + id,
+		type : "DELETE",
+		contentType : "application/json",
+		dataType : "json",
+		success : function(data) {
+
+			if (data == undefined) {
+				alert("Undefined!");
+				return;
+			} else if (data == false) {
+				alert("FALSE!");
+				return;
+			} else {
+				console.log('Deleted message successfully.');
+
+				if ($("#m" + id).find(".not-read").length) {
+					console.log("brisem iz delete-a");
+					var new_messages = Number($(".badge").html()) - 1;
+					$(".badge").html(new_messages);
+					if (!new_messages) {
+						$(".badge").removeClass("badge").html("");
+					}
+				}
+				$("#m" + id).remove();
+			}
+
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
+
+
+
+
 function submitComment(comment) {
 	console.log('Submiting comment.');
 	var data = {
@@ -782,7 +834,22 @@ function submitLike(element, commentId) {
 	});
 
 }
+function submitMessageRead(messageId) {
+	console.log("messageId: " + messageId);
+	$.ajax({
+		type : 'GET',
+		url : messagesURL + "/" + messageId,
+		dataType : "json", // data type of response
+		success : function(data) {
 
+
+			return data.new_messages;
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			alert("AJAX ERROR5: " + errorThrown + "\nTextStatus: " + textStatus);
+		}
+	});
+}
 function submitTopicRating(element, topicId) {
 	console.log('submitTopicRating(): \ntopicId=' + topicId);
 	var rate = -1;
@@ -865,12 +932,12 @@ function userLogged(usernameOrId) {
 		return isLogged;
 	} else if (arguments.length == 1) {
 		//		console.log('userLogged(username): ' + username);
-		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && 
-		( JSON.parse(sessionStorage.getItem('user')).username === usernameOrId || JSON.parse(sessionStorage.getItem('user')).userId == usernameOrId);
+		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined &&
+			(JSON.parse(sessionStorage.getItem('user')).username === usernameOrId || JSON.parse(sessionStorage.getItem('user')).userId == usernameOrId);
 		//		console.log('return userLogged(username): ' + isLogged);
 		return isLogged;
-//	} else if (arguments.length == 2) {
-//		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).userID === username;
+	//	} else if (arguments.length == 2) {
+	//		var isLogged = sessionStorage.getItem("user") != null && sessionStorage.getItem("user") != undefined && JSON.parse(sessionStorage.getItem('user')).userID === username;
 	}
 }
 
