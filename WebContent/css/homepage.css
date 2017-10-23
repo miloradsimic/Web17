@@ -304,7 +304,13 @@ form .error {
 .messages-wrapper .list-group input[type="checkbox"]{ margin-top: 2px; }
 .messages-wrapper .list-group .glyphicon { margin-right:10px; }
 .messages-wrapper .list-group .glyphicon:hover { color:#FFBC00; }
-
+.messages-wrapper .form-control.search-receiver { width: 150px !important; display: inline !important;}
+.messages-wrapper #name_slot { margin-left: 5px; }
+.messages-wrapper .not_found { color: #F00;}
+.messages-wrapper .found { color: #0F0;}
+.messages-wrapper #new_message_container { background: #ccdfff; border-radius: 4px; border-style: double; border-color: #F00;}
+.messages-wrapper .compose-message-area { resize: vertical; font-size: 12px; margin-top: 5px; padding-right: 70px; }
+.messages-wrapper #submitMessage { margin-top: -30px; margin-right: 8px; font-size: 12px; }
 .messages-wrapper .list-group-item .text { font-size: 12px; }
  a.list-group-item.read { color: #222;background-color: #F3F3F3; }
 hr { margin-top: 5px;margin-bottom: 10px; }

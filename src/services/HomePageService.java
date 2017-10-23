@@ -29,6 +29,7 @@ import beans.Comments;
 import beans.EditProfileBean;
 import beans.LoginBean;
 import beans.Message;
+import beans.MessageBean;
 import beans.Messages;
 import beans.SearchBean;
 import beans.Subforum;
@@ -58,6 +59,52 @@ public class HomePageService {
 	HttpServletRequest request;
 	@Context
 	ServletContext ctx;
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/upload_message")
+	public HashMap<String, Object> newMessage(@Context HttpServletRequest request, MessageBean bean) {
+		
+		LoginBean loggedUser = null;
+		loggedUser = (LoginBean) request.getSession().getAttribute("user");
+		
+		if (loggedUser == null) {
+			System.out.println("You're not logged.");
+			return null;
+		}
+		
+		User sender = getUsers().getUsersMapByUsername().get(loggedUser.getUsername());
+		User receiver = getUsers().getUsersMapByUsername().get(bean.getReceivers_username());
+		
+		Message entry = new Message(sender, receiver, bean.getContent());
+		
+		if(DataManager.getInstance().saveMessage(entry)) {
+			ctx.setAttribute("messages", DataManager.getInstance().readMessages());
+			HashMap<String, Object> retVal = new HashMap<>();
+			retVal.put("message", entry);
+			return retVal;
+		}
+		return null;
+	}
+	
+	@GET
+	@Path("/get_users_full_name/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public HashMap<String, Object> getTopicsList2(@Context HttpServletRequest request,
+			@PathParam("username") String name) {
+		// System.out.println("Reading topics from " + subforum + " subforum.");
+		
+		String fullName = "Not Found!";
+		if(getUsers().getUsersMapByUsername().get(name) != null) {
+			fullName = getUsers().getUsersMapByUsername().get(name).getFirstName() + " " + getUsers().getUsersMapByUsername().get(name).getLastName();
+		}
+		
+		HashMap<String, Object> retVal = new HashMap<>();
+		retVal.put("name", fullName);
+		return retVal;
+	}
+	
 	/**
 	 * Search by criterion
 	 */

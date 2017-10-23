@@ -17,6 +17,9 @@ var submitNewSubforumURL = "rest/homepage/upload_new_subforum";
 var submitUserRoleChangeURL = "rest/homepage/user_change_role";
 var searchURL = "rest/homepage/search";
 var messagesURL = "rest/homepage/messages";
+var usersNameURL = "rest/homepage/get_users_full_name";
+var submitMessagesURL = "rest/homepage/upload_message";
+
 
 executeOnLoad();
 function executeOnLoad() {
@@ -30,6 +33,39 @@ function assignListeners() {
 		$("#logout").on("click", logout);
 	});
 }
+
+function findUsername(str) {
+	if (!str.length) {
+		$('#name_slot').removeClass("found");
+		$('#name_slot').addClass("not_found");
+		return;
+	}
+
+	$.ajax({
+		url : usersNameURL + "/" + str,
+		type : 'GET',
+		dataType : "json",
+		success : function(data) {
+
+			console.log("Searched: " + data.name);
+			$('#name_slot').html(data.name);
+			if (data.name === "Not Found!") {
+				$('#name_slot').removeClass("found");
+				$('#name_slot').addClass("not_found");
+			} else {
+				$('#name_slot').removeClass("not_found");
+				$('#name_slot').addClass("found");
+			}
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			var OriginalString = XMLHttpRequest.responseText;
+			var StrippedString = OriginalString.replace(/(<([^>]+)>)/ig, "");
+			console.log(StrippedString);
+			alert("AJAX ERROR71: " + errorThrown + "\nTextStatus: " + textStatus + "\nRequest" + XMLHttpRequest);
+		}
+	});
+}
+
 //Redirect functions
 function goToSubforum(id) {
 	window.location.href = "subforum.html" + "?id=" + id;
@@ -832,6 +868,47 @@ function submitLike(element, commentId) {
 			alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
 		}
 	});
+
+}
+function submitMessage(message) {
+	console.log('Submiting message.');
+	if (message.find(".found")) {
+		var data = {
+			content : message.find(".compose-message-area").val(),
+			receivers_username : message.find('.search-receiver').val()
+		};
+
+		var s = JSON.stringify(data);
+		console.log(s);
+		$.ajax({
+			url : submitMessagesURL,
+			type : "POST",
+			data : s,
+			contentType : "application/json",
+			dataType : "json",
+			success : function(data) {
+				if (data.message == undefined) {
+					alert("Undefined!");
+					return;
+				}
+				if (data.message == null) {
+					alert("null");
+					return;
+				} 
+				console.log("Message submited successfully!");
+				renderSentMessage(data.message);
+				$("#compose .search-receiver").val("");
+				$("#compose #name_slot").html("");
+				$("#compose .compose-message-area").val("");
+				
+				toggleComposeMessage();
+				
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				alert("AJAX ERROR8 submitComment: " + errorThrown + "\nRequest" + XMLHttpRequest);
+			}
+		});
+	}
 
 }
 function submitMessageRead(messageId) {

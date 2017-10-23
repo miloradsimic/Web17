@@ -1060,7 +1060,7 @@ function renderEditSubforumForm(data) {
 }
 
 function renderMessages(data) {
-//	console.log("users: " + JSON.stringify(data));
+//	console.log("users: " + JSON.stringify(data)); 
 	
 	var received = data.inbox;
 	var sent = data.sent;
@@ -1077,6 +1077,7 @@ function renderMessages(data) {
 	});
 
 	$("#mediaContainer").load("profile_messages.html", function() {
+		
 		var listReceived = received == null ? [] : (received instanceof Array ? received : [ received ]);
 		var containerReceived = $(this).find(".messages-wrapper #inbox");
 
@@ -1125,29 +1126,9 @@ function renderMessages(data) {
 		
 		
 		var listSent = sent == null ? [] : (sent instanceof Array ? sent : [ sent ]);
-		var containerSent = $(this).find(".messages-wrapper #sent");
 
 		$.each(listSent, function(index, message) {
-			var item = $('<a id="m' + message.messageId + '"class="list-group-item" onclick="toggleMessageDetails($(this), \'' + message.isRead + '\')"></a>');
-
-			var remove = $('<span class="glyphicon glyphicon-trash" onclick=deleteMessage("' + message.messageId + '")></span>');
-			var name = $('<span class="name">' + message.receiver.firstName + ' ' + message.receiver.lastName + '</span>');
-			var status = $('<span class="read">Sent Message</span>');
-			
-			
-			item.append(remove);
-			item.append(name);
-			item.append(status);
-			
-			// Message details hidden
-			var details = $("<div class='details-container' style='display:none;'></div");
-			var hr = $("<hr>");
-			var text = $('<span class="text">Message: ' + message.text + '</span>');
-
-			details.append(hr);
-			details.append(text);
-			item.append(details);
-			containerSent.append(item);
+			renderSentMessage(message);
 		});
 		
 	});
@@ -1182,6 +1163,52 @@ function toggleMessageDetails(messageContainer) {
 			}
 		}
 	});
+}
+
+function toggleComposeMessage() {
+	console.log("toogled");
+	
+	$("#compose").toggle(250, function() {
+		if($("#compose").find('#name_slot').length == 0) {
+			var item = $('<a id="new_message_container" class="list-group-item"></a>');
+		
+			var username = $('<input type="text" placeholder="Enter username" class="form-control search-receiver"' + 
+					'onfocusout="findUsername(this.value)" onkeyup="findUsername(this.value)"></span>');
+			var name = $('<span id="name_slot" class="name"></span>');
+			var textArea = $('<textarea name="text" class="compose-message-area form-control" rows="2" placeholder="Write your message here" ></textarea>');
+			var submitButton = $('<button id="submitMessage" class="pull-right" onclick="submitMessage($(this).parent().parent().parent())">Send</button>');
+			
+			item.append(username);
+			item.append(name);
+			item.append(textArea);
+			item.append(submitButton);
+			
+			$("#compose").append(item);
+		}
+	});
+}
+function renderSentMessage(message){
+	var item = $('<a id="m' + message.messageId + '"class="list-group-item" onclick="toggleMessageDetails($(this), \'' + message.isRead + '\')"></a>');
+
+	var remove = $('<span class="glyphicon glyphicon-trash" onclick=deleteMessage("' + message.messageId + '")></span>');
+	var name = $('<span class="name">' + message.receiver.firstName + ' ' + message.receiver.lastName + '</span>');
+	var status = $('<span class="read">Sent Message</span>');
+	
+	
+	item.append(remove);
+	item.append(name);
+	item.append(status);
+	
+	// Message details hidden
+	var details = $("<div class='details-container' style='display:none;'></div");
+	var hr = $("<hr>");
+	var text = $('<span class="text">Message: ' + message.text + '</span>');
+
+	details.append(hr);
+	details.append(text);
+	item.append(details);
+	$(".messages-wrapper #sent").append(item);
+
 }
 
 

@@ -961,8 +961,8 @@ public class DataManager {
 
 		return messages;
 	}
-
-	public Messages saveMessage(Message entry) {
+	
+	public boolean saveMessage(Message entry) {
 		messages.addMessage(entry);
 
 		FileOutputStream fout = null;
@@ -1000,7 +1000,7 @@ public class DataManager {
 
 		}
 
-		return messages;
+		return true;
 	}
 
 	
