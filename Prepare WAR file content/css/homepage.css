@@ -1,0 +1,320 @@
+/*Media wide as menubar*/
+#content {
+	padding-left: 0px;
+}
+/*Media items no padding*/
+#mediaContainer {
+	padding: 0px;
+	margin: 0px;
+}
+
+.commentsContainer {
+	list-style-type: none;
+	font-size: 12px;
+	margin-left: -20px;
+}
+
+#commentsContainerRoot {
+	margin-top: -20px;
+	margin-left: -40px;
+}
+
+#commentsContainer {
+	margin-left: -40px;
+}
+
+.comment-author {
+	color: #0048c1;
+}
+
+.comment-date {
+	color: #999999;
+	margin-left: 30px;
+	font-size: 9px;
+}
+
+.comment-text {
+	color: #333333;
+}
+
+.comment-reply {
+	color: #0048c1;
+	padding-top: 4px;
+	font-size: 9px;
+}
+
+.comment-edit {
+	color: #0048c1;
+	padding-top: 4px;
+	font-size: 9px;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
+.comment-rating-padding {
+	margin-top: -2px;
+}
+
+.comment-likes {
+	color: #00FF00;
+	text-align: center;
+}
+
+.comment-dislikes {
+	color: #FF0000;
+	text-align: center;
+}
+
+.comment-neutral {
+	color: #000000;
+	text-align: center;
+}
+
+.comment-like-used {
+	color: #00FF00;
+}
+
+.comment-like-unused {
+	color: #000000;
+}
+
+.comment-dislike-used {
+	color: #FF0000;
+}
+
+.comment-dislike-unused {
+	color: #000000;
+}
+
+.comment-reply-area {
+	resize: none;
+	font-size: 10px;
+	margin-top: 5px;
+	padding-right: 70px;
+}
+
+.submitComment {
+	margin-top: -30px;
+	margin-right: 8px;
+	font-size: 10px;
+}
+
+span .pull-right {
+	font-size: 10px;
+	margin-top: -20px;
+}
+
+.media {
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-right: 5px;
+	padding-left: 5px;
+	margin: 0px;
+}
+
+.media .media-heading {
+	color: #0048c1;
+	font-size: 14px;
+	line-height: normal;
+	margin: 0;
+}
+
+.media-body p {
+	/*	color: #bcbfc4;*/
+	font-size: 10px;
+	font-weight: normal;
+	line-height: normal;
+	margin: 0;
+}
+
+.media-body .media-meta {
+	color: #bcbfc4;
+	font-size: 10px;
+}
+
+.media-object {
+	width: 40px;
+}
+
+.topic.media:hover, .subforum.media:hover {
+	/*cursor: pointer; */
+	background-color: #eee;
+}
+
+.jumbotron {
+	background-color: #2E2D88;
+	color: white;
+}
+/* Adds borders for tabs */
+.tab-content {
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
+	padding: 10px;
+}
+
+.nav-tabs {
+	margin-bottom: 0;
+}
+
+/*-------------------Profile menu */
+.profile-menu {
+	font-family: 'Arimo', sans-serif;
+	font-size: 14px;
+	width: 100%;
+	margin-top: -67px;
+	margin-left: 2px;
+	padding-top: 50px;
+	background-color: #F5F5F5;
+}
+
+.profile-menu ul {
+	margin-bottom: 0;
+	margin: 0px;
+	padding: 0px;
+}
+
+.profile-menu a {
+	color: #333;
+	opacity: 0.8;
+	text-transform: uppercase;
+	margin: 0px;
+	padding: 5px;
+	padding-right: 8px;
+	padding-left: 8px;
+}
+
+.profile-menu li {
+	margin: -7px;
+}
+
+.profile-menu a:hover {
+	text-decoration: none;
+	background-color: #EEEEEE;
+	opacity: 1;
+}
+
+.profile-menu .active a {
+	text-decoration: none;
+	background-color: #AAAAFF;
+	opacity: 1;
+}
+
+input[type='file'] {
+	color: transparent;
+}
+
+.input-file {
+	width: 91px;
+}
+
+.center-verticaly {
+	vertical-align: middle;
+}
+/*-------------------End of Profile menu */
+/*-------------------Public profile */
+/**
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    contenteditable attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that are clearfixed.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ * this is called a clearfix. it makes sure that the container's children floats are cleared, without using extra markup
+ */
+.clearfix {
+	*zoom: 1 /* for IE */
+}
+
+.clearfix:before, .clearfix:after {
+	content: " ";
+	display: table;
+}
+
+.clearfix:after {
+	clear: both;
+}
+
+/* end clearfix*/
+
+/* tell the container's children to float left: */
+.float-my-children>* {
+	float: left;
+	margin-right: 5px;
+}
+
+.small-paragraph {
+	margin: 0px;
+}
+
+/*-------------------End of Public profile */
+/*
+.profile-menu a:focus {
+	text-decoration: none;
+	background-color: #00FF00;
+	opacity: 1;
+}
+
+.profile-menu a:visited {
+	background-color: #AAAAFF;
+}*/
+.topics-new-topic, .subforums-new-subforum {
+	margin-right: 5px;
+}
+
+.topic-image img, .subforum-image img {
+	height: 20px;
+	width: auto;
+}
+
+.topic-ratings-value {
+	font-size: 9px;
+}
+
+.topic-edit, .topic-delete, .subforum-edit, .subforum-delete {
+	margin-right: 4px;
+	font-size: 12px;
+}
+
+form .error {
+	color: #ff0000;
+}
+.advanced-search {
+	margin-right: -25px !important;
+	
+}
+ .navbar-form.navbar-right button {
+	margin-right: -25px !important;
+ }
+/* .navbar-form.navbar-right {
+	margin-right: -35px !important;
+} */
+
+/* CSS used here will be applied after bootstrap.css */
+
+.messages-wrapper { margin-top:25px;}
+.messages-wrapper .read { color: #222; }
+.messages-wrapper .not-read { color: #00f; }
+.messages-wrapper .glyphicon:not(.no-margin) { margin-right:10px; }
+.messages-wrapper .name { min-width:120px;display: inline-block; }
+.messages-wrapper .list-group-item:first-child {border-top-right-radius: 0px;border-top-left-radius: 0px;}
+.messages-wrapper .list-group-item:last-child {border-bottom-right-radius: 0px;border-bottom-left-radius: 0px;}
+.messages-wrapper .list-group .checkbox { display: inline-block;margin: 0px; }
+.messages-wrapper .list-group input[type="checkbox"]{ margin-top: 2px; }
+.messages-wrapper .list-group .glyphicon { margin-right:10px; }
+.messages-wrapper .list-group .glyphicon:hover { color:#FFBC00; }
+.messages-wrapper .form-control.search-receiver { width: 150px !important; display: inline !important;}
+.messages-wrapper #name_slot { margin-left: 5px; }
+.messages-wrapper .not_found { color: #F00;}
+.messages-wrapper .found { color: #0F0;}
+.messages-wrapper #new_message_container { background: #ccdfff; border-radius: 4px; border-style: double; border-color: #F00;}
+.messages-wrapper .compose-message-area { resize: vertical; font-size: 12px; margin-top: 5px; padding-right: 70px; }
+.messages-wrapper #submitMessage { margin-top: -30px; margin-right: 8px; font-size: 12px; }
+.messages-wrapper .list-group-item .text { font-size: 12px; }
+ a.list-group-item.read { color: #222;background-color: #F3F3F3; }
+hr { margin-top: 5px;margin-bottom: 10px; }
+.nav-pills>li>a {padding: 5px 10px;}
+
+
+

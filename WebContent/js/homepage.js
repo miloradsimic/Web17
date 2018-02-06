@@ -36,7 +36,8 @@ function showLogoutButons() {
 
 }
 function setMainMenuTabSelected() {
-	var page_name = window.location.pathname.split("/")[2];
+	var page_name = window.location.pathname.substr(window.location.pathname.lastIndexOf('/')+1);
+	console.log("Page name!: " + page_name);
 	var page_name = page_name.substr(0, page_name.indexOf(".")).toLowerCase();
 	console.log("Page name: " + page_name);
 
@@ -65,13 +66,13 @@ function showLoginModal() {
 	$("#loginModal").find("#username").val("moderator");
 	$("#loginModal").find("#password").val("moderator");
 	$("body").addClass("notScroll");
-	$("#loginSubmit").on("click", login);
+	$("#loginSubmit").unbind().on("click", login);
 }
 function showSignupModal() {
 	$("#loginModal").modal("hide");
 	$("#signupModal").modal();
 	$("body").addClass("notScroll");
-	$("#signUpSubmit").on("click", signup);
+	$("#signUpSubmit").unbind().on("click", signup);
 }
 
 function renderSearchResponse(data) {
@@ -1010,7 +1011,7 @@ function renderEditSubforumForm(data) {
 			$(this).find("#subforum_title").val(subforum.name);
 			$(this).find("#description textarea").val(subforum.description);
 
-			console.log("Image" + subforum.icon);
+			console.log("Image: " + subforum.icon);
 			
 			$(this).find('#upload_image').attr('value', subforum.icon);
 			$(this).find('#subforum_img_tag').attr('src', subforum.icon);
@@ -1044,7 +1045,7 @@ function renderEditSubforumForm(data) {
 						required : true
 					},
 					image : {
-						required : true
+						//required : true
 					}
 				},
 				messages : {

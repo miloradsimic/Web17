@@ -5,12 +5,7 @@
 	id="WebApp_ID" version="3.0">
 	<display-name>RESTApp</display-name>
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-		<welcome-file>index.htm</welcome-file>
-		<welcome-file>index.jsp</welcome-file>
-		<welcome-file>default.html</welcome-file>
-		<welcome-file>default.htm</welcome-file>
-		<welcome-file>default.jsp</welcome-file>
+		<welcome-file>homepage.html</welcome-file>
 	</welcome-file-list>
 
 	<servlet>
@@ -34,8 +29,4 @@
 		<servlet-name>Jersey REST Service</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-
-
-
-
 </web-app>

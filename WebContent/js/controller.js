@@ -154,7 +154,8 @@ function loadSearchQuery() {
 	} else {
 		showLogoutButons();
 	}
-
+	
+	if(getUrlParameter("q") == null) return;
 	var query = getUrlParameter("q").replace(/\+/g, ' ');
 	var advanced = getUrlParameter('advanced');
 	if (advanced != undefined) {

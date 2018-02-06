@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.JList;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -856,7 +857,7 @@ public class HomePageService {
 		Users users = (Users) ctx.getAttribute("users");
 		if (users == null) {
 			DataManager.setUpRootPath(ctx.getRealPath(""));
-			usersData();
+//			usersData();
 			users = DataManager.getInstance().readUsers();
 			ctx.setAttribute("users", users);
 		}
@@ -940,19 +941,19 @@ public class HomePageService {
 		DataManager.getInstance().saveComment(c6);
 	}
 
-	private void usersData() {
+	/*private void usersData() {
 
-		User u1 = new User(1, Role.ADMIN, "admin", "admin", "Al", "Andereson", "0651111111", "al@gmail.com",
+		User u1 = new User(1, Role.ADMIN, "admin", "pass", "Milorad", "Simic", "0654671639", "simic.milorad90@gmail.com",
 				"resources/lav.jpg");
-		User u2 = new User(2, Role.MODERATOR, "moderator", "moderator", "Mike", "Morison", "0652222222",
+		User u2 = new User(2, Role.MODERATOR, "moderator", "pass", "Mike", "Morison", "0652222222",
 				"mike@gmail.com", "resources/lav.jpg");
-		User u3 = new User(3, Role.USER, "user", "user", "Usain", "Ulman", "0653333333", "usain@gmail.com",
+		User u3 = new User(3, Role.USER, "user", "pass", "Usain", "Ulman", "0653333333", "usain@gmail.com",
 				"resources/slon.jpg");
 
 		DataManager.getInstance().saveUser(u1);
 		DataManager.getInstance().saveUser(u2);
 		DataManager.getInstance().saveUser(u3);
-	}
+	}*/
 
 	private void topicsData() {
 

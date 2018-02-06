@@ -28,7 +28,8 @@ function login() {
 	var $form = $("#loginform");
 	var data = getFormData($form);
 	var s = JSON.stringify(data);
-	//	alert("Request object: " + s);
+	
+//		alert("Request object: " + s);
 	console.log("Login triggered!");
 	$.ajax({
 		url : "rest/authenticate/login",
@@ -46,21 +47,21 @@ function login() {
 				showLogoutButons(user);
 				console.log("Logged user saved in localStorage!");
 			}
-			//			alert("Response stringify: " + JSON.stringify(user));
+						alert("Response stringify: " + JSON.stringify(user));
 
 			if (user.role.toLowerCase() === "ADMIN".toLowerCase()) {
-				//				alert("role is admin");
+								alert("role is admin");
 				console.log("Successfully logged as ADMIN with username: " + user.username);
 				enableUserPrivs();
 			//				window.location.href = "admin.html";
 			}
 			if (user.role.toLowerCase() === "MODERATOR".toLowerCase()) {
-				//				alert("role is moderator");
+								alert("role is moderator");
 				console.log("Successfully logged as MODERATOR with username: " + user.username);
 				enableModeratorPrivs();
 			}
 			if (user.role.toLowerCase() === "USER".toLowerCase()) {
-				//				alert("role is user");
+								alert("role is user");
 				console.log("Successfully logged as USER with username: " + user.username);
 				enableAdminPrivs();
 			}

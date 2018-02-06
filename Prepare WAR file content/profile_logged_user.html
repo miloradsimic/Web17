@@ -1,0 +1,95 @@
+
+<div class="container" style="margin-top: 20px">
+	<div class="row">
+		<div class="col-md-10 ">
+			<form class="form-horizontal" id="edit_profile_form">
+				<fieldset>
+
+
+
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">First Name</label>
+						<div class="col-md-4">
+							<input id="first_name" name="first_name" type="text"
+								placeholder="First name" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">Last Name</label>
+						<div class="col-md-4">
+							<input id="last_name" name="last_name" type="text"
+								placeholder="Last name" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">Email Address</label>
+						<div class="col-md-4">
+
+							<input id="email" name="email" type="text"
+								placeholder="Email Address" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">Old password</label>
+						<div class="col-md-4">
+							<input id="old_password" name="old_password" type="password"
+								placeholder="Old password" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">New password</label>
+						<div class="col-md-4">
+							<input id="new_password" name="new_password" type="password"
+								placeholder="New password" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label">Confirm password</label>
+						<div class="col-md-4">
+							<input id="confirm_password" name="confirm_password"
+								type="password" placeholder="Confirm password"
+								class="form-control input-md">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label"></label>
+						<div class="col-md-4">
+							<a href="#" class="btn btn-success"
+								onclick=submitProfileData($(this).parent().parent().parent().parent())><span
+								class="glyphicon glyphicon-thumbs-up"></span> Submit</a>
+
+						</div>
+					</div>
+
+
+				</fieldset>
+			</form>
+		</div>
+		<div class="col-md-2 col-lg-2">
+			<img id="avatar"
+				src="http://websamplenow.com/30/userprofile/images/avatar.jpg"
+				class="img-responsive img-thumbnail ">
+			<!-- File Button -->
+			<div>
+				<label class="control-label" for="Upload photo">Upload photo</label>
+				<div>
+					<input id="upload_avatar" onchange="setUpProfileAvatar(this);"
+						name="Upload photo" class="input-file" type="file">
+				</div>
+			</div>
+
+		</div>
+

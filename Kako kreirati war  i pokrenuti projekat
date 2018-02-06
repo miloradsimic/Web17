@@ -1,0 +1,15 @@
+-Pripremiti i ekstraktovati projekat i tomcat server
+-Kreirati war file tako sto se u jedan folder kopira sadrzaj WebContent foldera, a u WEB-INF/classes se kopiraju kompajlirane klase bez menjanja strukture paketa. Tada se u tom folderu pozove komanda: 
+>jar -cvf forum.war *
+i tada se dobije WAR fajl. Taj war fajl se kopira u apache/webapps. 
+
+Pokrene se server sa 
+>./catalina.sh start
+
+ako to ne uspe, pozvati u sudo modu, ako ni to ne uspe pozvati
+>chmod +x catalina.sh
+
+startovati server.
+
+Naci applikaciju na localhost:8080/forum
+

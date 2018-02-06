@@ -1,2 +1,0 @@
-1;Cars;Topics about all kind of vehicles.;resources/cars.jpg;Standard rules.;2
-2;Sport;Topics about all kind of sports.;resources/sport.png;No spamming.;2
